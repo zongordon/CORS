@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsClasses" value="name:class_id;datatype:int,name:comp_id;datatype:int,name:class_category;datatype:string,name:class_discipline;datatype:string,name:class_gender_category;datatype:string,name:class_gender;datatype:string,name:class_weight_length;datatype:string,name:class_age;datatype:string" />
+</info>
