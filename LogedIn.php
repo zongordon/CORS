@@ -1,7 +1,5 @@
 <?php
-//Changed from using $_SESSION['MM_Username'] to $_SESSION['MM_Accountid'] to prevent problems if changing user_name
-//Changed from query name $query_rsAccountId to $query_rsAccount  
-//Removed HTML header and use includes/functions.php instead
+//Added log function of every login
 
 if (!isset($_SESSION)) {
   session_start();
@@ -24,6 +22,21 @@ $query_rsAccount = sprintf("SELECT contact_name, access_level FROM account WHERE
 $rsAccount = mysql_query($query_rsAccount, $DBconnection) or die(mysql_error());
 $row_rsAccount = mysql_fetch_assoc($rsAccount);
 
+//Select the current competition
+mysql_select_db($database_DBconnection, $DBconnection);
+$query_rsCompActive = "SELECT comp_id FROM competition WHERE comp_current = 1";
+$rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
+$row_rsCompActive = mysql_fetch_assoc($rsCompActive);
+
+//Insert login data in DB
+        $insertSQL = sprintf("INSERT INTO loginlog (account_id, comp_id, login_timestamp, ip_address) VALUES (%s,%s,%s,%s)",
+                       GetSQLValueString($colname_rsAccountId, "int"),
+                       GetSQLValueString($row_rsCompActive['comp_id'], "int"),
+                       GetSQLValueString($now, "date"),
+                       GetSQLValueString($user_ip, "text"));
+        mysql_select_db($database_DBconnection, $DBconnection);
+        $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
+        
 //Creating Session variable
 $_SESSION['MM_Level'] = $row_rsAccount['access_level'];
 ?>

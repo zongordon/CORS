@@ -1,5 +1,7 @@
 <?php
-//Added function for confirmation before deletion for account
+//Added function for confirmation before deletion of message
+//Changed to Descending order of messages
+//Changed to Europe/Stockholm timezone for correct message_timestamp
 ob_start();
 
 Global $insert_message_id;
@@ -25,7 +27,7 @@ $row_rsCompActive = mysql_fetch_assoc($rsCompActive);
 
 // Select all messages and comp_id for the current competition
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsMessages = "SELECT m.message_id, message_subject, message, message_how, message_to, message_from, message_timestamp, co.comp_id FROM messages AS m INNER JOIN competition AS co ON m.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY message_timestamp";
+$query_rsMessages = "SELECT m.message_id, message_subject, message, message_how, message_to, message_from, message_timestamp, co.comp_id FROM messages AS m INNER JOIN competition AS co ON m.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY message_timestamp DESC";
 $rsMessages = mysql_query($query_rsMessages, $DBconnection) or die(mysql_error());
 $row_rsMessages = mysql_fetch_assoc($rsMessages);
 $totalRows_rsMessages = mysql_num_rows($rsMessages);
@@ -85,14 +87,19 @@ if (((isset($_POST["MM_insert_message"])) && ($_POST["MM_insert_message"] == "ne
         }
     }
  
-	if ($output_form == 'no') {		
+	if ($output_form == 'no') {
+            
+                //Set timestamp for Now()
+                $now = date('Y-m-d H:i');
+
 		// Insert new message if the button is clicked and the form is validated ok
-  		$insertSQL = sprintf("INSERT INTO messages (message_subject, message, message_how, message_to, message_from, comp_id) VALUES (%s, %s, %s, %s, %s, %s)",
+  		$insertSQL = sprintf("INSERT INTO messages (message_subject, message, message_how, message_to, message_from, message_timestamp, comp_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($insert_message_subject, "text"),
                        GetSQLValueString($insert_message, "text"),
                        GetSQLValueString($insert_message_how, "text"),
                        GetSQLValueString($insert_message_to, "text"),
                        GetSQLValueString($insert_message_from, "text"),
+                       GetSQLValueString($now, "date"),                        
                        GetSQLValueString($_POST['comp_id'], "int"));
 
   		mysql_select_db($database_DBconnection, $DBconnection);

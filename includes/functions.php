@@ -1,11 +1,38 @@
 <?php
-//Added <script language="JavaScript" type="text/javascript" src="includes/PopUp.js">
-//Changed from $Username to $AccountId to prevent problems if changing user_name
-//Set default redirection page to LogIn.php
+//Moved timezone transformation code and timestamp for Now() here
+
+//Transform server time to GMT+1 and set timestamp for Now()
+date_default_timezone_set('Europe/Stockholm');
+$now = date('Y-m-d H:i');
 
 if (!isset($_SESSION)) {
   session_start();
 }
+
+function getUserIP()
+{
+    $client  = @$_SERVER['HTTP_CLIENT_IP'];
+    $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+    $remote  = $_SERVER['REMOTE_ADDR'];
+
+    if(filter_var($client, FILTER_VALIDATE_IP))
+    {
+        $ip = $client;
+    }
+    elseif(filter_var($forward, FILTER_VALIDATE_IP))
+    {
+        $ip = $forward;
+    }
+    else
+    {
+        $ip = $remote;
+    }
+
+    return $ip;
+}
+
+
+$user_ip = getUserIP();
 
 //Convert strings to UTF-8
 function encodeToUtf8($string) {

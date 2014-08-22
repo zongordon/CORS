@@ -1,5 +1,5 @@
 <?php
-//Changed to flexible layout instead of fixed and emphasised on looking in the account list before creating new one
+//Made sure the white background is visible after submitting the form and changed from bold to normal confirmation text
 
 //Convert strings to UTF-8
 function encodeToUtf8($string) {
@@ -179,8 +179,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
     $output_form = 'yes';
   	}
 
-  	if ($output_form == 'yes') 
-            {
+  	if ($output_form == 'yes') {
 // Select information regarding active accounts
 mysql_select_db($database_DBconnection, $DBconnection);
 $query_rsAccounts = "SELECT club_name, contact_name, contact_email FROM account WHERE active = 1 ORDER BY club_name ASC";
@@ -305,22 +304,8 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
         
         // Send email to club contact
         mail($contact_email, $subject, $msg, $headers);                
-
- /*
-function mail_utf8($to, $from_user, $from_email, 
-                                             $subject = '(No subject)', $message = '')
-   { 
-      $from_user = "=?UTF-8?B?".base64_encode($from_user)."?=";
-      $subject = "=?UTF-8?B?".base64_encode($subject)."?=";
-
-      $headers = "From: $from_user <$from_email>\r\n". 
-               "MIME-Version: 1.0" . "\r\n" . 
-               "Content-type: text/html; charset=UTF-8" . "\r\n"; 
-
-     return mail($to, $subject, $message, $headers); 
-   }
-*/   
- 	echo '<div class="feature"><br /><h2>' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $contact_email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</h2></div>';
+   
+ 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $contact_email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
 	// Insert account data if insert data is validated correctly
         $insertSQL = sprintf("INSERT INTO account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($user_name, "text"),

@@ -1,6 +1,5 @@
 <?php
-//Added include("includes/footer.php"), made sure not to show both message about passed deadline and no existing classes and cleaned some of the the code
-
+//Moved timezone transformation code to functions.php
 ob_start();
 //Access level registered user
 $MM_authorizedUsers = "0";
@@ -39,8 +38,7 @@ $query_rsCompActive = "SELECT comp_id, comp_end_reg_date FROM competition WHERE 
 $rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
 $row_rsCompActive = mysql_fetch_assoc($rsCompActive);
 
-//Setting correct timezone, today's date, the date for last enrolment and if the last enrolment date is passed or not
-date_default_timezone_set('Europe/Stockholm');
+//Setting the date for today (including format), last enrolment date and check if the last enrolment date is passed or not
 $now = date('Y-m-d');
 $endEnrolmentDate = $row_rsCompActive['comp_end_reg_date'];
 $passedDate = 0;

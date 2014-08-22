@@ -20,7 +20,7 @@ if (!isset($_SESSION)) {
 <div id="content"> 
 <div class="feature"><img height="199" width="300" alt="" src="img/rotating/rotate.php" />
       <h3>Kontakter</h3> 
-      <p> F&ouml;r mer information: kontakta Bosse 070-592 59 10, Frank 073-558 59 34 eller skicka f&ouml;rfr&aring;gan till tunacup@karateklubben.com.</p> 
+      <p>F&ouml;r mer information: kontakta Frank 073-558 59 34 eller skicka f&ouml;rfr&aring;gan till tunacup@karateklubben.com.</p> 
   </div> 
   <div class="story"></div> 
 </div>

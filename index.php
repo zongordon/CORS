@@ -1,5 +1,6 @@
 <?php 
 //Added function to display information regarding elimination ladders depending on if the raffle has been completed or not
+//Changed entrance fee 50 kr -> 40 kr
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -48,8 +49,8 @@ $row_rsCompetition = mysql_fetch_assoc($rsCompetition);
     <p>Avgiften &auml;r 200 kr per klass 7-13 &aring;r och 250 kr 14-17 &aring;r. Anv&auml;nd bankgironummer 176-6526 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
     <h2>Registrering, strykningar och inv&auml;gning</h2>
     <p>Klubben registreras p&aring; t&auml;vlingsdagen av <strong>en</strong> lagledare eller coach vid p&aring;visad plats i t&auml;vlingshallen. Coach/lagledare f&aring;r h&auml;r ta emot coachbrickor och tidsplanering. Eventuella strykningar meddelar ni vid registrering eller direkt p&aring; respektive matta. Obs! De t&auml;vlande m&aring;ste inte sj&auml;lva vara p&aring; plats vid registreringen! Inv&auml;gning och registrering sker p&aring; t&auml;vlingsdagen 08.30-09.30 samt 12.00- 12.30.</p>
-    <h2>Entr&eacute; 50 kr</h2>
-    <p>F&ouml;r &aring;sk&aring;dare (icke t&auml;vlande eller deras coacher) kostar det 50 kr i entr&eacute;. F&ouml;rskolebarn kommer in gratis!</p>
+    <h2>Entr&eacute; 40 kr</h2>
+    <p>F&ouml;r &aring;sk&aring;dare (icke t&auml;vlande eller deras coacher) kostar det 40 kr i entr&eacute;. F&ouml;rskolebarn kommer in gratis!</p>
         <h2>Domare</h2>
         <p>F&ouml;ljande domare &auml;r klara att d&ouml;ma under Tuna Karate Cup 2014:</p>
     <ul>
