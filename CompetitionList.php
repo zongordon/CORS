@@ -1,5 +1,5 @@
 <?php 
-//Added function for confirmation before deletion
+//Added maximum allowed number of registrations before registration will close
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -40,8 +40,9 @@ $totalRows_rsCompetitions = mysql_num_rows($rsCompetitions);
       <td><strong>Startdatum</strong></td>
       <td><strong>Slutdatum</strong></td>
       <td><strong>Sista anm&auml;lningsdatum</strong></td>
+      <td><strong>Max antal anm&auml;lningar</strong></td>
+      <td><strong>Antal anm&auml;lningar</strong></td>      
       <td><strong>Antal t&auml;vlingsklasser</strong></td>
-      <td><strong>Antal anm&auml;lningar</strong></td>
       <td><strong>Aktiv</strong></td>
       <td><strong>Kopiera klasser</strong></td>
       <td><strong>&Auml;ndra</strong></td>
@@ -69,8 +70,9 @@ $totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
         <td><?php echo $row_rsCompetitions['comp_start_date']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_end_date']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_end_reg_date']; ?></td>
-        <td><?php echo $totalRows_rsClasses;?></td>
+        <td><?php echo $row_rsCompetitions['comp_max_regs']; ?></td>
         <td><?php echo $totalRows_rsRegistrations;?></td>
+        <td><?php echo $totalRows_rsClasses;?></td>
         <td><?php if (!(strcmp($row_rsCompetitions['comp_current'],1))) { echo "Ja"; } else {echo "Nej";} ?></td>
         <td><a href="ClassesCopy.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">Kopiera</a></td>        
         <td><a href="CompetitionUpdate.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">&Auml;ndra</a></td>

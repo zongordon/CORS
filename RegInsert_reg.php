@@ -1,5 +1,6 @@
 <?php
-//Moved timezone transformation code to functions.php
+//Automatically prevent registrations when maximum allowed number of registrations is reached
+
 ob_start();
 //Access level registered user
 $MM_authorizedUsers = "0";
@@ -16,7 +17,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
 
-// Select all classes for the current competition
+// Select all classes
 mysql_select_db($database_DBconnection, $DBconnection);
 $query_rsClasses = "SELECT cl.class_id, cl.comp_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
 $rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
@@ -32,11 +33,12 @@ $rsRegistrations = mysql_query($query_rsRegistrations, $DBconnection) or die(mys
 $row_rsRegistrations = mysql_fetch_assoc($rsRegistrations);
 $totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
 
-//Select data from the current competition
+//Select data from the current competition including max number of registrations for the current competition
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsCompActive = "SELECT comp_id, comp_end_reg_date FROM competition WHERE comp_current = 1";
+$query_rsCompActive = "SELECT comp_id, comp_end_reg_date, comp_max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
 $rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
 $row_rsCompActive = mysql_fetch_assoc($rsCompActive);
+$totalRows_rsCompActive = mysql_num_rows($rsCompActive);        
 
 //Setting the date for today (including format), last enrolment date and check if the last enrolment date is passed or not
 $now = date('Y-m-d');
@@ -65,7 +67,7 @@ if ($totalRows_rsClasses > 0) {
     //Show if the last date for registration is passed
     if ($passedDate == 1) { ?>
 	<div class="error">
-            <h3>Sista anm&auml;lningsdagen &auml;r passerad och inga till&auml;gg eller &auml;ndringar g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
+        <h3>Sista anm&auml;lningsdagen &auml;r passerad och inga till&auml;gg eller &auml;ndringar g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
 	</div>
 <?php
     }
@@ -123,7 +125,7 @@ if (isset($_SESSION['MM_AccountId'])) {
 }		
 
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsClubReg = sprintf("SELECT cl.club_reg_id, cl.coach_names, co.comp_id FROM clubregistration AS cl INNER JOIN competition AS co USING (comp_id) WHERE account_id = %s AND comp_current = 1", GetSQLValueString($colname_rsClubReg, "int"));
+$query_rsClubReg = sprintf("SELECT a.club_name, cl.club_reg_id, cl.coach_names, co.comp_id FROM clubregistration AS cl INNER JOIN competition AS co USING (comp_id) INNER JOIN account AS a USING (account_id) WHERE account_id = %s AND comp_current = 1", GetSQLValueString($colname_rsClubReg, "int"));
 $rsClubReg = mysql_query($query_rsClubReg, $DBconnection) or die(mysql_error());
 $row_rsClubReg = mysql_fetch_assoc($rsClubReg);
 $totalRows_rsClubReg = mysql_num_rows($rsClubReg);
@@ -309,11 +311,38 @@ if ($totalRows_rsContestants > 0) {
 		header(sprintf("Location: %s", $insertGoTo));
 		}
         mysql_free_result($rsClassGender);       
-	}	
+	}
 ?>
         </div>            
 <h3><a name="registration_insert" id="registration_insert"></a>3. Anm&auml;l till t&auml;vlingklasser</h3>
-<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.</p>
+<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
+<?php //Show if the maximum number of registrations is reached
+      if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
+        <div class="error">
+        <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $totalRows_rsCompActive; ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
+        </div>
+<?php
+        //Email to to Tuna Karate Cup Admin if the maximum number of registrations is reached
+        $club_name = $row_rsClubReg['club_name'];
+        $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+        "MIME-Version: 1.0\r\n" . 
+        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
+        "Content-Type: text/plain; charset=utf-8\r\n" . 
+        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
+        $adm_email = "tunacup@karateklubben.com";
+        $subject_adm = 'Max antal anmälningar registrerade på: http://tunacup.karateklubben.com';
+	$text_adm = "Nu har det maximalt tillåtna antalet ($totalRows_rsCompActive st.) anmälningar registrerats på tunacup.karateklubben.com:\n" .
+        "Sista anmälningen gjordes av $club_name.\n" .        
+        "\n" .
+	"Med vänliga hälsningar,\n" .
+	"Eskilstuna Karateklubb, http://www.karateklubben.com";
+        $msg_adm = "Max antal anmälningar registrerade!\n$text_adm";
+
+        // Send email to Tuna Karate Cup Admin
+        mail($adm_email, $subject_adm, $msg_adm, $headers);                
+
+      } ?>           
+</p>
       <table width="100%" border="1">
         <tr>
           <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
@@ -385,20 +414,26 @@ if ($totalRows_rsContestants > 0) {
 	  	$row_rsClasses = mysql_fetch_assoc($rsClasses);
   		}
 ?>
-    </select>
-    </label></td>
-    <td><label>
-    <?php if ($passedDate == 0) { ?>
-    <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
-    <?php } ?>                  
-    </label></td>
-    <td nowrap="nowrap">
-    <?php if ($passedDate == 0) { ?>
-    <a href="ContestantDelete_reg.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>          
-	<?php } ?>                  
-	</td>
-    </tr>
-    </table>
+                   </select>
+                </label></td>
+                <td><label>
+<?php
+          //Show if the last date for registrations is NOT passed
+          if ($passedDate == 0) { 
+                //Show if the maximum number of registrations is NOT reached
+                if ($totalRows_rsCompActive < ($row_rsCompActive['comp_max_regs'])) { ?>
+                <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
+    <?php       } 
+          } ?>                  
+                </label>
+                </td>
+                <td nowrap="nowrap">
+                <?php if ($passedDate == 0) { ?>
+                <a href="ContestantDelete_reg.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>          
+                <?php } ?>                  
+                </td>
+               </tr>
+              </table>
     <input name="contestant_id" type="hidden" id="contestant_id" value="<?php echo $row_rsContestants['contestant_id']; ?>" />
     <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />
     <input type="hidden" name="MM_insert_registration" value="new_registration" />

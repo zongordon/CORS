@@ -1,5 +1,6 @@
 <?php
-//Removed search for the registration to delete
+//Added ob_start() and <?php ob_end_flush()
+ob_start();
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -39,3 +40,4 @@ header(sprintf("Location: %s", $deleteGoTo));
 <?php include("includes/footer.php");?>
 </body>
 </html>
+<?php ob_end_flush();?>

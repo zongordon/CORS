@@ -1,5 +1,7 @@
 <?php
-//Added conversion to upper title case for comp_name
+//Added maximum allowed number of registrations before registration will close
+//Added validation of date format in form
+//Improved checkbox function to keep the setting during the validation phase
 
 ob_start();
 
@@ -29,7 +31,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
       <div class="error">
 <?php
 //Initiate global variables
-global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current;
+global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_max_regs;
 
 //Validate the form if button is clicked
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
@@ -37,6 +39,7 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
     $comp_start_date = $_POST['comp_start_date'];
     $comp_end_date = $_POST['comp_end_date'];
     $comp_end_reg_date = $_POST['comp_end_reg_date'];
+    $comp_max_regs = $_POST['comp_max_regs'];
     $comp_current = $_POST['comp_current'];
     $output_form = 'no';
 
@@ -50,16 +53,41 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens startdatum!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_start_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_start_date)) {
+    // $comp_start_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; t&auml;vlingens startdatum!</h3>';
+    $output_form = 'yes';
+    }	    
     if (empty($comp_end_date)) {
       // $comp_end_date is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens slutdatum!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_end_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_end_date)) {
+    // $comp_end_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; t&auml;vlingens slutdatum!</h3>';
+    $output_form = 'yes';
+    }	        
     if (empty($comp_end_reg_date)) {
       // $comp_end_reg_date is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens sista anm&auml;lningsdag!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_end_reg_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_end_reg_date)) {
+    // $comp_end_reg_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; sista anm&auml;lningsdag!</h3>';
+    $output_form = 'yes';
+    }	            
+    if (empty($comp_max_regs)) {
+      // $comp_max_regs is blank
+      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens maximala antal anm&auml;lningar!</h3>';
+      $output_form = 'yes';
+    }    
+    if (!empty($comp_max_regs ) && !is_numeric($comp_max_regs)) {
+    // $comp_max_regs is not a number
+    echo '<h3>Du anv&auml;nde annat format &auml;n siffror f&ouml;r max antal anm&auml;lningar!</h3>';
+    $output_form = 'yes';
+    }	                
 } 
 
   else {
@@ -98,11 +126,17 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
             </label></td>
           </tr>
           <tr>
-            <td>Aktiv t&auml;vling</td>
+            <td>Max antal anm&auml;lningar</td>
             <td><label>
-            <input name="comp_current" type="checkbox" id="comp_current" value="1" checked="checked" <?php if ($comp_current == 1) echo "checked='checked'" ; ?>/>              
+            <input name="comp_max_regs" type="text" id="comp_max_regs" value="<?php echo $comp_max_regs ?>"/>              
             </label></td>
           </tr>
+          <tr>
+            <td>Aktiv t&auml;vling</td>
+            <td><label>
+            <input name="comp_current" type="checkbox" id="comp_current" value="1" <?php if ($comp_current == 1){ echo 'checked';} elseif ($comp_current == 0) { echo 'unchecked';}?> />
+            </label></td>
+          </tr>          
           <tr>
             <td>&nbsp;</td>
             <td><label>
@@ -118,12 +152,13 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
   	else if ($output_form == 'no') {
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
-  $insertSQL = sprintf("INSERT INTO competition (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_current) VALUES (%s, %s, %s, %s, %s)",
+  $insertSQL = sprintf("INSERT INTO competition (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_max_regs, comp_current) VALUES (%s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($comp_name, "text"),
                        GetSQLValueString($_POST['comp_start_date'], "date"),
                        GetSQLValueString($_POST['comp_end_date'], "date"),
                        GetSQLValueString($_POST['comp_end_reg_date'], "date"),
-					   GetSQLValueString($_POST['comp_current'], "int"));
+                       GetSQLValueString($_POST['comp_max_regs'], "int"),
+                       GetSQLValueString($_POST['comp_current'], "int"));
 
   mysql_select_db($database_DBconnection, $DBconnection);
   $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
