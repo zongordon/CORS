@@ -1,5 +1,5 @@
 <?php
-//Changed to $_SESSION['MM_Account'] for remembering the account_id
+//Automatically prevent registrations when maximum allowed number of registrations is reached
 ob_start();
 
 //Initiate global variables
@@ -20,9 +20,9 @@ if (isset($_SERVER['QUERY_STRING'])) {
 $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
 
-//Select the current competition
+//Select data from the current competition including max number of registrations for the current competition
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsCompActive = "SELECT comp_id, comp_end_reg_date FROM competition WHERE comp_current = 1";
+$query_rsCompActive = "SELECT comp_id, comp_end_reg_date, comp_max_regs FROM competition WHERE comp_current = 1";
 $rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
 $row_rsCompActive = mysql_fetch_assoc($rsCompActive);
 //$totalRows_rsCompActive = mysql_num_rows($rsCompActive);
@@ -331,10 +331,25 @@ mysql_select_db($database_DBconnection, $DBconnection);
 $query_rsClasses = "SELECT cl.class_id, cl.comp_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
 $rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
 $row_rsClasses = mysql_fetch_assoc($rsClasses);
+
+//Select data from the current competition including max number of registrations for the current competition
+mysql_select_db($database_DBconnection, $DBconnection);
+$query_rsCompActive = "SELECT comp_id, comp_end_reg_date, comp_max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
+$rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
+$row_rsCompActive = mysql_fetch_assoc($rsCompActive);
+$totalRows_rsCompActive = mysql_num_rows($rsCompActive);          
 ?>
         </div>    
 <h3><a name="registration_insert" id="registration_insert"></a>4. Anm&auml;l till t&auml;vlingklasser</h3>
-<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget). <strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.</p>
+<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
+<?php //Show if the maximum number of registrations is reached
+      if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
+        <div class="error">
+        <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $totalRows_rsRegsinCompetition; ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
+        </div>
+<?php
+      } ?>           
+</p>
       <table width="100%" border="1">
         <tr>
           <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
@@ -409,9 +424,14 @@ do {
                     </select>
                   </label></td>
                   <td><label>
-          <?php if ($passedDate == 0) { ?>
-          <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
-          <?php } ?>                  
+<?php
+          //Show if the last date for registrations is NOT passed
+          if ($passedDate == 0) { 
+                //Show if the maximum number of registrations is NOT reached
+                if ($totalRows_rsCompActive < ($row_rsCompActive['comp_max_regs'])) { ?>
+                <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
+    <?php       } 
+          } ?>                
                   </label></td>
                 <td nowrap="nowrap">
           <?php if ($passedDate == 0) { ?>

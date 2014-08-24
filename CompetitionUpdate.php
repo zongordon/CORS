@@ -1,5 +1,5 @@
 <?php
-//Added conversion to upper title case for comp_name 
+//Added maximum allowed number of registrations before registration will close
 
 ob_start();
 
@@ -46,6 +46,7 @@ $totalRows_rsCompetition = mysql_num_rows($rsCompetition);
     $comp_start_date = $_POST['comp_start_date'];
     $comp_end_date = $_POST['comp_end_date'];
     $comp_end_reg_date = $_POST['comp_end_reg_date'];
+    $comp_max_regs = $_POST['comp_max_regs'];
     $comp_current = $_POST['comp_current'];
     $output_form = 'no';
 
@@ -59,16 +60,41 @@ $totalRows_rsCompetition = mysql_num_rows($rsCompetition);
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens startdatum!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_start_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_start_date)) {
+    // $comp_start_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; t&auml;vlingens startdatum!</h3>';
+    $output_form = 'yes';
+    }	        
     if (empty($comp_end_date)) {
       // $comp_end_date is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens slutdatum!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_end_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_end_date)) {
+    // $comp_end_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; t&auml;vlingens slutdatum!</h3>';
+    $output_form = 'yes';
+    }	            
     if (empty($comp_end_reg_date)) {
       // $comp_end_reg_date is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens sista anm&auml;lningsdag!</h3>';
       $output_form = 'yes';
     }
+    if (!empty($comp_end_reg_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_end_reg_date)) {
+    // $comp_end_reg_date is wrong format
+    echo '<h3>Du anv&auml;nde fel format p&aring; sista anm&auml;lningsdag!</h3>';
+    $output_form = 'yes';
+    }	            
+    if (empty($comp_max_regs)) {
+      // $comp_max_regs is blank
+      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens maximala antal anm&auml;lningar!</h3>';
+      $output_form = 'yes';
+    }    
+    if (!empty($comp_max_regs ) && !is_numeric($comp_max_regs)) {
+    // $comp_max_regs is not a number
+    echo '<h3>Du anv&auml;nde annat format &auml;n siffror f&ouml;r max antal anm&auml;lningar!</h3>';
+    $output_form = 'yes';
+    }	                    
 } 
 
   else {
@@ -104,6 +130,13 @@ $totalRows_rsCompetition = mysql_num_rows($rsCompetition);
           <td><input name="comp_end_reg_date" type="text" value="<?php echo $row_rsCompetition['comp_end_reg_date']; ?>" size="32" /></td>
         </tr>
         <tr>
+            <td align="right" valign="baseline" nowrap="nowrap">Max antal anm&auml;lningar:</td>
+            <td>&nbsp;</td> 
+            <td><label>
+            <input name="comp_max_regs" type="text" id="comp_max_regs" value="<?php echo $row_rsCompetition['comp_max_regs']; ?>"/>              
+            </label></td>
+        </tr>        
+        <tr>
           <td align="right" valign="baseline" nowrap="nowrap">Aktiv:</td>
           <td>&nbsp;</td>
           <td><label>
@@ -126,11 +159,12 @@ else if ($output_form == 'no') {
 
         //If button is clicked for updating then update to columns from data in the form
         if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "CompForm")) {
-        $updateSQL = sprintf("UPDATE competition SET comp_name=%s, comp_start_date=%s, comp_end_date=%s, comp_end_reg_date=%s, comp_current=%s WHERE comp_id=%s",
+        $updateSQL = sprintf("UPDATE competition SET comp_name=%s, comp_start_date=%s, comp_end_date=%s, comp_end_reg_date=%s, comp_max_regs=%s , comp_current=%s WHERE comp_id=%s",
                        GetSQLValueString($comp_name, "text"),
                        GetSQLValueString($_POST['comp_start_date'], "date"),
                        GetSQLValueString($_POST['comp_end_date'], "date"),
                        GetSQLValueString($_POST['comp_end_reg_date'], "date"),
+                       GetSQLValueString($_POST['comp_max_regs'], "int"),
                        GetSQLValueString(isset($_POST['comp_current']) ? "true" : "", "defined","1","0"),
                        GetSQLValueString($_POST['comp_id'], "int"));
 

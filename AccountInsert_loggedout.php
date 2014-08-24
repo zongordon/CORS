@@ -320,9 +320,8 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
 
         mysql_select_db($database_DBconnection, $DBconnection);
         $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
-	}
-?>
-    </div>
+	} ?>
+   </div>
 </div>
 <?php include("includes/footer.php");?>
 </body>

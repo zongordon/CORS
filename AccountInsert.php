@@ -1,6 +1,5 @@
 <?php
-//Added convertion to ISO-8859-1 for club_name input into DB
-//Added conversion to upper title case for contact_name and club_name 
+//Improved checkbox function to keep the setting during the validation phase
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -188,19 +187,19 @@ if (isset($_SERVER['QUERY_STRING'])) {
         <tr>
           <td>Administrat&ouml;rskonto</td>
           <td><label>
-            <input name="access_level" type="checkbox" id="access_level" value="0" <?php if ($access_level == 1) echo "checked='checked'"; ?>/>
+            <input name="access_level" type="checkbox" id="access_level" value="1" <?php if ($access_level == 1){ echo 'checked';} elseif ($access_level == 0) { echo 'unchecked';}?> />
           </label></td>
         </tr>
         <tr>
           <td>Aktivt konto</td>
           <td><label>
-            <input name="active" type="checkbox" id="active" value="1" checked="checked" <?php if ($active == 1) echo "checked='checked'"; ?>/>
+            <input name="active" type="checkbox" id="active" value="1" <?php if ($active == 1){ echo 'checked';} elseif ($active == 0) { echo 'unchecked';}?> />
           </label></td>
         </tr>
         <tr>
           <td>Bekr&auml;ftat konto</td>
           <td><label>
-            <input name="confirmed" type="checkbox" id="confirmed" value="1" checked="checked" <?php if ($confirmed == 1) echo "checked='checked'"; ?>/>
+            <input name="confirmed" type="checkbox" id="confirmed" value="1" value="1" <?php if ($confirmed == 1){ echo 'checked';} elseif ($confirmed == 0) { echo 'unchecked';}?> />
           </label></td>
         </tr>
         <tr>
