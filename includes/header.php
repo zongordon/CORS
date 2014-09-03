@@ -20,9 +20,10 @@ $row_rsLatestNews = mysql_fetch_assoc($rsLatestNews);
 $totalRows_rsLatestNews = mysql_num_rows($rsLatestNews);
 ?>
 <body>
-<div id="masthead"><a href="index.php"><img src="img/TKCSiteBanner.jpg" alt="Tuna Karate Cup - anordnas av Eskilstuna Karateklubb" width="553" height="90" hspace="10" border="0"></img></a><img src="img/WIKF-logga.gif" alt="WIKF Logo" width="87" height="86"/></img>
+<div id="masthead"><a href="index.php"><img src="img/TKC_logga.png" alt="TKC Logo" width="98" height="90" hspace="10"/></img></a><img src="img/TKCSiteBanner.jpg" alt="Tuna Karate Cup - anordnas av Eskilstuna Karateklubb" width="553" height="90"></img><img src="img/WIKF-logga.gif" alt="WIKF Logo" width="91" height="90" hspace="10"/></img>
 </div>
-        <div id="globalNav"><a href="index.php">Hem</a>|<a href="News.php" target="_self">Nyheter</a>|<a href="Contacts.php" target="_self">Kontakter</a>|<a href="ClassesList.php" target="_self">T&auml;vlingsklasser</a>|<a href="RegsAll.php" target="_self">Startlistor</a>|<a href="Results.php" target="_self">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a></div>
+<div id="globalNav"><a href="index.php">Hem</a>|<a href="News.php" target="_self">Nyheter</a>|<a href="Contacts.php" target="_self">Kontakter</a>|<a href="ClassesList.php" target="_self">T&auml;vlingsklasser</a>|<a href="RegsAll.php" target="_self">Startlistor</a>|<a href="Results.php" target="_self">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+</div>
 <div id="headlines">
   <div id="latestnews">
       <h3>Senaste Nytt</h3><br/>      
@@ -45,6 +46,8 @@ mysql_free_result($rsLatestNews);?>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/EKA-Logo.png" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
       <h3>&Ouml;vriga sponsorer</h3>
       <p><a href="http://www.eem.se/" target="_blank"><img src="img/EEM_logo.gif" width="150" height="107" border="0" alt="Eskilstuna Energi & Milj&ouml;"></a></p>      
+      <p><a href="http://www.contera.se/" target="_blank"><img src="img/ConteraEkonomi.jpg" width="150" height="86" border="0" alt="Contera Ekonomi;"></a></p>      
+
 <!--Hide code       
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      
       <p><a href="http://www.byggtec.se" target="_blank"><img src="img/ByggTec.jpg" alt="ByggTec Consulting AB &auml;r ett oberoende konsultf&ouml;retag inom bygg- och fastighetsbranschen" width="210" height="148" border="0" /></a></p>

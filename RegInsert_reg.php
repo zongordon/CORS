@@ -1,5 +1,5 @@
 <?php
-//Automatically prevent registrations when maximum allowed number of registrations is reached
+//Made sure the white background is visible
 
 ob_start();
 //Access level registered user
@@ -55,6 +55,7 @@ if ($endEnrolmentDate < $now) {
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
+       <div class="feature">    
 <?php 
 // Show if recordset rsClasses empty 
 if ($totalRows_rsClasses == 0) {?>
@@ -71,9 +72,8 @@ if ($totalRows_rsClasses > 0) {
 	</div>
 <?php
     }
-    //Show if the last date for registration is NOT passed
-    if ($passedDate == 0) { ?> 
-        <div class="feature">
+  //Show if the last date for registration is NOT passed
+  if ($passedDate == 0) { ?> 
         <h3>Registera t&auml;vlande klubbmedlemmar och anm&auml;l dem till deras t&auml;vlingsklasser</h3>
         <p>Anm&auml;lan g&ouml;rs i fyra steg:</p>
         <ol>
@@ -95,7 +95,7 @@ if (((isset($_POST["MM_insert_clubregistration"])) && ($_POST["MM_insert_clubreg
       // $coach_names is blank
       echo '<h3>Du gl&ouml;mde att fylla i klubbens coacher!</h3>';
       $output_form = 'yes';
-    }
+    } 
 	if ($output_form == 'no') {
                 //Insert new club registration if form validated ok
 		if ((isset($_POST["MM_insert_clubregistration"])) && ($_POST["MM_insert_clubregistration"] == "new_club_reg")) {
@@ -117,7 +117,9 @@ if (((isset($_POST["MM_insert_clubregistration"])) && ($_POST["MM_insert_clubreg
   		$Result1 = mysql_query($updateSQL, $DBconnection) or die(mysql_error());
 		}
  	}
-}  
+} ?>
+     </div>
+<?php  
 // Select the club_id for user currently registering coaches	
 $colname_rsClubReg = "-1";
 if (isset($_SESSION['MM_AccountId'])) {
@@ -139,7 +141,6 @@ $totalRows_rsClubReg = mysql_num_rows($rsClubReg);
 	<form id="update_club_reg" name="update_club_reg" method="POST" action="<?php echo $editFormAction; ?>"> 
 <?php
 	}?>
-      </div>                
     <table width="400" border="0">
       <tr>
         <td valign="top">Coacher</td>
@@ -162,9 +163,9 @@ $totalRows_rsClubReg = mysql_num_rows($rsClubReg);
         </label></td>
       </tr>
     </table>      
-</form>
-  <?php // Show if recordset not empty 
-        if ($totalRows_rsClubReg > 0) {?>
+        </form>
+<?php // Show if recordset not empty 
+    if ($totalRows_rsClubReg > 0) {?>
       <h3><a name="contestants" id="contestants"></a>2. L&auml;gg in klubbens t&auml;vlande</h3>
       <p>L&auml;gg in klubbens t&auml;vlande en och en. Ange namn, f&ouml;delsedatum och k&ouml;n.</p>
         <div class="error">
@@ -260,11 +261,12 @@ $totalRows_rsContestants = mysql_num_rows($rsContestants);
           </label></td>
         </tr>
       </table>
-    </form>   
-        <div class="error">
+</form>   
 <?php        
-// Show if recordset not empty 
-if ($totalRows_rsContestants > 0) { 
+        // Show if recordset not empty 
+        if ($totalRows_rsContestants > 0) { ?>
+        <div class="error">            
+<?php
 	// Validate the contestant form if the button is clicked
     	$contestant_height = "";
         $class_gender = "";
@@ -296,7 +298,7 @@ if ($totalRows_rsContestants > 0) {
       	// Compare $contestant_gender with $class_gender
       	echo '<h3>T&auml;vlandes k&ouml;n st&auml;mmer inte &ouml;verens med den valda klassen!</h3>';
       	$output_form = 'yes';
-	}
+	} 
 		if ($output_form == 'no') {		
   		$insertSQL = sprintf("INSERT INTO registration (club_reg_id, contestant_id, contestant_height, class_id) VALUES (%s, %s, %s, %s)",
                        GetSQLValueString($_POST['club_reg_id'], "int"),
@@ -313,7 +315,7 @@ if ($totalRows_rsContestants > 0) {
         mysql_free_result($rsClassGender);       
 	}
 ?>
-        </div>            
+        </div>                                    
 <h3><a name="registration_insert" id="registration_insert"></a>3. Anm&auml;l till t&auml;vlingklasser</h3>
 <p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
 <?php //Show if the maximum number of registrations is reached
@@ -442,9 +444,7 @@ if ($totalRows_rsContestants > 0) {
 <?php } while ($row_rsContestants = mysql_fetch_assoc($rsContestants)); ?>
       </table>
 <?php 
-mysql_free_result($rsContestants);
-// Show if recordset $totalRows_rsContestants not empty 
-}           // Show if recordset not empty 
+           // Show if recordset not empty 
             if ($totalRows_rsRegistrations > 0) { ?>
 	<h3><a name="registration_delete" id="registration_delete"></a>4. Ta bort anm&auml;lningar</h3>
         <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan. <strong>Du f&aring;r ingen bekr&auml;ftelse p&aring; anm&auml;lan, men kan se resultatet bl.a. under l&auml;nken "Startlistor"!</strong></p>
@@ -485,16 +485,19 @@ mysql_free_result($rsContestants);
 <?php       mysql_free_result($rsRegistrations);
             // Show if rsRegistrations recordset not empty
             }
-        mysql_free_result($rsClubReg);
-        // Show if rsClubReg recordset not empty
-        }
-    // Show if last registration date is NOT passed
+        mysql_free_result($rsContestants);
+        // Show if recordset $totalRows_rsContestants not empty 
+        }            
+    mysql_free_result($rsClubReg);
+    // Show if rsClubReg recordset not empty
     }
+  // Show if last registration date is NOT passed
+  }
 mysql_free_result($rsClasses);
 // If recordset rsClasses is NOT empty 
 }
-?>
-       </div>     
+?>   
+       </div>                     
 </div>                 
 <?php include("includes/footer.php");?>
 </body>

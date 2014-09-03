@@ -33,6 +33,7 @@ $row_rsCompetition = mysql_fetch_assoc($rsCompetition);
     <p>En t&auml;vling &ouml;ppen f&ouml;r samtliga karatestilar.</p>
     <p>Tuna Karate Cup &auml;r en barn- &amp; ungdomst&auml;vling, &ouml;ppen f&ouml;r deltagare mellan 7-17 &aring;r, som anordnas av Eskilstuna Karateklubb.    </p>
     <p>Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></p>
+    <p>L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
   <div class="story">
     <h2>Tid och plats</h2>
