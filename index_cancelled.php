@@ -25,7 +25,6 @@ if (!isset($_SESSION)) {
     <h1>2014 &aring;rs upplaga av Tuna Karate Cup  &auml;r INST&Auml;LLD!</h1>
     <p>Med respekt f&ouml;r de t&auml;vlande och v&aring;ra egna sponsorer beslutade idag t&auml;vlingsledningen att st&auml;lla in &aring;rets upplaga av t&auml;vlingen. Vi har f&aring;tt allt f&ouml;r f&aring; anm&auml;lningar, vilket orsakade mycket f&aring; deltagare i flertalet klasser. Det vore inte r&auml;ttvist mot de t&auml;vlande som reser hit f&ouml;r att f&aring; t&auml;vla, anser vi.</p>
     <p>Vi ska f&ouml;rs&ouml;ka analysera orsaken till de f&aring; anm&auml;lningarna och tar g&auml;rna emot hj&auml;lp av er ledare i den fr&aring;gan. Om analysen visar att v&aring;r t&auml;vling trots allt har en plats i karate-Sverige kommer vi att f&ouml;rs&ouml;ka igen.</p>
-    <p>De som har betalat in anm&auml;lningsavgift till Tuna Karate Cup 2014 f&aring;r givetvis pengarna tillbaka! V&aring;r kass&ouml;r ser till att det blir gjort s&aring; fort som m&ouml;jligt!</p>
   </div>
   <div class="story"></div>
 </div>

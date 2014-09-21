@@ -1,5 +1,8 @@
 <?php
-//Adjusted to display page title
+//Adjusted text to "Glömt lösenordet eller användarnamnet?" and clarified that the login credentials will be sent to the email address registered for that specific account
+//Added page footer and made sure it is always displayed correctly
+//Added ob_start(); and ob_end_flush();
+ob_start();
 
 global $editFormAction;
 
@@ -36,10 +39,10 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Gl&ouml;mt ditt l&ouml;senord?"?>
+<head><?php $pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?"?>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall."
-<meta name="keywords" content="tuna karate cup, karate, eskilstuna, sporthallen, wado, sj&auml;lvf&ouml;rsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
+<meta name="keywords" content="tuna karate cup, , förlorat ditt lösenord eller användar namn; karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
 </head>
@@ -51,13 +54,14 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content"> 
   <div class="feature">
-       <div class="error">       
-      <p><?php
+     
+<?php
  if ((isset($_POST["MM_select"])) && ($_POST["MM_select"] == "select_account")) {
     $contact_email = $_POST['contact_email'];
-    $output_form = 'no';
-
-	require_once('Connections/DBconnection.php');
+    $output_form = 'no'; ?> 
+       <div class="error">       
+<?php
+    require_once('Connections/DBconnection.php');
 
    if (empty($contact_email)) {
       // $contact_email is blank
@@ -79,7 +83,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
          echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3><br /></a>';
          $output_form = 'yes';
      	}
- 	}
+    }
 	 
 	$colname_rsContactemail = $contact_email; 
  	mysql_select_db($database_DBconnection, $DBconnection);
@@ -94,8 +98,8 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
         $output_form = 'yes';		
     	mysql_free_result($rsContactemail);
 	}
-  } 
-
+  } ?>
+       </div> <?php
 } 
 
   else {
@@ -104,9 +108,9 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 
   	if ($output_form == 'yes') {
 ?>
-       </div>
+
 <h3>Har du gl&ouml;mt ditt l&ouml;senord? </h3>
-      <p> Fyll i din mejladress och klicka p&aring; Skicka, s&aring; skickas dina inloggningsuppgifter till den mejladress du skrivit in.</p>
+      <p> Fyll i din mejladress och klicka p&aring; Skicka, s&aring; skickas dina inloggningsuppgifter till den mejladress som finns registrerad f&ouml;r kontot.</p>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="select_account" name="select_account">      
       <table border="0">
         <tr>
@@ -162,12 +166,12 @@ echo '<h3>' . $contact_name . ',<br />Dina inloggningsuppgifter skickades till: 
 	mysql_free_result($rsAccount);
 	}	 
 	?>
- </p>
-  </div>
-  <div class="story">
+    <div class="story">
     <p>&nbsp;</p>
-</div>
-</div>
-<br />
+    </div>
+  </div>
+</div>    
+<?php include("includes/footer.php");?>
 </body>
 </html>
+<?php ob_end_flush();?>
