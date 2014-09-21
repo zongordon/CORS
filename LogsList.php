@@ -1,4 +1,6 @@
 <?php
+//Changed sorting order to latest log first
+//Selected sorting will remain in drop list
 
 global $editFormAction;
 
@@ -13,7 +15,7 @@ $pagekeywords="tuna karate cup, logglista över login för administratörer, kar
 include_once('includes/functions.php');
 
 //Set initial sorting (ORDER BY) and change if new sort order is selected in dropdown list
-$sorting = "comp_current DESC, comp_name, login_timestamp";
+$sorting = "comp_current DESC, login_timestamp DESC";
 if (isset($_GET['sorting'])) {
   $sorting = $_GET['sorting'];
 }
@@ -47,9 +49,9 @@ if ($totalRows_rsLogins > 0) { ?>
       <td valign="middle">Sortering</td>
       <td><label>
         <select name="sorting" id="sorting">
-      <option value="comp_current DESC, comp_name, login_timestamp">Aktuell t&auml;vling f&ouml;rst</option>
-      <option value="comp_name, login_timestamp">T&auml;vlingsnamn</option>
-</select>
+      <option value="comp_current DESC, login_timestamp DESC"<?php if (!(strcmp($sorting, "comp_current DESC, login_timestamp DESC"))) {echo "selected=\"selected\"";} ?>>Aktuell t&auml;vling f&ouml;rst</option>
+      <option value="comp_name, login_timestamp DESC"<?php if (!(strcmp($sorting, "comp_name, login_timestamp DESC"))) {echo "selected=\"selected\"";} ?>>T&auml;vlingsnamn</option>            
+        </select>
       </label></td>
       <td><input type="submit" name="submit" id="submit" value="Sortera" /></td>
     </tr>

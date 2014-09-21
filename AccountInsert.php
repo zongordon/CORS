@@ -1,5 +1,5 @@
 <?php
-//Improved checkbox function to keep the setting during the validation phase
+//Made sure the white background is visible after submitting the form
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -74,8 +74,8 @@ if (isset($_SERVER['QUERY_STRING'])) {
       if (!checkdnsrr($domain)) {
          echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig!</h3>';
          $output_form = 'yes';
-     	}
- 	}
+      }
+    }
         // Validate insert account data
 	$colname_rsContactemail = $contact_email; 
  	mysql_select_db($database_DBconnection, $DBconnection);
@@ -134,15 +134,13 @@ if (isset($_SERVER['QUERY_STRING'])) {
       echo '<h3>L&ouml;senorden var inte identiska!</h3>';
       $output_form = 'yes';
     }	
-} 
-
+ } 
   else {
     $output_form = 'yes';
-  	}
+  } ?>
+       </div>  
+<?php  	if ($output_form == 'yes') { ?>
 
-  	if ($output_form == 'yes') {
-?>
-       </div>
 <h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
     <p>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i!</p>
 
@@ -253,8 +251,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
 
   mysql_select_db($database_DBconnection, $DBconnection);
   $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
-	}
-?>  
+	} ?>  
    </div>
 </div>    
 <?php include("includes/footer.php");?>

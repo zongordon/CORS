@@ -1,5 +1,5 @@
 <?php 
-//Added session variable $_SESSION['MM_AccountId'] = $row_LoginRS['account_id'] to prevent problems if changing user_name
+//Adjusted text to "Glömt lösenordet eller användarnamnet?" in the link to ForgottenPassword.php
 
 ob_start();
 
@@ -145,7 +145,7 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
           </tr>
         </table>
     </form>
-<p><a href="ForgottenPassword.php">Gl&ouml;mt l&ouml;senordet?</a></p>
+<p><a href="ForgottenPassword.php">Gl&ouml;mt l&ouml;senordet eller anv&auml;ndarnamnet?</a></p>
       <p>Har du inget anv&auml;ndarkonto &auml;n? <a href="AccountInsert.php">Skapa ett h&auml;r!</a></p>
   </div>
   <div class="story"></div>
