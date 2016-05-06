@@ -1,5 +1,5 @@
 <?php 
-//Adjusted to display page title
+//Adjusted to display red (aka) and blue (ao) colours in the ladder
 
 require_once('Connections/DBconnection.php'); 
 
@@ -131,7 +131,7 @@ $str = $name.', '.$club;
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">1</td><td nowrap="nowrap" class="result_tbl"><?php echo $str;?></td>
+      <td width = "5" bgcolor="#FF0000">1</td><td nowrap="nowrap" class="result_tbl"><?php echo $str;?></td>
     </tr>
     <tr>
 <?php    
@@ -144,7 +144,7 @@ $str = $name.', '.$club;
 $contestantsArray[] = $str; 
 } 
 ?>    
-      <td width = "5">17</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[15];?></td>
+      <td width = "5" bgcolor="#0000FF">17</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[15];?></td>
     </tr>
   </table>
 </div>
@@ -152,10 +152,10 @@ $contestantsArray[] = $str;
 <div id="apDiv2">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">9</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[7];?></td>
+      <td width = "5" bgcolor="#FF0000">9</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[7];?></td>
     </tr>
     <tr>
-      <td width = "5">25</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[23];?></td>
+      <td width = "5" bgcolor="#0000FF">25</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[23];?></td>
     </tr>
   </table>
 </div>
@@ -163,10 +163,10 @@ $contestantsArray[] = $str;
 <div id="apDiv3">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">5</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[3];?></td>
+      <td width = "5"  bgcolor="#FF0000">5</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[3];?></td>
     </tr>
     <tr>
-      <td width = "5">21</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[19];?></td>
+      <td width = "5"  bgcolor="#0000FF">21</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[19];?></td>
     </tr>
   </table>
 </div>
@@ -174,10 +174,10 @@ $contestantsArray[] = $str;
 <div id="apDiv4">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">13</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[11];?></td>
+      <td width = "5" bgcolor="#FF0000">13</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[11];?></td>
     </tr>
     <tr>
-      <td width = "5">29</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[27];?></td>
+      <td width = "5" bgcolor="#0000FF">29</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[27];?></td>
     </tr>
   </table>
 </div>
@@ -186,10 +186,10 @@ $contestantsArray[] = $str;
 <div id="apDiv5">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">3</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[1];?></td>
+      <td width = "5" bgcolor="#FF0000">3</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[1];?></td>
     </tr>
     <tr>
-      <td width = "5">19</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[17];?></td>
+      <td width = "5" bgcolor="#0000FF">19</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[17];?></td>
     </tr>
   </table>
 </div>
@@ -197,10 +197,10 @@ $contestantsArray[] = $str;
 <div id="apDiv6">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">11</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[9];?></td>
+      <td width = "5" bgcolor="#FF0000">11</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[9];?></td>
     </tr>
     <tr>
-      <td width = "5">27</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[25];?></td>
+      <td width = "5" bgcolor="#0000FF">27</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[25];?></td>
     </tr>
   </table>
 </div>
@@ -208,10 +208,10 @@ $contestantsArray[] = $str;
 <div id="apDiv7">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">7</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[5];?></td>
+      <td width = "5" bgcolor="#FF0000">7</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[5];?></td>
     </tr>
     <tr>
-      <td width = "5">23</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[21];?></td>
+      <td width = "5" bgcolor="#0000FF">23</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[21];?></td>
     </tr>
   </table>
 </div>
@@ -219,10 +219,10 @@ $contestantsArray[] = $str;
 <div id="apDiv8">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">15</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[13];?></td>
+      <td width = "5" bgcolor="#FF0000">15</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[13];?></td>
     </tr>
     <tr>
-      <td width = "5">31</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[29];?></td>
+      <td width = "5" bgcolor="#0000FF">31</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[29];?></td>
     </tr>
   </table>
 </div>
@@ -230,10 +230,10 @@ $contestantsArray[] = $str;
 <div id="apDiv9">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[0];?></td><td width = "5">2</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[0];?></td><td width = "5" bgcolor="#FF0000">2</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[16];?></td><td width = "5">18</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[16];?></td><td width = "5" bgcolor="#0000FF">18</td>
     </tr>
   </table>
 </div>
@@ -241,10 +241,10 @@ $contestantsArray[] = $str;
 <div id="apDiv10">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[8];?></td><td width = "5">10</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[8];?></td><td width = "5" bgcolor="#FF0000">10</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[24];?></td><td width = "5">26</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[24];?></td><td width = "5" bgcolor="#0000FF">26</td>
     </tr>
   </table>
 </div>
@@ -252,10 +252,10 @@ $contestantsArray[] = $str;
 <div id="apDiv11">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[4];?></td><td width = "5">6</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[4];?></td><td width = "5" bgcolor="#FF0000">6</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[20];?></td><td width = "5">22</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[20];?></td><td width = "5" bgcolor="#0000FF">22</td>
     </tr>
   </table>
 </div>
@@ -263,10 +263,10 @@ $contestantsArray[] = $str;
 <div id="apDiv12">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[12];?></td><td width = "5">14</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[12];?></td><td width = "5" bgcolor="#FF0000">14</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[28];?></td><td width = "5">30</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[28];?></td><td width = "5" bgcolor="#0000FF">30</td>
     </tr>
   </table>
 </div>
@@ -274,10 +274,10 @@ $contestantsArray[] = $str;
 <div id="apDiv13">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[2];?></td><td width = "5">4</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[2];?></td><td width = "5" bgcolor="#FF0000">4</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[18];?></td><td width = "5">20</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[18];?></td><td width = "5" bgcolor="#0000FF">20</td>
     </tr>
   </table>
 </div>
@@ -285,20 +285,20 @@ $contestantsArray[] = $str;
 <div id="apDiv14">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[10];?></td><td width = "5">12</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[10];?></td><td width = "5" bgcolor="#FF0000">12</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[26];?></td><td width = "5">28</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[26];?></td><td width = "5" bgcolor="#0000FF">28</td>
     </tr>
   </table>
 </div>
 <div id="apDiv15">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[6];?></td><td width = "5">8</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[6];?></td><td width = "5" bgcolor="#FF0000">8</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[22];?></td><td width = "5">24</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[22];?></td><td width = "5" bgcolor="#0000FF">24</td>
     </tr>
   </table>
 </div>
@@ -306,10 +306,10 @@ $contestantsArray[] = $str;
 <div id="apDiv16">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[14];?></td><td width = "5">16</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[14];?></td><td width = "5" bgcolor="#FF0000">16</td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[30];?></td><td width = "5">32</td>
+      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[30];?></td><td width = "5" bgcolor="#0000FF">32</td>
     </tr>
   </table>
 </div>
