@@ -1,5 +1,5 @@
 <?php
-//Automatically prevent registrations when maximum allowed number of registrations is reached
+//Added start numbers for each registration (starting with 100)
 ob_start();
 
 //Initiate global variables
@@ -311,11 +311,26 @@ if ($totalRows_rsContestants > 0) { // Show if recordset not empty
       	$output_form = 'yes';
 	}
 		if ($output_form == 'no') {		
+                    // Search for start number already set and if not, set start number for the contestant
+                    $colname_rsContestant = $_POST['contestant_id'];
+                    echo "Contestant id: ".$colname_rsContestant;
+                    mysql_select_db($database_DBconnection, $DBconnection);
+                    $query_rsContestant_Startnumber = sprintf("SELECT re.contestant_startnumber FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 AND contestant_id = %s", GetSQLValueString($colname_rsContestant, "int"));
+                    $rsContestant_Startnumber = mysql_query($query_rsContestant_Startnumber, $DBconnection) or die(mysql_error());
+                    $row_rsContestant_Startnumber = mysql_fetch_assoc($rsContestant_Startnumber);
+                    $totalRows_rsContestant_Startnumber = mysql_num_rows($rsContestant_Startnumber);
+                    if ($totalRows_rsContestant_Startnumber == 0) {
+                        $contestant_startnumber = $_POST['contestant_startnumber']; 
+                    }
+                    else {
+                        $contestant_startnumber = $row_rsContestant_Startnumber['contestant_startnumber'];
+                    }                       
 		// Insert new registration if the button is clicked and the form is validated
-  		$insertSQL = sprintf("INSERT INTO registration (club_reg_id, contestant_id, contestant_height, class_id) VALUES (%s, %s, %s, %s)",
+  		$insertSQL = sprintf("INSERT INTO registration (club_reg_id, contestant_id, contestant_height, contestant_startnumber, class_id) VALUES (%s, %s, %s, %s, %s)",
                        GetSQLValueString($_POST['club_reg_id'], "int"),
                        GetSQLValueString($_POST['contestant_id'], "int"),
                        GetSQLValueString($_POST['contestant_height'], "int"),					   
+                       GetSQLValueString($contestant_startnumber, "int"),					                           
                        GetSQLValueString($_POST['class'], "int"));
 
   		mysql_select_db($database_DBconnection, $DBconnection);
@@ -328,7 +343,7 @@ if ($totalRows_rsContestants > 0) { // Show if recordset not empty
 	}	
 // Select all classes for the current competition
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsClasses = "SELECT cl.class_id, cl.comp_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
+$query_rsClasses = "SELECT cl.class_id, cl.comp_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes As cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
 $rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
 $row_rsClasses = mysql_fetch_assoc($rsClasses);
 
@@ -338,10 +353,25 @@ $query_rsCompActive = "SELECT comp_id, comp_end_reg_date, comp_max_regs FROM reg
 $rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
 $row_rsCompActive = mysql_fetch_assoc($rsCompActive);
 $totalRows_rsCompActive = mysql_num_rows($rsCompActive);          
+
+// Select the currently highest start number
+mysql_select_db($database_DBconnection, $DBconnection);
+$query_rsMax_startnumber = "SELECT MAX(contestant_startnumber)AS max_startnumber FROM registration INNER JOIN classes AS cl USING (class_id) JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1"; 
+$rsMax_startnumber = mysql_query($query_rsMax_startnumber, $DBconnection) or die(mysql_error());
+$row_rsMax_startnumber = mysql_fetch_assoc($rsMax_startnumber);
+
+// Set a new start number (starting with 100)
+$max_startnumber = $row_rsMax_startnumber['max_startnumber'];
+    if ($max_startnumber < 100){
+        $contestant_startnumber = 100;
+    }
+    else {
+        $contestant_startnumber = $max_startnumber + 1;
+    }
 ?>
         </div>    
 <h3><a name="registration_insert" id="registration_insert"></a>4. Anm&auml;l till t&auml;vlingklasser</h3>
-<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
+<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 7-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
 <?php //Show if the maximum number of registrations is reached
       if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
         <div class="error">
@@ -444,6 +474,7 @@ do {
               <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />
               <input name="account_id" type="hidden" id="account_id" value="<?php echo $_SESSION['MM_Account']; ?>" />
               <input type="hidden" name="MM_insert_registration" value="new_registration" />
+              <input name="contestant_startnumber" type="hidden" id="contestant_startnumber" value="<?php echo $contestant_startnumber; ?>" />              
             </form></td>
           </tr>
           <?php } while ($row_rsContestants = mysql_fetch_assoc($rsContestants)); ?>
@@ -453,7 +484,7 @@ do {
     //Select the contestants and their information for the selected class
     $colname_rsRegistrations = $_SESSION['MM_Account'];
     mysql_select_db($database_DBconnection, $DBconnection);
-    $query_rsRegistrations = sprintf("SELECT re.reg_id, re.contestant_height, co.contestant_name, co.contestant_birth, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition AS com USING (comp_id) WHERE account_id = %s AND comp_current = 1 ORDER BY co.contestant_name", GetSQLValueString($colname_rsRegistrations, "int"));
+    $query_rsRegistrations = sprintf("SELECT re.reg_id, re.contestant_height, re.contestant_startnumber, co.contestant_name, co.contestant_birth, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition AS com USING (comp_id) WHERE account_id = %s AND comp_current = 1 ORDER BY co.contestant_name", GetSQLValueString($colname_rsRegistrations, "int"));
     $rsRegistrations = mysql_query($query_rsRegistrations, $DBconnection) or die(mysql_error());
     $row_rsRegistrations = mysql_fetch_assoc($rsRegistrations);
     $totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
@@ -463,6 +494,7 @@ do {
     <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan.</p>
       <table width="100%" border="1">
         <tr>
+          <td><strong>Startnr.</strong></td>
           <td><strong>T&auml;vlande</strong></td>
           <td><strong>F&ouml;delsedatum</strong></td>
           <td><strong>L&auml;ngd (eventuellt)</strong></td>
@@ -471,6 +503,7 @@ do {
         </tr>
         <?php do { ?>
           <tr>
+            <td><?php echo $row_rsRegistrations['contestant_startnumber']; ?></td>              
             <td><?php echo $row_rsRegistrations['contestant_name']; ?></td>
             <td><?php echo $row_rsRegistrations['contestant_birth']; ?></td>
             <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>
@@ -494,12 +527,13 @@ do {
           	<?php } ?>
             </td></tr>
           <?php } while ($row_rsRegistrations = mysql_fetch_assoc($rsRegistrations)); ?>
-      </table>
+      </table>    
 <?php mysql_free_result($rsRegistrations);
     } // Show if recordset not empty 
 mysql_free_result($rsClubReg);
 mysql_free_result($rsClasses);
 mysql_free_result($rsSelectedClub); 
+mysql_free_result($rsMax_startnumber); 
  }
 mysql_free_result($rsAccounts);
 mysql_free_result($rsCompActive);  
