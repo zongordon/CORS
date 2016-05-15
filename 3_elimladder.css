@@ -1,4 +1,6 @@
-/*Adjusted to display red (aka) and blue (ao) colours in the ladder by adding colours in pictures
+/*  Added masthead classes
+    Changed to white text on start numbers
+*/
 /***********************************************/
 /* 3col_leftNav.css                             */
 
@@ -219,10 +221,9 @@ label{
 
 
 */
-        width: 90%;
+        width: 1130px;
 
         margin-left: 1%;
-
 }
 
 #content{
@@ -246,6 +247,75 @@ label{
 }
 
 /***********************************************/
+
+/************** masthead classes ***************/
+.masthead_table {
+  table-layout: fixed;
+  text-overflow: ellipsis;
+  width: 1130px;  /*Important */
+}
+.zero_left {
+	width: 0px;
+        text-align: left;
+}
+.first_left {
+	width: 255px;
+        white-space: nowrap;
+        text-align: left;
+}
+.second_left {
+	width: 80px;
+        white-space: nowrap;
+        text-align: left;
+}
+.third_left {
+	width: 55px;
+        white-space: nowrap;        
+        text-align: left;
+}
+.fourth_left {
+	width:190px;
+        white-space: nowrap;
+        text-align: left;
+}
+.fourth_right {
+	width: 280px;
+        white-space: nowrap;
+        text-align: right;
+}
+.third_right {
+	width: 75px;
+        white-space: nowrap;
+        text-align: right;
+}
+.second_right {
+	width: 75px;
+        white-space: nowrap;
+        text-align: right;
+}
+.first_right {
+	width: 120px;
+        white-space: nowrap;
+        text-align: right;
+}
+.zero_right {
+	width: 0px;
+        text-align: right;
+}        
+
+/************** AKA/AO classes ***************/
+
+.AKA_red {
+	color: #FFF;
+	background-color: #F00;
+	width: 5px;
+}
+
+.AO_blue {
+	color: #FFF;
+	background-color: #00F;
+	width: 5px;
+}
 
 /************** .feature styles ***************/
 
@@ -919,6 +989,3 @@ label{
 	top: 480px;
 
 }
-
-
-
