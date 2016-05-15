@@ -1,5 +1,5 @@
 <?php
-//Changed SQL to only show messages intended for display not sent by email only
+//Fixed bug in links to Home page and adjusted banner names to more club independant ones
 
 require_once('Connections/DBconnection.php');
 
@@ -20,9 +20,12 @@ $row_rsLatestNews = mysql_fetch_assoc($rsLatestNews);
 $totalRows_rsLatestNews = mysql_num_rows($rsLatestNews);
 ?>
 <body>
-<div id="masthead"><a href="index.php"><img src="img/TKC_logga.png" alt="TKC Logo" width="98" height="90" hspace="10"/></img></a><img src="img/TKCSiteBanner.jpg" alt="Tuna Karate Cup - anordnas av Eskilstuna Karateklubb" width="553" height="90"></img><img src="img/WIKF-logga.gif" alt="WIKF Logo" width="91" height="90" hspace="10"/></img>
+<div id="masthead">
+    <a href="/"><img src="img/Banner_L.png" alt="Left Logo" width="98" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_M.jpg" alt="Middle Logo" width="553" height="90"></a>
+    <a href="/"><img src="img/Banner_R.gif" alt="Right Logo" width="91" height="90" hspace="10"></a>
 </div>
-<div id="globalNav"><a href="index.php">Hem</a>|<a href="News.php" target="_self">Nyheter</a>|<a href="Contacts.php" target="_self">Kontakter</a>|<a href="ClassesList.php" target="_self">T&auml;vlingsklasser</a>|<a href="RegsAll.php" target="_self">Startlistor</a>|<a href="Results.php" target="_self">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a>|<a href="Results.php">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
 <div id="headlines">
   <div id="latestnews">

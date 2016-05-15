@@ -1,5 +1,5 @@
 <?php
-//Adjusted to display page title
+//Adjusted to display contestant start number
 
 if (!isset($_SESSION)) {
   session_start();
@@ -52,7 +52,7 @@ if (isset($_GET['class_id'])) {
   $colname_rsRegistrations = $_GET['class_id'];
 }
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsRegistrations = sprintf("SELECT a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = %s ORDER BY club_startorder, reg_id", GetSQLValueString($colname_rsRegistrations, "int"));
+$query_rsRegistrations = sprintf("SELECT a.club_name, re.reg_id, re.contestant_height, re.contestant_startnumber, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = %s ORDER BY club_startorder, reg_id", GetSQLValueString($colname_rsRegistrations, "int"));
 $rsRegistrations = mysql_query($query_rsRegistrations, $DBconnection) or die(mysql_error());
 $row_rsRegistrations = mysql_fetch_assoc($rsRegistrations);
 $totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
@@ -86,12 +86,14 @@ echo ' | '.$row_rsRegistrations['class_weight_length'];
 ?></h3>
   <table width="80%" border="1">
     <tr>
-<td><strong>Klubb</strong></td>
+      <td><strong>Startnr.</strong></td>        
+      <td><strong>Klubb</strong></td>
       <td><strong>T&auml;vlande</strong></td>
       <td><strong>L&auml;ngd (eventuellt)</strong></td>
       </tr>
     <?php do { ?>
       <tr>
+        <td><?php echo $row_rsRegistrations['contestant_startnumber']; ?></td>          
         <td><?php echo $row_rsRegistrations['club_name']; ?></td>
         <td><?php echo $row_rsRegistrations['contestant_name']; ?></td>
         <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>

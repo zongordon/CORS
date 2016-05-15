@@ -1,5 +1,5 @@
 <?php
-//Changed link title on log out
+//Changed $_SESSION['MM_Level'] to unset
 
 //initialize the session
 if (!isset($_SESSION)) {
@@ -23,7 +23,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
   unset($_SESSION['MM_UserGroup']);
   unset($_SESSION['PrevUrl']);
   unset($_SESSION['MM_Accountid']); 
-	
+  unset($_SESSION['MM_Level']); 	
   $logoutGoTo = "Login.php";
   if ($logoutGoTo) {
     header("Location: $logoutGoTo");

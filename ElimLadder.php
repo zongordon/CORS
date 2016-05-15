@@ -1,5 +1,6 @@
 <?php 
-//Adjusted to display page title
+//Moved formatting to print.css and 3_elimladder.css - display of red (aka) and blue (ao) colours in the ladder
+//Removed round titles (Omgång 1, ...2 etc)
 
 require_once('Connections/DBconnection.php'); 
 
@@ -39,7 +40,7 @@ if (isset($_GET['class_id'])) {
   $colname_rsClassContestants = $_GET['class_id'];
 }
 mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsClassContestants = sprintf("SELECT com.comp_name, com.comp_start_date, a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re  INNER JOIN classes AS cl USING (class_id)  INNER JOIN contestants AS co USING (contestant_id)  INNER JOIN account AS a USING (account_id)  INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = %s AND comp_current = 1 ORDER BY club_startorder, reg_id", GetSQLValueString($colname_rsClassContestants, "int"));
+$query_rsClassContestants = sprintf("SELECT com.comp_name, com.comp_start_date, a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re  INNER JOIN classes AS cl USING (class_id)  INNER JOIN contestants AS co USING (contestant_id)  INNER JOIN account AS a USING (account_id)  INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = %s AND comp_current = 1 ORDER BY club_startorder, reg_id", GetSQLValueString($colname_rsClassContestants, "int"));
 $rsClassContestants = mysql_query($query_rsClassContestants, $DBconnection) or die(mysql_error());
 $row_rsClassContestants = mysql_fetch_assoc($rsClassContestants);
 $totalRows_rsClassContestants = mysql_num_rows($rsClassContestants);
@@ -90,61 +91,55 @@ echo ' | '.$class_weight_length;
 }
 ?>
 </h1>
-    <table width="90%">
-    <tr>
-      <td>&nbsp;</td>    
-      <td>Pool A</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td><?php echo '<NOBR>Datum: '.$comp_start_date.'</NOBR>';?></td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td align="right">Pool B</td>
-      <td>&nbsp;</td>      
-    </tr>
+    <table class = masthead_table>
     <tr>
       <td>&nbsp;</td>  
-    </tr>
+    </tr>        
     <tr>
-      <td>&nbsp;</td>    
-      <td width="255"><NOBR>Omg&aring;ng 1</NOBR></td>
-      <td width="80"><NOBR>Omg&aring;ng 2</NOBR></td>
-      <td width="80"><NOBR>Omg&aring;ng 3</NOBR></td>
-      <td width="150"><NOBR>Omg&aring;ng 4</NOBR></td>
-      <td width="150" align="right"><NOBR>Omg&aring;ng 4</NOBR></td>
-      <td width="80" align="right"><NOBR>Omg&aring;ng 3</NOBR></td>
-      <td width="80" align="right"><NOBR>Omg&aring;ng 2</NOBR></td>
-      <td width="255" align="right"><NOBR>Omg&aring;ng 1</NOBR></td>
-      <td>&nbsp;</td>          
+      <td class = zero_left>&nbsp;</td>    
+      <td class = first_left>Pool A</td>
+      <td class = second_left>&nbsp;</td>
+      <td class = third_left>&nbsp;</td>
+      <td class = fourth_left><?php echo 'Datum: '.$comp_start_date;?></td>
+      <td class = fourth_right>&nbsp;</td>
+      <td class = third_right>&nbsp;</td>
+      <td class = second_right>&nbsp;</td>
+      <td class = first_right>Pool B</td>
+      <td class = zero_right>&nbsp;</td>      
     </tr>
   </table> 
 </div>
   <div id="content">
       <div class="story">
 <?php 
+$startnumber = $row_rsClassContestants['contestant_startnumber']; 
 $name = $row_rsClassContestants['contestant_name']; 
 $club = $row_rsClassContestants['club_name']; 
 $str = $name.', '.$club;
-	if( strlen( $str ) > 34 ) $str = substr( $str, 0, 34 ) . "...";
+        if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
+$contestantsArray[] = $str;        
+$startnumberArray[] = $startnumber;        
 ?>
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">1</td><td nowrap="nowrap" class="result_tbl"><?php echo $str;?></td>
+        <td class="AKA_red"><?php if (array_key_exists(0, $startnumberArray)) { echo $startnumberArray[0]; } else { echo "1"; }?><!--1--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
 <?php    
 $contestantsArray = array(); 
+$startnumbersArray = array();
 while ($row_rsClassContestants = mysql_fetch_assoc($rsClassContestants)) { 
+$startnumber = $row_rsClassContestants['contestant_startnumber']; 
 $name = $row_rsClassContestants['contestant_name']; 
 $club = $row_rsClassContestants['club_name']; 
 $str = $name.', '.$club;
-	if( strlen( $str ) > 33 ) $str = substr( $str, 0, 33 ) . "...";
+        if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
 $contestantsArray[] = $str; 
+$startnumbersArray[] = $startnumber;
 } 
 ?>    
-      <td width = "5">17</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[15];?></td>
+       <td class="AO_blue"><?php if (array_key_exists(15, $startnumbersArray)) { echo $startnumbersArray[15]; } else { echo "17"; }?><!--17--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(15, $contestantsArray)) { echo $contestantsArray[15]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -152,10 +147,10 @@ $contestantsArray[] = $str;
 <div id="apDiv2">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">9</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[7];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(7, $startnumbersArray)) { echo $startnumbersArray[7]; } else { echo "9"; }?><!--9--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(7, $contestantsArray)) { echo $contestantsArray[7]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">25</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[23];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(23, $startnumbersArray)) { echo $startnumbersArray[23]; } else { echo "25"; }?><!--25--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(23, $contestantsArray)) { echo $contestantsArray[23]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -163,10 +158,10 @@ $contestantsArray[] = $str;
 <div id="apDiv3">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">5</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[3];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(3, $startnumbersArray)) { echo $startnumbersArray[3]; } else { echo "5"; }?><!--5--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">21</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[19];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(19, $startnumbersArray)) { echo $startnumbersArray[19]; } else { echo "21"; }?><!--21--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(19, $contestantsArray)) { echo $contestantsArray[19]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -174,10 +169,10 @@ $contestantsArray[] = $str;
 <div id="apDiv4">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">13</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[11];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(11, $startnumbersArray)) { echo $startnumbersArray[11]; } else { echo "13"; }?><!--13--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(11, $contestantsArray)) { echo $contestantsArray[11]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">29</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[27];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(27, $startnumbersArray)) { echo $startnumbersArray[27]; } else { echo "29"; }?><!--29--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(27, $contestantsArray)) { echo $contestantsArray[27]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -186,10 +181,10 @@ $contestantsArray[] = $str;
 <div id="apDiv5">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">3</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[1];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(1, $startnumbersArray)) { echo $startnumbersArray[1]; } else { echo "3"; }?><!--3--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">19</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[17];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(17, $startnumbersArray)) { echo $startnumbersArray[17]; } else { echo "19"; }?><!--19--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(17, $contestantsArray)) { echo $contestantsArray[17]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -197,10 +192,10 @@ $contestantsArray[] = $str;
 <div id="apDiv6">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">11</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[9];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(9, $startnumbersArray)) { echo $startnumbersArray[9]; } else { echo "11"; }?><!--11--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(9, $contestantsArray)) { echo $contestantsArray[9]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">27</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[25];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(25, $startnumbersArray)) { echo $startnumbersArray[25]; } else { echo "27"; }?><!--27--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(25, $contestantsArray)) { echo $contestantsArray[25]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -208,10 +203,10 @@ $contestantsArray[] = $str;
 <div id="apDiv7">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">7</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[5];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(5, $startnumbersArray)) { echo $startnumbersArray[5]; } else { echo "7"; }?><!--7--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(5, $contestantsArray)) { echo $contestantsArray[5]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">23</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[21];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(21, $startnumbersArray)) { echo $startnumbersArray[21]; } else { echo "23"; }?><!--23--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(21, $contestantsArray)) { echo $contestantsArray[21]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -219,10 +214,10 @@ $contestantsArray[] = $str;
 <div id="apDiv8">
   <table width="100%" border="0">
     <tr>
-      <td width = "5">15</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[13];?></td>
+      <td class="AKA_red"><?php if (array_key_exists(13, $startnumbersArray)) { echo $startnumbersArray[13]; } else { echo "15"; }?><!--15--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(13, $contestantsArray)) { echo $contestantsArray[13]; } else { /*it does not exist*/ }?></td>
     </tr>
     <tr>
-      <td width = "5">31</td><td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[29];?></td>
+      <td class="AO_blue"><?php if (array_key_exists(29, $startnumbersArray)) { echo $startnumbersArray[29]; } else { echo "31"; }?><!--31--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(29, $contestantsArray)) { echo $contestantsArray[29]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
 </div>
@@ -230,10 +225,10 @@ $contestantsArray[] = $str;
 <div id="apDiv9">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[0];?></td><td width = "5">2</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(0, $startnumbersArray)) { echo $startnumbersArray[0]; } else { echo "2"; }?><!--2--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[16];?></td><td width = "5">18</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(16, $contestantsArray)) { echo $contestantsArray[16]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(16, $startnumbersArray)) { echo $startnumbersArray[16]; } else { echo "18"; }?><!--18--></td>
     </tr>
   </table>
 </div>
@@ -241,10 +236,10 @@ $contestantsArray[] = $str;
 <div id="apDiv10">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[8];?></td><td width = "5">10</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(8, $contestantsArray)) { echo $contestantsArray[8]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(8, $startnumbersArray)) { echo $startnumbersArray[8]; } else { echo "10"; }?><!--10--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[24];?></td><td width = "5">26</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(24, $contestantsArray)) { echo $contestantsArray[24]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(24, $startnumbersArray)) { echo $startnumbersArray[24]; } else { echo "26"; }?><!--26--></td>
     </tr>
   </table>
 </div>
@@ -252,10 +247,10 @@ $contestantsArray[] = $str;
 <div id="apDiv11">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[4];?></td><td width = "5">6</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(4, $startnumbersArray)) { echo $startnumbersArray[4]; } else { echo "6"; }?><!--6--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[20];?></td><td width = "5">22</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(20, $contestantsArray)) { echo $contestantsArray[20]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(20, $startnumbersArray)) { echo $startnumbersArray[20]; } else { echo "22"; }?><!--22--></td>
     </tr>
   </table>
 </div>
@@ -263,10 +258,10 @@ $contestantsArray[] = $str;
 <div id="apDiv12">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[12];?></td><td width = "5">14</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(12, $contestantsArray)) { echo $contestantsArray[12]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(12, $startnumbersArray)) { echo $startnumbersArray[12]; } else { echo "14"; }?><!--14--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[28];?></td><td width = "5">30</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(28, $contestantsArray)) { echo $contestantsArray[28]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(28, $startnumbersArray)) { echo $startnumbersArray[28]; } else { echo "30"; }?><!--30--></td>
     </tr>
   </table>
 </div>
@@ -274,10 +269,10 @@ $contestantsArray[] = $str;
 <div id="apDiv13">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[2];?></td><td width = "5">4</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(2, $startnumbersArray)) { echo $startnumbersArray[2]; } else { echo "4"; }?><!--4--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[18];?></td><td width = "5">20</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(18, $contestantsArray)) { echo $contestantsArray[18]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(18, $startnumbersArray)) { echo $startnumbersArray[18]; } else { echo "20"; }?><!--20--></td>
     </tr>
   </table>
 </div>
@@ -285,20 +280,20 @@ $contestantsArray[] = $str;
 <div id="apDiv14">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[10];?></td><td width = "5">12</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(10, $contestantsArray)) { echo $contestantsArray[10]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(10, $startnumbersArray)) { echo $startnumbersArray[10]; } else { echo "12"; }?><!--12--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[26];?></td><td width = "5">28</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(26, $contestantsArray)) { echo $contestantsArray[26]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(26, $startnumbersArray)) { echo $startnumbersArray[26]; } else { echo "28"; }?><!--28--></td>
     </tr>
   </table>
 </div>
 <div id="apDiv15">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[6];?></td><td width = "5">8</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(6, $contestantsArray)) { echo $contestantsArray[6]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(6, $startnumbersArray)) { echo $startnumbersArray[6]; } else { echo "8"; }?><!--8--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[22];?></td><td width = "5">24</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(22, $contestantsArray)) { echo $contestantsArray[22]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(22, $startnumbersArray)) { echo $startnumbersArray[22]; } else { echo "24"; }?><!--24--></td>
     </tr>
   </table>
 </div>
@@ -306,10 +301,10 @@ $contestantsArray[] = $str;
 <div id="apDiv16">
   <table width="100%" border="0">
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[14];?></td><td width = "5">16</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(14, $contestantsArray)) { echo $contestantsArray[14]; } else { /*it does not exist*/ }?></td><td class="AO_blue"><?php if (array_key_exists(14, $startnumbersArray)) { echo $startnumbersArray[14]; } else { echo "16"; }?><!--16--></td>
     </tr>
     <tr>
-      <td nowrap="nowrap" class="result_tbl"><?php echo $contestantsArray[30];?></td><td width = "5">32</td>
+      <td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(30, $contestantsArray)) { echo $contestantsArray[30]; } else { /*it does not exist*/ }?></td><td class="AKA_red"><?php if (array_key_exists(30, $startnumbersArray)) { echo $startnumbersArray[30]; } else { echo "32"; }?><!--32--></td>
     </tr>
   </table>
 </div>

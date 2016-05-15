@@ -1,5 +1,5 @@
 <?php
-//Added function for showing links to elimination ladders or not depending on if competition is raffled or not
+//Fixed bugg with links to elimination ladder, showing the same ladder regardless of link
 
 if (!isset($_SESSION)) {
   session_start();
@@ -96,7 +96,7 @@ $totalRows_rsClasses = mysql_num_rows($rsClasses);
           <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
           <td><a href="ClassContestants_loggedout.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">Startlista</a></td>
           <?php if ($row_rsClasses['comp_raffled'] == 1) {
-                echo "<td><a href=javascript:MM_openBrWindow('ElimLadder.php?class_id=21','T&auml;vlingsstege','',1131,800,'true')>T&auml;vlingsstege</a></td>";
+                echo "<td><a href=javascript:MM_openBrWindow('ElimLadder.php?class_id=".$row_rsClasses['class_id']."','T&auml;vlingsstege','',1131,800,'true')>T&auml;vlingsstege</a></td>";
                 } ?>          
         </tr>
         <?php } while ($row_rsClasses = mysql_fetch_assoc($rsClasses)); ?>
