@@ -1,8 +1,6 @@
 <?php
-//Added maximum allowed number of registrations before registration will close
-//Added validation of date format in form
-//Improved checkbox function to keep the setting during the validation phase
-
+//Added function to only have one current competition (active) at a time
+//Removed mb_convert_case from Competition Name
 ob_start();
 
 //Access level top administrator
@@ -35,7 +33,7 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
 
 //Validate the form if button is clicked
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
-    $comp_name = encodeToISO(mb_convert_case($_POST['comp_name'], MB_CASE_TITLE,"ISO-8859-1"));
+    $comp_name = encodeToISO($_POST['comp_name']);
     $comp_start_date = $_POST['comp_start_date'];
     $comp_end_date = $_POST['comp_end_date'];
     $comp_end_reg_date = $_POST['comp_end_reg_date'];
@@ -152,6 +150,13 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
   	else if ($output_form == 'no') {
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
+    // Set all competitions first to non-current (0) if the new competition shall be current
+    if ($_POST["comp_current"] == 1) {
+       $resetSQL = sprintf("UPDATE competition SET comp_current = 0");
+       mysql_select_db($database_DBconnection, $DBconnection);
+       $Result1 = mysql_query($resetSQL, $DBconnection) or die(mysql_error());
+    }
+  // Insert all competition data  
   $insertSQL = sprintf("INSERT INTO competition (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_max_regs, comp_current) VALUES (%s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($comp_name, "text"),
                        GetSQLValueString($_POST['comp_start_date'], "date"),

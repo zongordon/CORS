@@ -1,5 +1,5 @@
 <?php 
-//Added maximum allowed number of registrations before registration will close
+//Added function to change current competition and only one current (active) at a time
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -11,12 +11,24 @@ $pagekeywords="tuna karate cup, lista tävlingar, karate, eskilstuna, sporthalle
 // Includes HTML Head, and several other code functions
 include_once('includes/functions.php'); 
 
+    //If button is clicked for updating then update the current competition
+    if (isset($_POST["MM_update"]) && isset($_POST['new_current_comp_id']) && ($_POST["MM_update"] == "CompForm")) {
+       $new_current_comp_id = $_POST['new_current_comp_id'];
+       // Set all competitions first to non-current (0)
+       $resetSQL = sprintf("UPDATE competition SET comp_current = 0");
+       mysql_select_db($database_DBconnection, $DBconnection);
+       $Result1 = mysql_query($resetSQL, $DBconnection) or die(mysql_error());
+       // Set selected competition as current (1)     
+       $updateSQL = sprintf("UPDATE competition SET comp_current = 1 WHERE comp_id=$new_current_comp_id");
+       mysql_select_db($database_DBconnection, $DBconnection);
+       $Result2 = mysql_query($updateSQL, $DBconnection) or die(mysql_error());
+    }
  //Select all columns from competitions table
 mysql_select_db($database_DBconnection, $DBconnection);
 $query_rsCompetitions = "SELECT * FROM competition ORDER BY comp_id ASC";
 $rsCompetitions = mysql_query($query_rsCompetitions, $DBconnection) or die(mysql_error());
 $row_rsCompetitions = mysql_fetch_assoc($rsCompetitions);
-$totalRows_rsCompetitions = mysql_num_rows($rsCompetitions);
+$totalRows_rsCompetitions = mysql_num_rows($rsCompetitions);            
 ?>
 <!-- Include top navigation links, News and sponsor sections -->
 <?php include("includes/header.php"); ?>
@@ -34,7 +46,8 @@ $totalRows_rsCompetitions = mysql_num_rows($rsCompetitions);
   <p>Det finns inga t&auml;vlingar att visa!</p>
   <?php } // Show if recordset empty ?>
 <?php if ($totalRows_rsCompetitions > 0) { // Show if recordset not empty ?>
-  <table width="100%" border="1">
+  <form id="CompForm" name="CompForm" method="POST" action=""> 
+    <table width="100%" border="1">
     <tr>
       <td><strong>T&auml;vling</strong></td>
       <td><strong>Startdatum</strong></td>
@@ -72,15 +85,36 @@ $totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
         <td><?php echo $row_rsCompetitions['comp_end_reg_date']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_max_regs']; ?></td>
         <td><?php echo $totalRows_rsRegistrations;?></td>
-        <td><?php echo $totalRows_rsClasses;?></td>
-        <td><?php if (!(strcmp($row_rsCompetitions['comp_current'],1))) { echo "Ja"; } else {echo "Nej";} ?></td>
+        <td><?php echo $totalRows_rsClasses;?></td> 
+        <td><label>
+        <input <?php if (!(strcmp($row_rsCompetitions['comp_current'],1))) { 
+                        echo "checked=\"checked\"";
+                     } ?> 
+        type="radio" name="new_current_comp_id" value ="<?php echo $row_rsCompetitions['comp_id'];?>" id = "new_current_comp_id_<?php echo $row_rsCompetitions['comp_id'];?>"/>               
+        </label></td>
         <td><a href="ClassesCopy.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">Kopiera</a></td>        
         <td><a href="CompetitionUpdate.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">&Auml;ndra</a></td>
         <td><a href="#" onclick="return deleteCompetition('<?php echo $row_rsCompetitions['comp_id']; ?>')">Ta bort</a></td>
       </tr> 
       <?php } while ($row_rsCompetitions = mysql_fetch_assoc($rsCompetitions)); ?>
-  </table>
-  <?php } // Show if recordset not empty ?>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>          
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Uppdatera aktiv t&auml;vling:</td>          
+          <td><input name="CompUpdate" type="submit" id="CompUpdate" value="Spara" /></td>
+        </tr>
+    </table>
+      <input type="hidden" name="MM_update" value="CompForm" />      
+  </form>      
+  <?php 
+      } // Show if recordset not empty ?>
   </div>
   <div class="story"></div>
 </div>
