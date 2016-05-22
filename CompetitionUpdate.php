@@ -1,6 +1,5 @@
 <?php
-//Added function to only have one current competition (active) at a time
-//Removed mb_convert_case from Competition Name
+//Fixed bug to prevent no competition being current (active) after update
 
 ob_start();
 
@@ -109,7 +108,7 @@ if ($output_form == 'yes') {
   </div>
   <div class="story">
     <form id="CompForm" name="CompForm" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="200" border="0">
+      <table width="400" border="0">
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens namn:</td>
           <td>&nbsp;</td>
@@ -141,7 +140,15 @@ if ($output_form == 'yes') {
           <td align="right" valign="baseline" nowrap="nowrap">Aktiv:</td>
           <td>&nbsp;</td>
           <td><label>
-<input <?php if (!(strcmp($row_rsCompetition['comp_current'],1))) {echo "checked=\"checked\"";} ?> type="checkbox" name="comp_current" id="comp_current" />
+          <input type="checkbox" name="comp_current" id="comp_current" 
+          <?php if (!(strcmp($row_rsCompetition['comp_current'],1))) {
+                        //Disable checkbox if competition is current (active)
+                   echo "checked=\"checked\" disabled='disabled'/ />(&auml;ndrar du i listan &ouml;ver t&auml;vlingar)";
+                   echo "<input name='comp_current' type='hidden' value='true'/>";
+                }   
+                else {
+                   echo "/>"; 
+                } ?>  
           </label></td>
         </tr>
         <tr>
@@ -161,7 +168,6 @@ else if ($output_form == 'no') {
         //If button is clicked for updating then update to columns from data in the form
         if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "CompForm")) {
                 // Set all competitions first to non-current (0) if the new competition shall be current
-//            echo "Data: ".$_POST["comp_current"];
                 if ($_POST["comp_current"] == "on") {
                 $resetSQL = sprintf("UPDATE competition SET comp_current = 0");
                 mysql_select_db($database_DBconnection, $DBconnection);
