@@ -1,5 +1,5 @@
 <?php
-//Changed from <div id ="feature"> to <div class ="feature"> 
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 
 ob_start();
 //Access level top administrator
@@ -30,8 +30,8 @@ if (isset($_SERVER['QUERY_STRING'])) {
 // Update class data if button is clicked and all fields are validated to be correct
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "update_class")) {
     $class_fee = $_POST['class_fee'];	
-    $class_weight_length = encodeToISO($_POST['class_weight_length']);
-    $class_age = encodeToISO($_POST['class_age']);
+    $class_weight_length = encodeToUtf8($_POST['class_weight_length']);
+    $class_age = encodeToUtf8($_POST['class_age']);
     $output_form = 'no';
         
     if (empty($class_fee)) {

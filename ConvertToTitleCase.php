@@ -1,4 +1,5 @@
 <?php
+//Changed MB_CASE_TITLE from iso-8859-1
 //Create DB connection
 require_once('Connections/DBconnection.php');
 
@@ -13,7 +14,7 @@ echo '<table><thead><tr><td>Id</td>
 <tbody>';
 while($row = mysql_fetch_array($Result1)){
 $ID = $row["contestant_id"];
-$name = stripslashes($row["contestant_name"]);$newName = mb_convert_case($name, MB_CASE_TITLE, "ISO-8859-1");
+$name = stripslashes($row["contestant_name"]);$newName = mb_convert_case($name, MB_CASE_TITLE, "UTF-8");
 echo "
 <tr>
 <td>$ID</td>

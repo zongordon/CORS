@@ -1,7 +1,6 @@
 <?php
-//Added function for confirmation before deletion of message
-//Changed to Descending order of messages
-//Changed to Europe/Stockholm timezone for correct message_timestamp
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
+//Made it possible to send UTF-8 characters in the subject line
 ob_start();
 
 Global $insert_message_id;
@@ -56,8 +55,8 @@ $totalRows_rsMessages = mysql_num_rows($rsMessages);
     $insert_message_to = "";
  // Validate the contestant form if the button is clicked	
 if (((isset($_POST["MM_insert_message"])) && ($_POST["MM_insert_message"] == "new_message"))) {
-    $insert_message_subject = encodeToISO($_POST['message_subject']);
-    $insert_message = encodeToISO($_POST['message']);
+    $insert_message_subject = encodeToUtf8($_POST['message_subject']);
+    $insert_message = encodeToUtf8($_POST['message']);
     $insert_message_how = $_POST['message_how'];
     $insert_message_to = $_POST['message_to'];
     $insert_message_from = "tunacup@karateklubben.com";
@@ -133,8 +132,8 @@ if (((isset($_POST["MM_insert_message"])) && ($_POST["MM_insert_message"] == "ne
                     'X-Mailer: PHP/' . phpversion() . "\r\n" .        
                     "Content-Type: text/plain; charset=utf-8\r\n" . 
                     "Content-Transfer-Encoding: 8bit\r\n\r\n"; 
-                    $message_subject = encodeToUtf8($insert_message_subject);
-                    $message_body =  encodeToUtf8($insert_message); 
+                    $message_subject = $insert_message_subject;
+                    $message_body =  $insert_message; 
                     $message = $message_body.
                     "\n" .
                     "\n" .        
@@ -143,7 +142,7 @@ if (((isset($_POST["MM_insert_message"])) && ($_POST["MM_insert_message"] == "ne
                     $msg = "Hej $contact_name,\n$message";
         
                     // Send email to club contact
-                    mail($contact_email, $message_subject, $msg, $headers);                
+                    mail($contact_email, '=?utf-8?B?'.base64_encode($message_subject).'?=', $msg, $headers);                
                
                     } while ($row_rsClubEmails = mysql_fetch_assoc($rsClubEmails));                  
                 }

@@ -1,5 +1,9 @@
 <?php
-//Made sure the white background is visible after submitting the form and changed from bold to normal confirmation text
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
+//Changed charset on page from iso-8859-1
+//Added default time zone
+
+date_default_timezone_set('Europe/Stockholm');
 
 //Convert strings to UTF-8
 function encodeToUtf8($string) {
@@ -20,7 +24,7 @@ if (!isset($_SESSION)) {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head><?php $pagetitle="L&auml;gga till eget konto"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
 <meta name="keywords" content="tuna karate cup, karate, lägga till ett konto, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp"/>
 <title><?php echo $pagetitle ?></title>
@@ -73,13 +77,13 @@ if (isset($_SERVER['QUERY_STRING'])) {
 <?php
 // Validate insert account data
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_account")) {
-    $club_name = encodeToISO(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"ISO-8859-1"));
-    $contact_name = encodeToISO(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"ISO-8859-1"));
+    $club_name = encodeToUtf8(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"UTF-8"));
+    $contact_name = encodeToUtf8(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"UTF-8"));
     $contact_email = $_POST['contact_email'];
     $contact_phone = $_POST['contact_phone'];
-    $user_name = encodeToISO($_POST['user_name']);
-    $user_password = encodeToISO($_POST['user_password']);	
-    $confirm_user_password = encodeToISO($_POST['confirm_user_password']);		
+    $user_name = encodeToUtf8($_POST['user_name']);
+    $user_password = encodeToUtf8($_POST['user_password']);	
+    $confirm_user_password = encodeToUtf8($_POST['confirm_user_password']);		
     $output_form = 'no';
 	
     if (empty($club_name)) {

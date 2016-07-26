@@ -1,5 +1,5 @@
 <?php
-//Fixed bug to prevent no competition being current (active) after update
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 
 ob_start();
 
@@ -42,7 +42,7 @@ $totalRows_rsCompetition = mysql_num_rows($rsCompetition);
 <?php
  //Validate the form if button is clicked        
 if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "CompForm")) {
-    $comp_name = encodeToISO($_POST['comp_name']);
+    $comp_name = encodeToUtf8($_POST['comp_name']);
     $comp_start_date = $_POST['comp_start_date'];
     $comp_end_date = $_POST['comp_end_date'];
     $comp_end_reg_date = $_POST['comp_end_reg_date'];

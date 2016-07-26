@@ -1,5 +1,5 @@
 <?php
-//Made sure the white background is visible after submitting the form
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -30,13 +30,13 @@ if (isset($_SERVER['QUERY_STRING'])) {
    global $club_name, $contact_name, $contact_email, $contact_phone, $user_name, $user_password, $confirm_user_password, $access_level, $confirmed, $active ;		
 // Insert new account data if button is clicked and all fields are validated to be correct
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_account")) {
-    $club_name = encodeToISO(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"ISO-8859-1"));
-    $contact_name = encodeToISO(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"ISO-8859-1"));
+    $club_name = encodeToUtf8(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"UTF-8"));
+    $contact_name = encodeToUtf8(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"UTF-8"));
     $contact_email = $_POST['contact_email'];
     $contact_phone = $_POST['contact_phone'];
-    $user_name = encodeToISO($_POST['user_name']);
-    $user_password = encodeToISO($_POST['user_password']);	
-    $confirm_user_password = encodeToISO($_POST['confirm_user_password']);		
+    $user_name = encodeToUtf8($_POST['user_name']);
+    $user_password = encodeToUtf8($_POST['user_password']);	
+    $confirm_user_password = encodeToUtf8($_POST['confirm_user_password']);		
     $access_level = $_POST['access_level'];	
     $confirmed = $_POST['confirmed'];		
     $active = $_POST['active'];		

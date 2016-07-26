@@ -1,6 +1,5 @@
 <?php
-//Added function to only have one current competition (active) at a time
-//Removed mb_convert_case from Competition Name
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 ob_start();
 
 //Access level top administrator
@@ -33,7 +32,7 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
 
 //Validate the form if button is clicked
  if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
-    $comp_name = encodeToISO($_POST['comp_name']);
+    $comp_name = encodeToUtf8($_POST['comp_name']);
     $comp_start_date = $_POST['comp_start_date'];
     $comp_end_date = $_POST['comp_end_date'];
     $comp_end_reg_date = $_POST['comp_end_reg_date'];

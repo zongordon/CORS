@@ -1,5 +1,5 @@
 <?php
-//Added start numbers for each registration (starting with 100)
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 
 ob_start();
 //Access level registered user
@@ -102,7 +102,7 @@ if ($totalRows_rsClasses > 0) {
 <?php // Validate the club registration form if the "Spara" button is clicked
     $coach_names = "";
 if (((isset($_POST["MM_insert_clubregistration"])) && ($_POST["MM_insert_clubregistration"] == "new_club_reg") || (isset($_POST["MM_update_clubregistration"])) && ($_POST["MM_update_clubregistration"] == "update_club_reg"))) {
-    $coach_names = encodeToISO(mb_convert_case($_POST['coach_names'], MB_CASE_TITLE,"ISO-8859-1"));
+    $coach_names = encodeToUtf8(mb_convert_case($_POST['coach_names'], MB_CASE_TITLE,"UTF-8"));
     $output_form = 'no';
 	
     if (empty($coach_names)) {
@@ -189,7 +189,7 @@ $totalRows_rsClubReg = mysql_num_rows($rsClubReg);
     $insert_contestant_gender = "";
 // Validate the contestant form if the button is clicked	
 if (((isset($_POST["MM_insert_contestant"])) && ($_POST["MM_insert_contestant"] == "new_contestant"))) {
-    $insert_contestant_name = encodeToISO(mb_convert_case($_POST['contestant_name'], MB_CASE_TITLE,"ISO-8859-1"));    
+    $insert_contestant_name = encodeToUtf8(mb_convert_case($_POST['contestant_name'], MB_CASE_TITLE,"UTF-8"));    
     $insert_contestant_birth = $_POST['contestant_birth'];
     $insert_contestant_gender = $_POST['contestant_gender'];
     $output_form = 'no';

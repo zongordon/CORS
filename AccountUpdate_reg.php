@@ -1,5 +1,5 @@
 <?php 
-//Removed back-link to form for correction after validation and changed to show the form directly instead
+//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
 ob_start();
 
 //Access level registered users
@@ -40,13 +40,13 @@ $totalRows_rsAccount = mysql_num_rows($rsAccount);
 <?php
 // Convert to UTF-8 and validate the account form fields if the update button is clicked
 if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "AccountForm")) {
-    $club_name = encodeToISO(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"ISO-8859-1"));
-    $contact_name = encodeToISO(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"ISO-8859-1"));
+    $club_name = encodeToUtf8(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"UTF-8"));
+    $contact_name = encodeToUtf8(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"UTF-8"));
     $contact_email = $_POST['contact_email'];
     $contact_phone = $_POST['contact_phone'];
-    $user_name = encodeToISO($_POST['user_name']);
-    $user_password = encodeToISO($_POST['user_password']);	
-    $confirm_user_password = encodeToIso($_POST['confirm_user_password']);		
+    $user_name = encodeToUtf8($_POST['user_name']);
+    $user_password = encodeToUtf8($_POST['user_password']);	
+    $confirm_user_password = encodeToUtf8($_POST['confirm_user_password']);		
     $output_form = 'no';
 
 	echo '<br />';	
