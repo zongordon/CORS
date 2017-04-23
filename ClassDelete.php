@@ -1,35 +1,42 @@
 <?php
-//Changed from $pageAccessLevel = "1" to $MM_authorizedUsers = "1" and $MM_donotCheckaccess = "false" due to redirect loop
+//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
+//Fetch the selected Class
+if (filter_input(INPUT_GET, 'class_id')) {
+    $colname_rsClass = filter_input(INPUT_GET, 'class_id');
+// Delete the selected class when clicking the Delete link
+    require('Connections/DBconnection.php');           
+    $query = "DELETE FROM classes WHERE class_id = :class_id";
+    $stmt_rsUserexists = $DBconnection->prepare($query);
+    $stmt_rsUserexists->bindValue(':class_id', $colname_rsClass, PDO::PARAM_INT);   
+    $stmt_rsUserexists->execute();
+}
+
+    $deleteGoTo = "ClassesList.php";
+    if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+    $deleteGoTo .= (strpos($deleteGoTo, '?')) ? "&" : "?";
+    $deleteGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+    }
+    header(sprintf("Location: %s", $deleteGoTo));
+
 //Moved html head and several other code functions to includes/functions.php
 $pagetitle="Ta bort t&auml;vlingsklass";
 $pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
 $pagekeywords="tuna karate cup, ta bort tävlingsklasser, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
+// Includes Several code functions
 include_once('includes/functions.php');
-
-if ((isset($_GET['class_id'])) && ($_GET['class_id'] != "")) {
-  $deleteSQL = sprintf("DELETE FROM classes WHERE class_id=%s",
-                       GetSQLValueString($_GET['class_id'], "int"));
-
-  mysql_select_db($database_DBconnection, $DBconnection);
-  $Result1 = mysql_query($deleteSQL, $DBconnection) or die(mysql_error());
-
-  $deleteGoTo = "ClassesList.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $deleteGoTo .= (strpos($deleteGoTo, '?')) ? "&" : "?";
-    $deleteGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $deleteGoTo));
-}
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->

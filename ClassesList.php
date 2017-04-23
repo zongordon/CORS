@@ -1,8 +1,11 @@
 <?php
-//Corrected bug preventing classes from being displayed correctly
+//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Changed way of sorting
 ob_start();
 
-global $editFormAction;
+//Declare and initialise variables
+$editFormAction = '';
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -11,27 +14,36 @@ $MM_donotCheckaccess = "false";
 $pagetitle="T&auml;vlingsklasser - admin";
 $pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
 $pagekeywords="tuna karate cup, lista tävlingsklasser för administratörer, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
 
 //Set initial sorting (ORDER BY) and change if new sort order is selected in dropdown list
-$sorting = "comp_current DESC, comp_name, class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
-if (isset($_GET['sorting'])) {
-  $sorting = $_GET['sorting'];
+$sorting = "class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
+if (filter_input(INPUT_GET, 'sorting')) {
+$sorting = filter_input(INPUT_GET, 'sorting');
 }
-//Select all classes for respective competition
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsClasses = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, com.comp_name FROM classes AS c INNER JOIN competition AS com USING (comp_id) WHERE comp_current = 1 ORDER BY $sorting";
-$rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
-$row_rsClasses = mysql_fetch_assoc($rsClasses);
-$totalRows_rsClasses = mysql_num_rows($rsClasses);
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+
+try {
+    //Select all classes for respective competition
+    require('Connections/DBconnection.php');           
+    $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, com.comp_name FROM classes AS c INNER JOIN competition AS com USING (comp_id) WHERE comp_current = 1 ORDER BY $sorting";
+    $stmt_rsClasses = $DBconnection->query($query1);
+    $totalRows_rsClasses = $stmt_rsClasses->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }               
+
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class="feature">
 <?php if ($totalRows_rsClasses == 0) { // Show if recordset empty ?>
@@ -47,8 +59,8 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
       <td valign="middle">Sortering</td>
       <td><label>
         <select name="sorting" id="sorting">
-      <option value="comp_current DESC, comp_name, class_discipline, class_gender, class_age, class_weight_length, class_gender_category">Aktuell t&auml;vling f&ouml;rst</option>
-      <option value="comp_name, class_discipline, class_gender, class_age, class_weight_length, class_gender_category">T&auml;vlingsnamn</option>
+      <option value="class_discipline, class_gender, class_age, class_weight_length, class_gender_category">Klassens namn</option>
+      <option value="class_age, class_discipline, class_gender, class_weight_length, class_gender_category">Klassens &aring;lder</option>
 </select>
       </label></td>
       <td><input type="submit" name="submit" id="submit" value="Sortera" /></td>
@@ -69,7 +81,7 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
         <td><strong>&Auml;ndra</strong></td>
         <td><strong>Ta bort</strong></td>
       </tr>
-      <?php do { ?>
+<?php while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) { ?>
   <tr>
     <td><?php echo $row_rsClasses['comp_name']; ?></td>      
           <td><?php echo $row_rsClasses['class_discipline']; ?></td>
@@ -83,14 +95,17 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
     <td><a href="ClassUpdate.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">&Auml;ndra</a></td>
     <td><a href="#" onclick="return deleteClass('<?php echo $row_rsClasses['class_id']; ?>')">Ta bort</a></td>
   </tr>
-  <?php } while ($row_rsClasses = mysql_fetch_assoc($rsClasses)); ?>
+<?php } ?>
     </table>
 <?php 
-mysql_free_result($rsClasses);    
 } // Show if recordset not empty 
 ?>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php
+//Kill statement and DB connection
+$stmt_rsClasses->closeCursor();
+$DBconnection = null;
+include("includes/footer.php");?>
 </body>
 </html>

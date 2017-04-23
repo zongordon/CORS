@@ -1,139 +1,91 @@
 <?php
-//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
-//Changed charset on page from iso-8859-1
-//Added default time zone
-
-date_default_timezone_set('Europe/Stockholm');
-
-//Convert strings to UTF-8
-function encodeToUtf8($string) {
-     return mb_convert_encoding($string, "UTF-8", mb_detect_encoding($string, "UTF-8, ISO-8859-1, ISO-8859-15", true));
-}
-
-//Convert strings to ISO-8859-1
-function encodeToISO($string) {
-     return mb_convert_encoding($string, "ISO-8859-1", mb_detect_encoding($string, "UTF-8, ISO-8859-1, ISO-8859-15", true));
-}
-
-global $club_name, $contact_name, $contact_email, $contact_phone, $user_name, $user_password, $confirm_user_password ;
+//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php and news_sponsors_nav.php as includes.
+//Removed globally defined variables
 
 if (!isset($_SESSION)) {
   session_start();
 }
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="L&auml;gga till eget konto"?>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
-<meta name="keywords" content="tuna karate cup, karate, lägga till ett konto, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp"/>
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" /></head>
-<?php include("includes/header.php"); ?>
-<?php require_once('Connections/DBconnection.php'); ?>
-<?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
-}
-?>
+$pagetitle="L&auml;gga till eget konto";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, karate, eskilstuna, lägga till ett konto, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+//Includes Several code functions
+include_once('includes/functions.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");     
+?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<!-- Include different navigation links depending on authority  -->
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
    <div class="feature">    
       <div class="error">
 <?php
-// Validate insert account data
- if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_account")) {
-    $club_name = encodeToUtf8(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"UTF-8"));
-    $contact_name = encodeToUtf8(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"UTF-8"));
-    $contact_email = $_POST['contact_email'];
-    $contact_phone = $_POST['contact_phone'];
-    $user_name = encodeToUtf8($_POST['user_name']);
-    $user_password = encodeToUtf8($_POST['user_password']);	
-    $confirm_user_password = encodeToUtf8($_POST['confirm_user_password']);		
+//Declare and initialise variables
+  $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+// Validate insert account data if button is clicked
+ if (filter_input(INPUT_POST, 'MM_insert' == 'new_account')) {
+    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
+    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
+    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
+    $confirmed = filter_input(INPUT_POST, 'confirmed');     
+    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8")); 
+    $email = filter_input(INPUT_POST, trim('contact_email'));
+    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
+    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
+    $active = filter_input(INPUT_POST, 'active');
+    $access_level = filter_input(INPUT_POST, 'access_level');		
     $output_form = 'no';
-	
-    if (empty($club_name)) {
-      // $club_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn!</h3>';
-      $output_form = 'yes';
-    }
-
-    if (empty($contact_name)) {
-      // $contact_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn!</h3>';
-      $output_form = 'yes';
-    }
-   if (empty($contact_email)) {
-      // $contact_email is blank
+	    
+    if (empty($email)) {
+    // contact_email is blank
       echo '<h3>Du gl&ouml;mde att fylla i e-post!</h3>';
       $output_form = 'yes';
     }  
-    
-  if (!empty($contact_email)) {
-    if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', $contact_email)) {
-      // $contact_email is invalid because LocalName is bad
-      echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig!</h3>';
-      $output_form = 'yes';
-    }
+    //If contact_email is not blank validate the input and check if it's already registered 
     else {
-      // Strip out everything but the domain from the email
-      $domain = preg_replace('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', '', $contact_email);
-	  
-	 // Now check if $domain is registered ON A NON-WINDOWS SERVER
-      if (!checkdnsrr($domain)) {
-         echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig!</h3>';
-         $output_form = 'yes';
-     	}
- 	}
-        // Validate insert account data
-	$colname_rsContactemail = $contact_email; 
- 	mysql_select_db($database_DBconnection, $DBconnection);
-	$query_rsContactemail = sprintf("SELECT club_name, contact_email FROM account WHERE contact_email = %s", GetSQLValueString(	$colname_rsContactemail, "text"));
-	$rsContactemail = mysql_query($query_rsContactemail, $DBconnection) or die(mysql_error());
-	$row_rsContactemail = mysql_fetch_assoc($rsContactemail);
-	$totalRows_rsContactemail = mysql_num_rows($rsContactemail);
-	
+      // Validate contact_email
+      if(valid_email($email)){
+            $output_form = 'no';
+      } 
+      else {
+        // contact_email is invalid because LocalName is bad  
+        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
+        $output_form = 'yes';
+      }        
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');               
+    // Validate insert account data    
+    $colname_rsContactemail = $email;     
+    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email";
+    $stmt_rsContactemail = $DBconnection->prepare($query1);
+    $stmt_rsContactemail->execute(array(':contact_email' => $colname_rsContactemail));
+    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }   
 	if ($totalRows_rsContactemail > 0) {
         // $contact_email is already in use
         echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
         $output_form = 'yes';		
 	}
-	mysql_free_result($rsContactemail);
-  }
+         //Kill statement and DB connection
+        $stmt_rsContactemail->closeCursor();
+        $DBconnection = null;   	
+    }
+  
     if (empty($contact_phone)) {
       // $contact_phone is blank
       echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens telefonnummer!</h3>';
@@ -145,20 +97,31 @@ if (isset($_SERVER['QUERY_STRING'])) {
       echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
       $output_form = 'yes';
     }
-
-	$colname_rsUsername = $user_name;
- 	mysql_select_db($database_DBconnection, $DBconnection);
-	$query_rsUsername = sprintf("SELECT club_name, user_name FROM account WHERE user_name = %s", GetSQLValueString(	$colname_rsUsername, "text"));
-	$rsUsername = mysql_query($query_rsUsername, $DBconnection) or die(mysql_error());
-	$row_rsUsername = mysql_fetch_assoc($rsUsername);
-	$totalRows_rsUsername = mysql_num_rows($rsUsername);
-	
+    //If user_name is not blank validate the input and check if it's already registered    
+    else {        
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');                   
+    //Validate account insert data against current accounts    
+    $colname_rsUsername = $user_name;
+    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name";
+    $stmt_rsUsername = $DBconnection->prepare($query2);
+    $stmt_rsUsername->execute(array(':user_name' => $colname_rsUsername));
+    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }       
 	if ($totalRows_rsUsername > 0) {
-    // $user_name is already in use
-    echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
-    $output_form = 'yes';		
+            // $user_name is already in use
+            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+            $output_form = 'yes';		
 	}
-	mysql_free_result($rsUsername);
+        //Kill statement and DB connection
+        $stmt_rsUsername->closeCursor();
+        $DBconnection = null;   
+    }	
 	
     if (empty($user_password)) {
       // $user_password is blank
@@ -177,19 +140,35 @@ if (isset($_SERVER['QUERY_STRING'])) {
       echo '<h3>L&ouml;senorden var inte identiska!</h3>';
       $output_form = 'yes';
     }	
-} 
+    
+    if (empty($club_name)) {
+      // $club_name is blank
+      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn!</h3>';
+      $output_form = 'yes';
+    }
 
-  else {
+    if (empty($contact_name)) {
+      // $contact_name is blank
+      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn!</h3>';
+      $output_form = 'yes';
+    }    
+ } 
+ else {
     $output_form = 'yes';
-  	}
+ }
 
-  	if ($output_form == 'yes') {
-// Select information regarding active accounts
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccounts = "SELECT club_name, contact_name, contact_email FROM account WHERE active = 1 ORDER BY club_name ASC";
-$rsAccounts = mysql_query($query_rsAccounts, $DBconnection) or die(mysql_error());
-$row_rsAccounts = mysql_fetch_assoc($rsAccounts);
-?>
+if ($output_form == 'yes') {
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');                   
+    // Select information regarding all active accounts    
+    $query3 = "SELECT club_name, contact_name, contact_email FROM account WHERE active = 1 ORDER BY club_name ASC";
+    $stmt_rsAccounts = $DBconnection->query($query3);
+    $totalRows_rsAccounts = $stmt_rsAccounts->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    } ?>
       </div>
 <h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
 <p><strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
@@ -212,7 +191,7 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
         <tr>
           <td>E-post</td>
           <td valign="top"><label>
-            <input name="contact_email" type="text" id="contact_email" size="25" value="<?php echo $contact_email; ?>"/>
+            <input name="contact_email" type="text" id="contact_email" size="25" value="<?php echo $email; ?>"/>
           </label></td>
         </tr>
         <tr>
@@ -246,6 +225,7 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
     </form>
 <!-- Show current accounts -->
 <h3>Registrerade konton</h3>
+<?php if ($totalRows_rsAccounts > 0) { ?>    
       <p>Detta &auml;r konton som redan finns registrerade.</p>
   <table width="100%" border="1" cellpadding="2">
     <tr>
@@ -253,16 +233,23 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
       <td nowrap="nowrap"><strong>Kontaktnamn</strong></td>
       <td nowrap="nowrap"><strong>E-post</strong></td>      
     </tr>
-    <?php do { ?>
+<?php   while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) { ;?>
       <tr>
         <td><?php echo $row_rsAccounts['club_name']; ?></td>
         <td><?php echo $row_rsAccounts['contact_name']; ?></td>
         <td><?php echo $row_rsAccounts['contact_email']; ?></td>
       </tr>
-      <?php } while ($row_rsAccounts = mysql_fetch_assoc($rsAccounts)); ?>
+<?php   } ?>
   </table>
 <?php
-  	} 
+      } 
+      else {
+          echo 'Inga konton tillg&auml;ngliga &auml;n!';
+      }
+//Kill statement and DB connection
+$stmt_rsAccounts->closeCursor();
+$DBconnection = null;      
+} 
 	//Send the account information to the users email address and save it
   	else if ($output_form == 'no') {
         //Email to to Tuna Karate Cup Admin    
@@ -276,7 +263,7 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
 	$text_adm = "Detta konto har registrerats på tunacup.karateklubben.com:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
-        "E-post: $contact_email\n" .
+        "E-post: $email\n" .
         "Telefon: $contact_phone\n" .
 	"Användarnamn: $user_name\n" .
 	"\n";
@@ -296,7 +283,7 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
         "Här är de inloggningsuppgifter som du registrerade:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
-        "E-post: $contact_email\n" .
+        "E-post: $email\n" .
         "Telefon: $contact_phone\n" .
 	"Användarnamn: $user_name\n" .
 	"Lösenord: $user_password\n" .
@@ -307,23 +294,33 @@ $row_rsAccounts = mysql_fetch_assoc($rsAccounts);
         $msg = "Hej $contact_name,\n$text";
         
         // Send email to club contact
-        mail($contact_email, $subject, $msg, $headers);                
+        mail($email, $subject, $msg, $headers);                
    
- 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $contact_email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
-	// Insert account data if insert data is validated correctly
-        $insertSQL = sprintf("INSERT INTO account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($user_name, "text"),
-                       GetSQLValueString($user_password, "text"),
-                       GetSQLValueString($_POST['confirmed'], "int"),
-                       GetSQLValueString($contact_name, "text"),
-                       GetSQLValueString($_POST['contact_email'], "text"),
-                       GetSQLValueString($_POST['contact_phone'], "text"),
-                       GetSQLValueString($club_name, "text"),
-                       GetSQLValueString($_POST['active'], "int"),
-                       GetSQLValueString($_POST['access_level'], "int"));
-
-        mysql_select_db($database_DBconnection, $DBconnection);
-        $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
+ 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
+       //Catch anything wrong with query
+            try {
+            require('Connections/DBconnection.php');           
+            //INSERT account data in DB
+            $query = "INSERT INTO 
+                account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level)
+                VALUES (:user_name, :user_password, :confirmed, :contact_name, :contact_email, :contact_phone, :club_name, :active, :access_level)"; 
+            $stmt_rsAccount = $DBconnection->prepare($query);                                  
+            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+            $stmt_rsAccount->execute();
+            }   
+            catch(PDOException $ex) {
+                echo "An Error occured: ".$ex->getMessage();
+            }
+            $stmt_rsAccount->closeCursor();
+            $DBconnection = null;   
 	} ?>
    </div>
 </div>

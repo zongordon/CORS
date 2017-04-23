@@ -1,33 +1,49 @@
 <?php
-//Removed two out of three identical queries and one unnecessary
-//Changed from using $_SESSION['MM_Username'] to $_SESSION['MM_AccountId'] to prevent problems if changing user_name
-//Changed from query name $query_rsAccountId to $query_rsAccount and $rsAccountId to $rsAccount 
+//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Removed query for selecting data from current competition
 
+if (!isset($_SESSION)) {
+  session_start();
+}
 //Access level registered user
 $MM_authorizedUsers = "0";
 $MM_donotCheckaccess = "false";
-
-$pagetitle="Kontouppgifter";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, visa uppgifterna i valt användarkonto, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
 
 $colname_rsAccountId = "";
 if (isset($_SESSION['MM_AccountId'])) {
   $colname_rsAccountId = $_SESSION['MM_AccountId'];
 }
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccount = sprintf("SELECT * FROM account WHERE account_id = %s", GetSQLValueString($colname_rsAccountId, "int"));
-$rsAccount = mysql_query($query_rsAccount, $DBconnection) or die(mysql_error());
-$row_rsAccount = mysql_fetch_assoc($rsAccount);
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+
+//Catch anything wrong with query
+try {
+require('Connections/DBconnection.php');                
+//Select all data regarding the selected account 
+$query2 = "SELECT * FROM account WHERE account_id = :account_id";
+$stmt_rsAccount = $DBconnection->prepare($query2);
+$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
+$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+$totalRows_rsAccount = $stmt_rsAccount->rowCount();
+}   
+catch(PDOException $ex) {
+    echo "An Error occured: ".$ex->getMessage();
+}       
+
+$pagetitle="Kontouppgifter";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, visa uppgifterna i valt användarkonto, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">    
   <div class="feature">
 <h3>Informationen om kontot</h3>
@@ -65,5 +81,7 @@ $row_rsAccount = mysql_fetch_assoc($rsAccount);
 </body>
 </html>
 <?php
-mysql_free_result($rsAccount);
+//Kill statement and DB connection
+$stmt_rsAccount->closeCursor();
+$DBconnection = null; 
 ?>

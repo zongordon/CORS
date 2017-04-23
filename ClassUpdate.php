@@ -1,37 +1,54 @@
 <?php
-//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
+//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
+}
+
+//Fetch the selected Class
+$colname_rsClass = filter_input(INPUT_GET, 'class_id');
+    
 $pagetitle="Uppdatera t&auml;vlingsklass";
 $pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
 $pagekeywords="tuna karate cup, uppdatera tävlingsklasser, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
+// Includes Several code functions
 include_once('includes/functions.php');
-
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
-}
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class ="feature">
         <div class="error">
 <?php 
 // Update class data if button is clicked and all fields are validated to be correct
- if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "update_class")) {
-    $class_fee = $_POST['class_fee'];	
-    $class_weight_length = encodeToUtf8($_POST['class_weight_length']);
-    $class_age = encodeToUtf8($_POST['class_age']);
+ if (filter_input(INPUT_POST,'MM_insert') == 'update_class') {
+    $comp_id = filter_input(INPUT_POST,'comp_id');         
+    $class_category = filter_input(INPUT_POST,'class_category');             
+    $class_discipline = filter_input(INPUT_POST,'class_discipline');         
+    $class_gender = filter_input(INPUT_POST,'class_gender');         
+    $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
+    if (filter_input(INPUT_POST, trim('class_weight_length')) == '') { 
+        $class_weight_length = '-';            
+    } 
+    else {
+        $class_weight_length = encodeToUtf8(filter_input(INPUT_POST,trim('class_weight_length'))); 
+    }
+    $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
+    $class_fee = filter_input(INPUT_POST, trim('class_fee'));
     $output_form = 'no';
         
     if (empty($class_fee)) {
@@ -47,20 +64,22 @@ if (isset($_SERVER['QUERY_STRING'])) {
         }     
     }
  }
-    else {  
+ else {  
     $output_form = 'yes';
-    }
+ }
   	if ($output_form == 'yes') {
-
-        $colname_rsClass = "1";
-            if (isset($_GET['class_id'])) {
-            $colname_rsClass = $_GET['class_id'];
-            }
-        //Select Class data
-        mysql_select_db($database_DBconnection, $DBconnection);
-        $query_rsClass = sprintf("SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = %s", GetSQLValueString($colname_rsClass, "int"));
-        $rsClass = mysql_query($query_rsClass, $DBconnection) or die(mysql_error());
-        $row_rsClass = mysql_fetch_assoc($rsClass);
+   //Catch anything wrong with query
+    try {
+        //Select Class data for selected class
+        require('Connections/DBconnection.php');           
+        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
+        $stmt_rsClass = $DBconnection->prepare($query1);
+        $stmt_rsClass->execute(array(':class_id' => $colname_rsClass));
+        $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }                         
 ?>
         </div>
 <h3>&Auml;ndra en t&auml;vlingsklass f&ouml;r att kunna anm&auml;la t&auml;vlande till</h3>
@@ -71,18 +90,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
             <td>T&auml;vling</td>
             <td><label>
 <select name="comp_id" id="comp_id">
-  <?php
-do {  
-?>
-  <option value="<?php echo $row_rsClass['comp_id']?>"<?php if (!(strcmp($row_rsClass['comp_id'], $row_rsClass['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['comp_name']?></option>
-  <?php
-} while ($row_rsClass = mysql_fetch_assoc($rsClass));
-  $rows = mysql_num_rows($rsClass);
-  if($rows > 0) {
-      mysql_data_seek($rsClass, 0);
-	  $row_rsClass = mysql_fetch_assoc($rsClass);
-  }
-?>
+<option value="<?php echo $row_rsClass['comp_id']?>"<?php if (!(strcmp($row_rsClass['comp_id'], $row_rsClass['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['comp_name']?></option>
 </select>
             </label></td>
           </tr>
@@ -95,18 +103,7 @@ do {
                 <option value="Junior" <?php if (!(strcmp("Junior", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Junior</option>
                 <option value="Kadett" <?php if (!(strcmp("Kadett", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Kadett</option>
                 <option value="Barn" <?php if (!(strcmp("Barn", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Barn</option>
-                <?php
-do {  
-?>
-                <option value="<?php echo $row_rsClass['class_category']?>"<?php if (!(strcmp($row_rsClass['class_category'], $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_category']?></option>
-                <?php
-} while ($row_rsClass = mysql_fetch_assoc($rsClass));
-  $rows = mysql_num_rows($rsClass);
-  if($rows > 0) {
-      mysql_data_seek($rsClass, 0);
-	  $row_rsClass = mysql_fetch_assoc($rsClass);
-  }
-?>
+<option value="<?php echo $row_rsClass['class_category']?>"<?php if (!(strcmp($row_rsClass['class_category'], $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_category']?></option>
               </select>
             </label></td>
           </tr>
@@ -146,18 +143,7 @@ Kata</label>
     <option value="Pojkar" <?php if (!(strcmp("Pojkar", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Pojkar</option>
     <option value="Flickor" <?php if (!(strcmp("Flickor", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Flickor</option>
     <option value="Mix" <?php if (!(strcmp("Mix", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Mix</option>    
-<?php
-do {  
-?>
-    <option value="<?php echo $row_rsClass['class_gender_category']?>"<?php if (!(strcmp($row_rsClass['class_gender_category'], $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_gender_category']?></option>
-<?php
-} while ($row_rsClass = mysql_fetch_assoc($rsClass));
-  $rows = mysql_num_rows($rsClass);
-  if($rows > 0) {
-      mysql_data_seek($rsClass, 0);
-	  $row_rsClass = mysql_fetch_assoc($rsClass);
-  }
-?>
+<option value="<?php echo $row_rsClass['class_gender_category']?>"<?php if (!(strcmp($row_rsClass['class_gender_category'], $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_gender_category']?></option>
   </select>
 </label></td>
           </tr>
@@ -193,30 +179,48 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($rsClass);
+//Kill statements and DB connection
+$stmt_rsClass->closeCursor();
         }
  	else if ($output_form == 'no') {        
-            if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "update_class")) {
-            $updateSQL = sprintf("UPDATE classes SET comp_id=%s, class_category=%s, class_discipline=%s, class_gender_category=%s, class_gender=%s, class_weight_length=%s, class_age=%s, class_fee=%s WHERE class_id=%s",
-                       GetSQLValueString($_POST['comp_id'], "int"),
-                       GetSQLValueString($_POST['class_category'], "text"),
-                       GetSQLValueString($_POST['class_discipline'], "text"),
-                       GetSQLValueString($_POST['class_gender_category'], "text"),
-                       GetSQLValueString($_POST['class_gender'], "text"),
-                       GetSQLValueString($class_weight_length, "text"),
-                       GetSQLValueString($class_age, "text"),
-                       GetSQLValueString($_POST['class_fee'], "int"),
-                       GetSQLValueString($_POST['class_id'], "int"));
-
-            mysql_select_db($database_DBconnection, $DBconnection);
-            $Result1 = mysql_query($updateSQL, $DBconnection) or die(mysql_error());
+            if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
+                //Catch anything wrong with query
+                try {
+                require('Connections/DBconnection.php');
+                //UPDATE selected Class
+                $updateSQL = "UPDATE classes SET comp_id = :comp_id, 
+                class_category = :class_category, 
+                class_discipline = :class_discipline, 
+                class_gender = :class_gender, 
+                class_gender_category = :class_gender_category, 
+                class_weight_length = :class_weight_length, 
+                class_age = :class_age, 
+                class_fee = :class_fee
+                WHERE class_id = :class_id"; 
+                $stmt = $DBconnection->prepare($updateSQL);                                 
+                $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
+                $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
+                $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
+                $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
+                $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
+                $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
+                $stmt->bindValue(':class_age', $class_age, PDO::PARAM_STR);            
+                $stmt->bindValue(':class_fee', $class_fee, PDO::PARAM_INT);                        
+                $stmt->bindValue(':class_id', $colname_rsClass, PDO::PARAM_INT);
+                $stmt->execute();
+                }   
+                catch(PDOException $ex) {
+                    echo "An Error occured: ".$ex->getMessage();
+                }   
 
             $updateGoTo = "ClassesList.php";
-                if (isset($_SERVER['QUERY_STRING'])) {
+                if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                 $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
-                $updateGoTo .= $_SERVER['QUERY_STRING'];
+                $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
                 }
             header(sprintf("Location: %s", $updateGoTo));
+            //Kill statement 
+            $stmt->closeCursor();
             }
         }
 ob_end_flush();
