@@ -1,5 +1,5 @@
 <?php
-//Added ob_start(); and ob_end_flush();
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
 ob_start();
 
 //Access level top administrator
@@ -12,20 +12,25 @@ $pagekeywords="tuna karate cup, ta bort tävling, karate, eskilstuna, sporthalle
 // Includes HTML Head, and several other code functions
 include_once('includes/functions.php');
 
-if ((isset($_GET['comp_id'])) && ($_GET['comp_id'] != "")) {
-  $deleteSQL = sprintf("DELETE FROM competition WHERE comp_id=%s",
-                       GetSQLValueString($_GET['comp_id'], "int"));
+//Fetch the selected competition from previous page
+$colname_rsCompetition = filter_input(INPUT_GET,'comp_id');    
 
-  mysql_select_db($database_DBconnection, $DBconnection);
-  $Result1 = mysql_query($deleteSQL, $DBconnection) or die(mysql_error());
+//DELETE the competition 
+require('Connections/DBconnection.php');         
+$query = "DELETE FROM competition WHERE comp_id = :comp_id";
+$stmt_rsCompDelete = $DBconnection->prepare($query);
+$stmt_rsCompDelete->bindValue(':comp_id', $colname_rsCompetition, PDO::PARAM_INT);   
+$stmt_rsCompDelete->execute();
 
   $deleteGoTo = "CompetitionList.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
+  if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
     $deleteGoTo .= (strpos($deleteGoTo, '?')) ? "&" : "?";
-    $deleteGoTo .= $_SERVER['QUERY_STRING'];
+    $deleteGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
   }
   header(sprintf("Location: %s", $deleteGoTo));
-}
+  //Kill statements and DB connection
+  $stmt_rsCompDelete->closeCursor();
+  $DBconnection = null;
 ?>
 <!-- Include top navigation links, News and sponsor sections -->
 <?php include("includes/header.php");?> 

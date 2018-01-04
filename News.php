@@ -7,9 +7,9 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
 //Catch anything wrong with query
 try {
@@ -25,15 +25,15 @@ $totalRows_rsNews = $stmt_rsNews->rowCount();
 $pagetitle="Nyheter";
 $pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
 $pagekeywords="tuna karate cup, logga in, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes Several other code functions
-//include_once('includes/functions.php');
+// Includes Several code functions
+include_once('includes/functions.php');
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");     
-?>
+include_once("includes/news_sponsors_nav.php");?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
+<!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>    
 <div id="content">
   <div class="feature"><img height="199" width="300" alt="" src="img/rotating/rotate.php" />

@@ -50,7 +50,6 @@ $totalRows_rsCompetitions = $stmt_rsCompetitions->rowCount();
 catch(PDOException $ex) {
     echo "An Error occured with query1: ".$ex->getMessage();
 }   
-
 $pagetitle="T&auml;vlingar";
 $pagedescription="Lista de tävlingar som finns. Tuna Karate Cup arrangeras av Eskilstuna Karateklubb.";
 $pagekeywords="";

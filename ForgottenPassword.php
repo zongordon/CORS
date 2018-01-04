@@ -1,114 +1,73 @@
 <?php
-//Adjusted text to "Glömt lösenordet eller användarnamnet?" and clarified that the login credentials will be sent to the email address registered for that specific account
-//Added page footer and made sure it is always displayed correctly
-//Added ob_start(); and ob_end_flush();
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 ob_start();
 
-global $editFormAction;
-
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall."
-<meta name="keywords" content="tuna karate cup, , förlorat ditt lösenord eller användar namn; karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
-</head>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?";
+$pagedescription="Tävling som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
+$pagekeywords="tuna karate cup, , förlorat ditt lösenord eller användar namn; karate, eskilstuna, munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes Several code functions
+include_once('includes/functions.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content"> 
-  <div class="feature">
-     
+  <div class="feature">      
 <?php
- if ((isset($_POST["MM_select"])) && ($_POST["MM_select"] == "select_account")) {
-    $contact_email = $_POST['contact_email'];
+ //Validate the form if button is clicked
+ if (filter_input(INPUT_POST,'MM_select') == 'select_account') {
+    $contact_email = filter_input(INPUT_POST,'contact_email');
     $output_form = 'no'; ?> 
-       <div class="error">       
+<div class="error">       
 <?php
-    require_once('Connections/DBconnection.php');
-
-   if (empty($contact_email)) {
+  if (empty($contact_email)) {
       // $contact_email is blank
       echo '<h3>Du gl&ouml;mde att fylla i e-post!</h3>';
       $output_form = 'yes';
-    }
-  if (!empty($contact_email)) {
-    if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', $contact_email)) {
-      // $contact_email is invalid because LocalName is bad
-      echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3><br />';
-      $output_form = 'yes';
-    }
-    else {
-      // Strip out everything but the domain from the email
-      $domain = preg_replace('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', '', $contact_email);
-	  
-	 // Now check if $domain is registered (USED ON A NON-WINDOWS SERVER)
-      if (!checkdnsrr($domain)) {
-         echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3><br /></a>';
-         $output_form = 'yes';
-     	}
-    }
-	 
-	$colname_rsContactemail = $contact_email; 
- 	mysql_select_db($database_DBconnection, $DBconnection);
-	$query_rsContactemail = sprintf("SELECT contact_email FROM account WHERE contact_email = %s", GetSQLValueString(	$colname_rsContactemail, "text"));
-	$rsContactemail = mysql_query($query_rsContactemail, $DBconnection) or die(mysql_error());
-	$row_rsContactemail = mysql_fetch_assoc($rsContactemail);
-	$totalRows_rsContactemail = mysql_num_rows($rsContactemail);
-	
-	if ($totalRows_rsContactemail == 0) {
-        // $contact_email is missing
-        echo '<h3>Det finns ingen anv&auml;ndare med e-postadressen du angett!</h3>';
-        $output_form = 'yes';		
-    	mysql_free_result($rsContactemail);
-	}
-  } ?>
-       </div> <?php
-} 
-
+  }
+  //If contact_email is not blank validate the input and check if it's already registered 
   else {
-    $output_form = 'yes';
-  	}
-
-  	if ($output_form == 'yes') {
+     // Validate contact_email
+      if(valid_email($contact_email)){
+            $output_form = 'no';
+            //Catch anything wrong with query
+            try {   
+            //SELECT contactt email from account
+            require('Connections/DBconnection.php');         
+            $query = "SELECT contact_email FROM account WHERE contact_email =:contact_email";
+            $stmt_rsContactemail = $DBconnection->prepare($query);
+            $stmt_rsContactemail->execute(array(':contact_email'=>$contact_email));
+            $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+            $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+            }      
+            catch(PDOException $ex) {
+                echo "An Error occured with queryX: ".$ex->getMessage();
+            }
+            if ($totalRows_rsContactemail === 0) {
+            // $contact_email is missing
+            echo '<h3>Det finns ingen anv&auml;ndare med e-postadressen du angett!</h3>';
+            $output_form = 'yes';		
+            }
+      }
+      else {
+        // contact_email is invalid because LocalName is bad  
+        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
+        $output_form = 'yes';
+      }
+  }
 ?>
-
+</div> <?php
+}
+else {
+    $output_form = 'yes';
+}
+if ($output_form === 'yes') {
+?>
 <h3>Har du gl&ouml;mt ditt l&ouml;senord? </h3>
       <p> Fyll i din mejladress och klicka p&aring; Skicka, s&aring; skickas dina inloggningsuppgifter till den mejladress som finns registrerad f&ouml;r kontot.</p>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="select_account" name="select_account">      
@@ -124,19 +83,25 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
       <input type="hidden" name="MM_select" value="select_account" />
     </form>
 <?php
-  	} 
-  	else if ($output_form == 'no') {
+} 
+else if ($output_form == 'no') {
 
 $colname_rsAccount = "-1";
-if (isset($_POST['contact_email'])) {
-  $colname_rsAccount = $_POST['contact_email'];
+if (filter_input(INPUT_POST,'contact_email')) {
+  $colname_rsAccount = filter_input(INPUT_POST,'contact_email');
 }
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccount = sprintf("SELECT * FROM account WHERE contact_email = %s", GetSQLValueString($colname_rsAccount, "text"));
-$rsAccount = mysql_query($query_rsAccount, $DBconnection) or die(mysql_error());
-$row_rsAccount = mysql_fetch_assoc($rsAccount);
-$totalRows_rsAccount = mysql_num_rows($rsAccount);
-
+//Catch anything wrong with query
+try {
+//SELECT data from account
+require('Connections/DBconnection.php');         
+$query = "SELECT * FROM account WHERE contact_email = :contact_email";
+$stmt_rsAccount = $DBconnection->prepare($query);
+$stmt_rsAccount->execute(array(':contact_email'=>$colname_rsAccount));
+$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+}   
+catch(PDOException $ex) {
+    echo "An Error occured with queryX: ".$ex->getMessage();
+}   
 $club_name = $row_rsAccount['club_name'];
 $contact_name = $row_rsAccount['contact_name'];
 $contact_phone = $row_rsAccount['contact_phone'];
@@ -163,9 +128,10 @@ echo '<h3>' . $contact_name . ',<br />Dina inloggningsuppgifter skickades till: 
         // Send email to Club Contact
         mail($contact_email, $subject, $msg, $headers);                
 
-	mysql_free_result($rsAccount);
-	}	 
-	?>
+//Kill statements and DB connection
+$stmt_rsAccount->closeCursor();
+$DBconnection = null;
+} ?>
     <div class="story">
     <p>&nbsp;</p>
     </div>

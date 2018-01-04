@@ -1,5 +1,5 @@
 <?php
-//Secured input (UTF-8) into database after upgrading to PHP 5.6.23, causing problem with special characters - https://github.com/zongordon/CORS/issues/16
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
 ob_start();
 
 //Access level top administrator
@@ -7,8 +7,8 @@ $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 $pagetitle="L&auml;gga till t&auml;vling";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, lägga till tävling, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
+$pagekeywords="tuna karate cup, lägga till tävling, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes HTML Head, and several other code functions
 include_once('includes/functions.php');
 
@@ -31,13 +31,13 @@ if (isset($_SERVER['QUERY_STRING'])) {
 global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_max_regs;
 
 //Validate the form if button is clicked
- if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
-    $comp_name = encodeToUtf8($_POST['comp_name']);
-    $comp_start_date = $_POST['comp_start_date'];
-    $comp_end_date = $_POST['comp_end_date'];
-    $comp_end_reg_date = $_POST['comp_end_reg_date'];
-    $comp_max_regs = $_POST['comp_max_regs'];
-    $comp_current = $_POST['comp_current'];
+ if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
+    $comp_name = encodeToUtf8(filter_input(INPUT_POST,'comp_name'));
+    $comp_start_date = filter_input(INPUT_POST,'comp_start_date');
+    $comp_end_date = filter_input(INPUT_POST,'comp_end_date');
+    $comp_end_reg_date = filter_input(INPUT_POST,'comp_end_reg_date');
+    $comp_max_regs = filter_input(INPUT_POST,'comp_max_regs');
+    $comp_current = filter_input(INPUT_POST,'comp_current');
     $output_form = 'no';
 
     if (empty($comp_name)) {
@@ -87,11 +87,11 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
     }	                
 } 
 
-  else {
+ else {
     $output_form = 'yes';
-  	}
+ }
 
-  	if ($output_form == 'yes') {
+ if ($output_form == 'yes') {
 ?>  
        </div>         
 <h3>Skapa en ny t&auml;vling</h3>
@@ -146,34 +146,50 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
     <?php
   	} 
 	//Save the competition information
-  	else if ($output_form == 'no') {
-
-if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_comp")) {
+else if ($output_form == 'no') {
+//If button is clicked for insert then insert to columns from data in the form
+    if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
     // Set all competitions first to non-current (0) if the new competition shall be current
-    if ($_POST["comp_current"] == 1) {
-       $resetSQL = sprintf("UPDATE competition SET comp_current = 0");
-       mysql_select_db($database_DBconnection, $DBconnection);
-       $Result1 = mysql_query($resetSQL, $DBconnection) or die(mysql_error());
+    $comp_current = filter_input(INPUT_POST,'comp_current');
+            // Set all competitions first to non-current (0) if this competition will be the active  one ($comp_current == "on")
+            if ($comp_current == "on") {
+                //Catch anything wrong with query
+                try {
+                // Set all competitions first to non-current (0)   
+                require('Connections/DBconnection.php');
+                $comp_reset = 0;
+                $resetSQL = "UPDATE competition SET comp_current = :comp_current"; 
+                $stmt_rsReset = $DBconnection->prepare($resetSQL);                                 
+                $stmt_rsReset->bindValue(':comp_current', $comp_reset, PDO::PARAM_INT);
+                $stmt_rsReset->execute();
+                }   
+                catch(PDOException $ex) {
+                    echo "An Error occured with query (resetSQL): ".$ex->getMessage();
+                }
+                $comp_current = 1;
+            }    
+    // Insert all competition data  
+    require('Connections/DBconnection.php');         
+    $insertSQL = "INSERT INTO competition  (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_date, :comp_end_date, :comp_end_reg_date, :comp_max_regs, :comp_current)";
+    $stmt = $DBconnection->prepare($insertSQL);
+    $stmt->bindValue(':comp_name', $comp_name, PDO::PARAM_STR);
+    $stmt->bindValue(':comp_start_date', $comp_start_date, PDO::PARAM_STR);
+    $stmt->bindValue(':comp_end_date', $comp_end_date, PDO::PARAM_STR);
+    $stmt->bindValue(':comp_end_reg_date', $comp_end_reg_date, PDO::PARAM_STR);
+    $stmt->bindValue(':comp_max_regs', $comp_max_regs, PDO::PARAM_INT);
+    $stmt->bindValue(':comp_current', $comp_current, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $insertGoTo = "CompetitionList.php";
+        if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+        $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
+        $insertGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+        }
+        header(sprintf("Location: %s", $insertGoTo));
     }
-  // Insert all competition data  
-  $insertSQL = sprintf("INSERT INTO competition (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_max_regs, comp_current) VALUES (%s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($comp_name, "text"),
-                       GetSQLValueString($_POST['comp_start_date'], "date"),
-                       GetSQLValueString($_POST['comp_end_date'], "date"),
-                       GetSQLValueString($_POST['comp_end_reg_date'], "date"),
-                       GetSQLValueString($_POST['comp_max_regs'], "int"),
-                       GetSQLValueString($_POST['comp_current'], "int"));
-
-  mysql_select_db($database_DBconnection, $DBconnection);
-  $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
-
-  $insertGoTo = "CompetitionList.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
-    $insertGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $insertGoTo));
-}
+    //Kill statements and DB connection
+    $stmt->closeCursor();
+    $DBconnection = null;
 }
 ?>
   </div>

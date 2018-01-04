@@ -73,7 +73,7 @@ include_once("includes/news_sponsors_nav.php");
           <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
           <td><a href="ClassContestants_loggedout.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">Startlista</a></td>
           <?php if ($totalRows_rsRaffled == 1) {
-                echo "<td><a href=javascript:MM_openBrWindow('ElimLadder.php?class_id=".$row_rsClasses['class_id']."','T&auml;vlingsstege','',1131,800,'true')>T&auml;vlingsstege</a></td>";
+                echo "<td><a href=javascript:MM_openBrWindow('ElimLadder.php?class_id=".$row_rsClasses['class_id']."','T&auml;vlingsstege','',1145,800,'true')>T&auml;vlingsstege</a></td>";
                 } ?>          
         </tr>
 <?php }; ?>

@@ -1,26 +1,29 @@
 <?php 
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
 //Added header.php and news_sponsors_nav.php as includes.
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
-require_once('Connections/DBconnection.php');
-mysql_select_db($database_DBconnection, $DBconnection);
+//Catch anything wrong with query
+try {
+// Select number of classes including last date for registrations, for the active competition
+require('Connections/DBconnection.php');           
 $query_rsCompetition = "SELECT comp_raffled FROM competition WHERE comp_current = 1";
-$rsCompetition = mysql_query($query_rsCompetition, $DBconnection) or die(mysql_error());
-$row_rsCompetition = mysql_fetch_assoc($rsCompetition);
+$stmt_rsCompetition = $DBconnection->query($query_rsCompetition);
+$row_rsCompetition = $stmt_rsCompetition->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
 
 $pagetitle="Tuna Karate Cup";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup inställd, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes Several other code functions
-//include_once('includes/functions.php');
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
+$pagekeywords="tuna karate cup, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");
-?>
+include_once("includes/news_sponsors_nav.php");?>
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->

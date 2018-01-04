@@ -2,18 +2,21 @@
 //Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
 //Added header.php and news_sponsors_nav.php as includes.
 //Removed function GetSQLValueString
+//Adjusted sorting function
 
 if (!isset($_SESSION)) {
   session_start();
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+//Handle input from form
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
+
 $sorting = "class_discipline, class_gender, class_age, class_weight_length, contestant_result";
-if (isset($_GET['sorting'])) {
-  $sorting = $_GET['sorting'];
+if (filter_input(INPUT_GET,'sorting')) {
+  $sorting = filter_input(INPUT_GET,'sorting');
 }
 //Catch anything wrong with DB connection
 try {
@@ -34,8 +37,7 @@ $pagekeywords="tuna karate cup, karate, eskilstuna, sporthallen, wado, sj&auml;l
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");     
-?>
+include_once("includes/news_sponsors_nav.php");?>
 <!-- start page -->
 <!-- Include top navigation links, News and sponsor sections -->
 <?php include("includes/header.php");?> 
@@ -61,9 +63,18 @@ if ($totalRows_rsResult > 0) { // Show if recordset not empty ?>
       <td valign="middle">Sortering</td>
       <td><label>
         <select name="sorting" id="sorting">
-      <option value="club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_name"<?php if (!(strcmp($sorting, "club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_name"))) {echo "selected=\"selected\"";} ?>>Klubb</option>
-      <option value="class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"<?php if (!(strcmp($sorting, "class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"))) {echo "selected=\"selected\"";} ?>>T&auml;vlingsklass</option>
-      <option value="contestant_name, club_name"<?php if (!(strcmp($sorting, "contestant_name, club_name"))) {echo "selected=\"selected\"";} ?>>T&auml;vlande</option>
+      <option value="club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_result"
+          <?php if (!(strcmp($sorting, "club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_result"))) {
+                    echo "selected=\"selected\"";
+                } ?>>Klubb</option>
+      <option value="class_discipline, class_gender, class_age, class_weight_length, contestant_result"
+          <?php if (!(strcmp($sorting, "class_discipline, class_gender, class_age, class_weight_length, contestant_result"))) {
+                    echo "selected=\"selected\"";
+                } ?>>T&auml;vlingsklass</option>
+      <option value="contestant_name, club_name"
+          <?php if (!(strcmp($sorting, "contestant_name, club_name"))) {
+                    echo "selected=\"selected\"";
+                } ?>>T&auml;vlande</option>
         </select>
       </label></td>
       <td><input type="submit" name="submit" id="submit" value="Sortera" /></td>

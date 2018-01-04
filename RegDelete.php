@@ -1,32 +1,42 @@
 <?php
-//Added ob_start() and <?php ob_end_flush()
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added footer.php, header.php, restrict_access.php and news_sponsors_nav.php as includes.
+
 ob_start();
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
-$pagetitle="Ta bort anm&auml;lan";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, Ta bort anmälan, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
-
-//Select the account_id (forwarding to next page) and then deleted the selected registration
-if ((isset($_GET['reg_id'])) && ($_GET['reg_id'] != "")) {
-  $deleteSQL = sprintf("DELETE FROM registration WHERE reg_id=%s",
-                       GetSQLValueString($_GET['reg_id'], "int"));
-
-  mysql_select_db($database_DBconnection, $DBconnection);
-  $Result1 = mysql_query($deleteSQL, $DBconnection) or die(mysql_error());    
-  
-  $deleteGoTo = "RegsHandleAll.php#registration_delete";
-
-header(sprintf("Location: %s", $deleteGoTo));
+if (filter_input(INPUT_GET,'reg_id') != "") {
+        $reg_id = filter_input(INPUT_GET,'reg_id');
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');         
+    $query = "DELETE FROM registration WHERE reg_id = :reg_id";
+    $stmt_rsDelete = $DBconnection->prepare($query);
+    $stmt_rsDelete->bindValue(':reg_id', $reg_id, PDO::PARAM_INT);   
+    $stmt_rsDelete->execute();
+    }   catch(PDOException $ex) {
+            echo "An Error occured with queryX: ".$ex->getMessage();
+        }
+    $deleteGoTo = "RegsHandleAll.php#registration_insert";
+    header(sprintf("Location: %s", $deleteGoTo));
+//Kill statements and DB connection
+$stmt_rsDelete->closeCursor();
+$DBconnection = null;
 }
-  ?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$pagetitle="Ta bort anm&auml;lan - admin";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Muntellarena.";
+$pagekeywords="tuna karate cup, Ta bort anmälan som admin, karate, eskilstuna, Muntellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>      
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->

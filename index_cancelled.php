@@ -6,15 +6,12 @@ if (!isset($_SESSION)) {
   session_start();
 }
 $pagetitle="Tuna Karate Cup";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup inställd, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes Several other code functions
-//include_once('includes/functions.php');
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
+$pagekeywords="tuna karate cup, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");
-?>
+include_once("includes/news_sponsors_nav.php");?>
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>    

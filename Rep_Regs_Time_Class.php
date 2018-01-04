@@ -1,93 +1,55 @@
-<?php
-//Adjusted to display page title
+<?php 
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Added check of access level
+
 ob_start();
  
 if (!isset($_SESSION)) {
   session_start();
 }
-require_once('Connections/DBconnection.php'); ?>
-<?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
+//Access level registered user
+$MM_authorizedUsers = "0";
+$MM_donotCheckaccess = "false";
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+//Catch anything wrong with query
+try {
+// Select number of registrations for each class, for the active competition
+require('Connections/DBconnection.php');           
+$query_rsRegistrations = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
+$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC); 
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
 
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-?> 
-<?php
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsRegistrations = sprintf("SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length", GetSQLValueString($colname_rsRegistrations, "int"));
-$rsRegistrations = mysql_query($query_rsRegistrations, $DBconnection) or die(mysql_error());
-$row_rsRegistrations = mysql_fetch_assoc($rsRegistrations);
-$totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Rapport: antal anm&auml;lningar per t&auml;vlingsklass"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
-<meta name="keywords" content="tuna karate cup, rapport antal anmälningar och tidsåtgång per klass, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
-</head>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$pagetitle="Rapport: antal anm&auml;lningar och tids&aring;tg&aringng per t&auml;vlingsklass";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
+$pagekeywords="tuna karate cup, rapport antal anmälningar och tidsåtgång per klass, karate, eskilstuna, Munktellarena, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
-<!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div id="content">    
-    <div class="feature">
-<h3>Antal anm&auml;lningar och ber&auml;knad tids&aring;tg&aring;ng per t&auml;vlingsklass</h3>
-<p>Rapporten visar hur m&aring;nga anm&auml;lningar som gjorts till aktuell t&auml;vling och ber&auml;knad tids&aring;tg&aring;ng per t&auml;vlingsklass.</p>
+		<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="content">
+  <div class="feature">
+<h3>Antal anm&auml;lningar och tids&aring;tg&aringng per t&auml;vlingsklass</h3>
+<p>Rapporten visar hur m&aring;nga anm&auml;lningar som gjorts till aktuell t&auml;vling per t&auml;vlingsklass och ber&auml;knad tids&aring;tg&aringng f&ouml;r klassen.</p>
 <table width="80%" border="1">
     <tr>
       <td><strong>T&auml;vlingsklass</strong></td>
           <td><strong>Antal t&auml;vlande</strong></td>
           <td><strong>Totalt ber&auml;knad tid (min)</strong></td>
       </tr>
-        <?php do { ?>
+      <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { ?>
         <tr>
-          <td nowrap="nowrap">
- <?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
-      if ($row_rsRegistrations['class_age'] == "") { 
-          echo "";          
-      } 
-      if ($row_rsRegistrations['class_age'] <> "") { 
-          echo $row_rsRegistrations['class_age'].' &aring;r'.' | '; 
-      }
-      if ($row_rsRegistrations['class_weight_length'] == "-") {
-          echo "";                    
-      }
-      if ($row_rsRegistrations['class_weight_length'] <> "-") {
-         echo $row_rsRegistrations['class_weight_length']; 
-      }
-      ?></td>
-
+          <td nowrap="nowrap"><?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
           <td nowrap="nowrap">
 <?php 
@@ -102,7 +64,7 @@ $time_class = 5;
 }
 echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
         </tr>
-      <?php } while ($row_rsRegistrations = mysql_fetch_assoc($rsRegistrations)); ?>        
+      <?php }  ?>        
     </table>
       <p>&nbsp;</p>
   </div>
@@ -114,5 +76,7 @@ echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
 </body>
 </html>
 <?php
-mysql_free_result($rsRegistrations);
+//Kill statements and DB connection
+$stmt_rsRegistrations->closeCursor();
+$DBconnection = null;
 ?>

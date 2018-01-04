@@ -91,7 +91,7 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
           <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
     <td><?php echo $row_rsClasses['class_fee'].' kr'; ?></td>
     <td><a href="ClassContestants.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">Startlista</a></td>
-    <td><a href="javascript:MM_openBrWindow('ElimLadder.php?class_id=<?php echo $row_rsClasses['class_id']; ?>','T&auml;vlingsstege','',1131,800,'true')">T&auml;vlingsstege</a></td>          
+    <td><a href="javascript:MM_openBrWindow('ElimLadder.php?class_id=<?php echo $row_rsClasses['class_id']; ?>','T&auml;vlingsstege','',1145,800,'true')">T&auml;vlingsstege</a></td>          
     <td><a href="ClassUpdate.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">&Auml;ndra</a></td>
     <td><a href="#" onclick="return deleteClass('<?php echo $row_rsClasses['class_id']; ?>')">Ta bort</a></td>
   </tr>

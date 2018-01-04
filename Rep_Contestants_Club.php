@@ -1,62 +1,39 @@
 <?php 
-//Adjusted to display page title
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Added check of access level
 
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
+//Access level registered user
+$MM_authorizedUsers = "0";
+$MM_donotCheckaccess = "false";
 
-require_once('Connections/DBconnection.php'); 
-
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_DBconnection, $DBconnection);
+//Catch anything wrong with query
+try {
+// Select number of registrations for each club, for the active competition
+require('Connections/DBconnection.php');           
 $query_rsContestants = "SELECT club_name, COUNT(reg_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
-$rsContestants = mysql_query($query_rsContestants, $DBconnection) or die(mysql_error());
-$row_rsContestants = mysql_fetch_assoc($rsContestants);
-$totalRows_rsContestants= mysql_num_rows($rsContestants);
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Rapport: antal t&auml;vlande som anm&auml;lts till aktuell t&auml;vling, per klubb"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
-<meta name="keywords" content="tuna karate cup, karate, eskilstuna, sporthallen, wado, sj&auml;lvf&ouml;rsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
-</head>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$stmt_rsContestants = $DBconnection->query($query_rsContestants);
+$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC); 
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+
+$pagetitle="Rapport: antal t&auml;vlande som anm&auml;lts till aktuell t&auml;vling, per klubb";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
+$pagekeywords="tuna karate cup, rapport om antal tävlande per klubb, karate, eskilstuna, Munktellarena, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>    
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -70,12 +47,12 @@ $totalRows_rsContestants= mysql_num_rows($rsContestants);
           <td><strong>Klubb</strong></td>
           <td><strong>Antal&nbsp;t&auml;vlande</strong></td>
         </tr>
-    <?php do { ?>
+    <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
         <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
         <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(reg_id)']; ?></td>
         </tr>
-      <?php } while ($row_rsContestants = mysql_fetch_assoc($rsContestants));?>
+    <?php } ?>
 </table>
       <p>&nbsp;</p>
   </div>
@@ -88,5 +65,7 @@ $totalRows_rsContestants= mysql_num_rows($rsContestants);
 </body>
 </html>
 <?php
-mysql_free_result($rsContestants);
+//Kill statements and DB connection
+$stmt_rsContestants->closeCursor();
+$DBconnection = null;
 ?>
