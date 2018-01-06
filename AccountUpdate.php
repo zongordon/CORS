@@ -1,8 +1,5 @@
 <?php 
-//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-//Changed validation method for contact_email
-//Added validation of email and/or user name that they are not already registered (if you try to change to someone elses)
+//v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
 
 ob_start();
 
@@ -56,11 +53,13 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
     $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
     $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
     $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
-    $confirmed = filter_input(INPUT_POST, 'confirmed');     
-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name'), MB_CASE_TITLE,"UTF-8")));
+    $confirmed = filter_input(INPUT_POST, 'confirmed');    
+    $contact = trim(filter_input(INPUT_POST, 'contact_name'));
+    $contact_name = mb_convert_case($contact, MB_CASE_TITLE,"UTF-8");
     $email = filter_input(INPUT_POST, trim('contact_email'));
     $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name'), MB_CASE_TITLE,"UTF-8")));
+    $club = trim(filter_input(INPUT_POST, 'club_name'));    
+    $club_name = mb_convert_case($club, MB_CASE_TITLE,"UTF-8");
     $active = filter_input(INPUT_POST, 'active');
     $access_level = filter_input(INPUT_POST, 'access_level');
     $account_id = filter_input(INPUT_POST, 'account_id');			
