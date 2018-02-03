@@ -7,8 +7,8 @@
 try { 
 //Testsite DB
 //$DBconnection = new PDO('mysql:host=localhost;dbname=karatekl_compreg;charset=utf8mb4', 'karatekl_tkc', '4=L|$?fQ1=jx');
-//Production DB/Local site
-$DBconnection = new PDO('mysql:host=localhost;dbname=tkc_test;charset=utf8mb4', 'karatekl_tkc', '4=L|$?fQ1=jx');
+//Production DB
+$DBconnection = new PDO('mysql:host=localhost;dbname=karatekl_tkc;charset=utf8mb4', 'karatekl_tkc', '4=L|$?fQ1=jx');
 $DBconnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 $DBconnection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
 } 

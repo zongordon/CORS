@@ -1,5 +1,6 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 ob_start();
 //Access level top administrator
@@ -51,6 +52,8 @@ $colname_rsCompetition = filter_input(INPUT_GET, 'comp_id');
     }
 
 $pagetitle="Kopiera T&auml;vlingklasser";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, kopiera tävlingsklasser från en tävling till en annan, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

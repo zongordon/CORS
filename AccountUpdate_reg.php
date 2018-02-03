@@ -1,8 +1,9 @@
 <?php 
-//v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
-//Changed from $colname_rsAccountId = filter_input(INPUT_SESSION, 'MM_AccountId');
-//Changed from  $updateGoTo = "AccountList.php";
-//Moved meta description and keywords to header.php
+//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Changed validation method for contact_email
+//Added validation of email and/or user name that they are not already registered (if you try to change to someone elses)
+
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -12,7 +13,7 @@ if (!isset($_SESSION)) {
 $MM_authorizedUsers = "0";
 $MM_donotCheckaccess = "true";
 
-$colname_rsAccountId = $_SESSION['MM_AccountId'];
+$colname_rsAccountId = filter_input(INPUT_SESSION, 'MM_AccountId');
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (filter_input(INPUT_SERVER, 'QUERY_STRING')) {
@@ -33,6 +34,8 @@ catch(PDOException $ex) {
 }
 
 $pagetitle="&Auml;ndra anv&auml;ndarkonto";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, ändra användarkonto, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -271,7 +274,7 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
             }
-            $updateGoTo = "AccountList_reg.php";
+            $updateGoTo = "AccountList.php";
             if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                 $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
                 $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');

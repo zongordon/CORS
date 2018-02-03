@@ -1,5 +1,6 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -50,6 +51,8 @@ catch(PDOException $ex) {
     echo "An Error occured with query1: ".$ex->getMessage();
 }   
 $pagetitle="T&auml;vlingar";
+$pagedescription="Lista de tävlingar som finns. Tuna Karate Cup arrangeras av Eskilstuna Karateklubb.";
+$pagekeywords="";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

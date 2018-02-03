@@ -1,25 +1,24 @@
 <?php
-//Moved meta description and keywords to header.php
-//Added function to handle more input: comp_arranger, comp_email and comp_url
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
 ob_start();
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
-$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
-if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
-$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
-}
 $pagetitle="L&auml;gga till t&auml;vling";
-// Includes Several code functions
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
+$pagekeywords="tuna karate cup, lägga till tävling, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+// Includes HTML Head, and several other code functions
 include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
-// Includes HTML Head
-include_once('includes/header.php');
-//Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?>  
+
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
+?>
+<!-- Include top navigation links, News and sponsor sections -->
+<?php include("includes/header.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -29,7 +28,7 @@ include_once("includes/news_sponsors_nav.php");?>
       <div class="error">
 <?php
 //Initiate global variables
-global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_arranger, $comp_email, $comp_url, $comp_max_regs;
+global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_max_regs;
 
 //Validate the form if button is clicked
  if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
@@ -37,9 +36,6 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
     $comp_start_date = filter_input(INPUT_POST,'comp_start_date');
     $comp_end_date = filter_input(INPUT_POST,'comp_end_date');
     $comp_end_reg_date = filter_input(INPUT_POST,'comp_end_reg_date');
-    $comp_arranger = encodeToUtf8(filter_input(INPUT_POST,'comp_arranger'));
-    $comp_email = filter_input(INPUT_POST,'comp_email');
-    $comp_url = filter_input(INPUT_POST,'comp_url');
     $comp_max_regs = filter_input(INPUT_POST,'comp_max_regs');
     $comp_current = filter_input(INPUT_POST,'comp_current');
     $output_form = 'no';
@@ -79,41 +75,6 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
     echo '<h3>Du anv&auml;nde fel format p&aring; sista anm&auml;lningsdag!</h3>';
     $output_form = 'yes';
     }	            
-    if (empty($comp_arranger)) {
-      // $comp_arranger is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens arrang&ouml;r!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($comp_email)) {
-      // $comp_email is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingsarrang&ouml;rens mejladresss!</h3>';
-      $output_form = 'yes';
-    }
-    //If comp_email is not blank validate the input 
-    else {
-      // Validate contact_email
-      if(!valid_email($comp_email)){
-        // comp_email is invalid because LocalName is bad  
-        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
-        $output_form = 'yes';
-      }
-    }
-    if (empty($comp_url)) {
-      // $comp_url is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens webbadress!</h3>';
-      $output_form = 'yes';
-    }  
-    //If comp_url is not blank validate the input 
-    else {
-      // Remove all illegal characters from a url
-      $comp_url = filter_var($comp_url, FILTER_SANITIZE_URL);        
-      // Validate comp_url
-      if(!filter_var($comp_url, FILTER_VALIDATE_URL)){
-        // comp_url is invalid   
-        echo '<h3>Den ifyllda webbadressen &auml;r inte giltig.</h3>';
-        $output_form = 'yes';
-      } 
-    }         
     if (empty($comp_max_regs)) {
       // $comp_max_regs is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens maximala antal anm&auml;lningar!</h3>';
@@ -140,49 +101,31 @@ global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_c
           <tr>
             <td>T&auml;vlingens namn</td>
             <td><label>
-              <input type="text" name="comp_name" id="comp_name" value="<?php echo $comp_name ?>" size="32"/>
+              <input type="text" name="comp_name" id="comp_name" value="<?php echo $comp_name ?>"/>
             </label></td>
           </tr>
           <tr>
             <td>Startdatum</td>
             <td><label>
-              <input type="text" name="comp_start_date" id="comp_start_date" value="<?php echo $comp_start_date ?>" size="32"/>
+              <input type="text" name="comp_start_date" id="comp_start_date" value="<?php echo $comp_start_date ?>"/>
             </label></td>
           </tr>
           <tr>
             <td>Slutdatum</td>
             <td><label>
-              <input type="text" name="comp_end_date" id="comp_end_date" value="<?php echo $comp_end_date ?>" size="32"/>
+              <input type="text" name="comp_end_date" id="comp_end_date" value="<?php echo $comp_end_date ?>"/>
             </label></td>
           </tr>
           <tr>
             <td>Sista anm&auml;lningsdag</td>
             <td><label>
-              <input type="text" name="comp_end_reg_date" id="comp_end_reg_date" value="<?php echo $comp_end_reg_date ?>" size="32"/>
+              <input type="text" name="comp_end_reg_date" id="comp_end_reg_date" value="<?php echo $comp_end_reg_date ?>"/>
             </label></td>
           </tr>
-          <tr>
-            <td>T&auml;vlingens arrang&ouml;r:</td>
-            <td><label>
-              <input type="text" name="comp_arranger" id="comp_arranger" value="<?php echo $comp_arranger ?>" size="32"/>
-          </label></td>
-          </tr>
-          <tr>
-            <td>T&auml;vlingsarrang&ouml;rens mejladress:</td>
-            <td><label>
-              <input type="text" name="comp_email" id="comp_email" value="<?php echo $comp_email ?>" size="32"/>
-            </label></td>
-          </tr>
-          <tr>
-            <td>T&auml;vlingens webbadress:</td>
-            <td><label>
-              <input type="text" name="comp_url" id="comp_url" value="<?php echo $comp_url ?>" size="32"/>
-            </label></td>
-          </tr>          
           <tr>
             <td>Max antal anm&auml;lningar</td>
             <td><label>
-            <input name="comp_max_regs" type="text" id="comp_max_regs" value="<?php echo $comp_max_regs ?>" size="32"/>              
+            <input name="comp_max_regs" type="text" id="comp_max_regs" value="<?php echo $comp_max_regs ?>"/>              
             </label></td>
           </tr>
           <tr>
@@ -209,7 +152,7 @@ else if ($output_form == 'no') {
     // Set all competitions first to non-current (0) if the new competition shall be current
     $comp_current = filter_input(INPUT_POST,'comp_current');
             // Set all competitions first to non-current (0) if this competition will be the active  one ($comp_current == "on")
-            if ($comp_current === "on") {
+            if ($comp_current == "on") {
                 //Catch anything wrong with query
                 try {
                 // Set all competitions first to non-current (0)   
@@ -227,17 +170,12 @@ else if ($output_form == 'no') {
             }    
     // Insert all competition data  
     require('Connections/DBconnection.php');         
-    $insertSQL = "INSERT INTO competition  (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_arranger, comp_email, "
-            . "comp_url, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_date, :comp_end_date, :comp_arranger, :comp_email, "
-            . ":comp_url, :comp_end_reg_date, :comp_max_regs, :comp_current)";
+    $insertSQL = "INSERT INTO competition  (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_date, :comp_end_date, :comp_end_reg_date, :comp_max_regs, :comp_current)";
     $stmt = $DBconnection->prepare($insertSQL);
     $stmt->bindValue(':comp_name', $comp_name, PDO::PARAM_STR);
     $stmt->bindValue(':comp_start_date', $comp_start_date, PDO::PARAM_STR);
     $stmt->bindValue(':comp_end_date', $comp_end_date, PDO::PARAM_STR);
     $stmt->bindValue(':comp_end_reg_date', $comp_end_reg_date, PDO::PARAM_STR);
-    $stmt->bindValue(':comp_arranger', $comp_arranger, PDO::PARAM_STR);
-    $stmt->bindValue(':comp_email', $comp_email, PDO::PARAM_STR);
-    $stmt->bindValue(':comp_url', $comp_url, PDO::PARAM_STR);
     $stmt->bindValue(':comp_max_regs', $comp_max_regs, PDO::PARAM_INT);
     $stmt->bindValue(':comp_current', $comp_current, PDO::PARAM_INT);
     $stmt->execute();

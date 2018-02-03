@@ -1,28 +1,12 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Create DB connection
+require_once('Connections/DBconnection.php');
 
-ob_start();
-//Catch anything wrong with query
-try {
-// Select data for conversion
-require('../Connections/DBconnection.php');           
-$query_rsSelect = "SELECT account_id, user_name, user_password, contact_name, club_name FROM account";
-$stmt_rsSelect = $DBconnection->query($query_rsSelect);
-}   catch(PDOException $ex) {
-        echo "An Error occured with queryX: ".$ex->getMessage();
-    }
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<?php
-// Includes Several code functions
-include_once('../includes/functions.php');
+$sql = ' SELECT `account_id`, `user_name`, `user_password`, `contact_name`, `club_name` FROM `account` ';
+mysql_select_db($database_DBconnection, $DBconnection);
+$Result1 = mysql_query($sql, $DBconnection) or die(mysql_error());
 echo '<table><thead><tr><td>Id</td>
 <td>Old user_name</td>
-<td>Encoding</td>
 <td>New user_name</td>
 <td>Old user_password</td>
 <td>New user_password</td>
@@ -33,23 +17,21 @@ echo '<table><thead><tr><td>Id</td>
 </tr>
 </thead>
 <tbody>';
-while($row = $row_rsSelect = $stmt_rsSelect->fetch(PDO::FETCH_ASSOC)) {
+while($row = mysql_fetch_array($Result1)){
 $ID = $row["account_id"];
 
-$user_name = $row["user_name"];
-$user_password = $row["user_password"];
-$contact_name = $row["contact_name"];
-$club_name = $row["club_name"];
-$encoding = mb_detect_encoding($club_name); 
-$newuser_name = encodeToUtf8($user_name);
-$newuser_password = encodeToUtf8($user_password);
-$newcontact_name = encodeToUtf8($contact_name);
-$newclub_name = encodeToUtf8($club_name);
+$user_name = stripslashes($row["user_name"]);
+$newuser_name = utf8_encode($user_name);
+$user_password = stripslashes($row["user_password"]);
+$newuser_password = utf8_encode($user_password);
+$contact_name = stripslashes($row["contact_name"]);
+$newcontact_name = utf8_encode($contact_name);
+$club_name = stripslashes($row["club_name"]);
+$newclub_name = utf8_encode($club_name);
 echo "
 <tr>
 <td>$ID</td>
 <td>$user_name</td>
-<td>$encoding</td>
 <td>$newuser_name</td>
 <td>$user_password</td>
 <td>$newuser_password</td>
@@ -59,20 +41,10 @@ echo "
 <td>$newclub_name</td>
 </tr>
 ";
-
-//UPDATE with parameters  
-$query = "UPDATE account SET user_name = :user_name, user_password = :user_password, contact_name = :contact_name, club_name = :club_name WHERE account_id = :account_id";
-$stmt = $DBconnection->prepare($query);                                  
-$stmt->bindValue(':user_name', $newuser_name, PDO::PARAM_STR);       
-$stmt->bindValue(':user_password', $newuser_password, PDO::PARAM_STR);    
-$stmt->bindValue(':contact_name', $newcontact_name, PDO::PARAM_STR);
-$stmt->bindValue(':club_name', $newclub_name, PDO::PARAM_STR); 
-$stmt->bindValue(':account_id', $ID, PDO::PARAM_INT);   
-$stmt->execute(); 
-
+$sql2 = "UPDATE `account` SET `user_name` = '".addslashes($newuser_name)."',`user_password` = '".addslashes($newuser_password)."',`contact_name` = '".addslashes($newcontact_name)."',`club_name` = '".addslashes($newclub_name)."' WHERE `account_id` = $ID ";
+  mysql_select_db($database_DBconnection, $DBconnection);
+  $Result2 = mysql_query($sql2, $DBconnection) or die(mysql_error());
 }
 echo '</tbody>
 </table>'
 ?>
-</html>
-<?php ob_end_flush();?>

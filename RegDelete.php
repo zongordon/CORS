@@ -1,5 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added footer.php, header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 ob_start();
 
@@ -26,6 +27,8 @@ $stmt_rsDelete->closeCursor();
 $DBconnection = null;
 }
 $pagetitle="Ta bort anm&auml;lan - admin";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Muntellarena.";
+$pagekeywords="tuna karate cup, Ta bort anmälan som admin, karate, eskilstuna, Muntellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

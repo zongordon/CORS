@@ -1,7 +1,6 @@
 <?php
 //Moved news and sponsor code from header.php file
 //Adapted sql query to PHP 7 (PDO) and added minor error handling.
-//Changed sponsors including pics
 
 require_once('Connections/DBconnection.php');
 
@@ -9,9 +8,9 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
-$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
-if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
-$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
 //Catch anything wrong with DB connection
 try {
@@ -55,8 +54,10 @@ $DBconnection = null;
       <h3>Huvudsponsor</h3>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-Logo.png" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
       <h3>&Ouml;vriga sponsorer</h3>
-      <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
-      <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
+      <p><a href="https://www.facebook.com/pages/SMAI-Stockholm/1502585413300594" target="_blank"><img src="img/sponsors/SMAI.gif" width="150" height="150" border="0" alt="SMAI: Stockholm"></a></p>      
+      <p><a href="http://www.eem.se/" target="_blank"><img src="img/sponsors/EEM_logo.gif" width="150" height="107" border="0" alt="Eskilstuna Energi & Milj&ouml;"></a></p>      
+      <p><a href="http://www.contera.se/" target="_blank"><img src="img/sponsors/ConteraEkonomi.jpg" width="150" height="86" border="0" alt="Contera Ekonomi;"></a></p>      
+      <p><a href="http://www.byggtec.se" target="_blank"><img src="img/sponsors/ByggTec.jpg" alt="ByggTec Consulting AB &auml;r ett oberoende konsultf&ouml;retag inom bygg- och fastighetsbranschen" width="150" height="91" border="0" /></a></p>
 <!--Hide code       
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      
       <p><a href="http://gulasidorna.eniro.se/f/narkiniemi-elkonsult:4392999" target="_blank"><img src="img/nKon.gif" alt="Narkiniemi Elkonsult" width="210" height="68" border="0" /></a></p>

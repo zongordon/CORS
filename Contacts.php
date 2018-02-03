@@ -1,10 +1,12 @@
 <?php
-//Moved meta description and keywords to header.php
+//Added header.php and news_sponsors_nav.php as includes.
 
 if (!isset($_SESSION)) {
   session_start();
 }
 $pagetitle="Kontakter f&ouml;r t&auml;vlingen";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="visa kontakter att kontakta, tuna karate cup, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several other code functions
 //include_once('includes/functions.php');
 // Includes HTML Head

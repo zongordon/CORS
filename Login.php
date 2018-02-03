@@ -1,5 +1,7 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php and news_sponsors_nav.php as includes.
+//Moved require('Connections/DBconnection.php') within the function, that is below first $tryLogin
 
  ob_start();
 
@@ -8,6 +10,8 @@ if (!isset($_SESSION)) {
 }
 
 $pagetitle="Logga in";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, logga in, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections

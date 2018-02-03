@@ -1,5 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
+//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 if (!isset($_SESSION)) {
   session_start();
@@ -8,6 +9,8 @@ $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 $pagetitle="Inloggad - admin";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup, inloggad som administratÃ¶r, karate, eskilstuna, sporthallen, wado, sjÃ¤lvfÃ¶rsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

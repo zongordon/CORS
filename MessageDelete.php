@@ -1,5 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 
 ob_start();
 //Access level top administrator
@@ -37,6 +38,8 @@ if (filter_input(INPUT_GET,'message_id') != "") {
 }
 
 $pagetitle="Ta bort meddelande";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
+$pagekeywords="tuna karate cup, Ta bort meddelande, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

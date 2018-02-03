@@ -1,5 +1,7 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Added check of access level
 
 ob_start();
 
@@ -22,6 +24,8 @@ $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
     }
 
 $pagetitle="Rapport: antal t&auml;vlande som anm&auml;lts till aktuell t&auml;vling, per klubb";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
+$pagekeywords="tuna karate cup, rapport om antal tävlande per klubb, karate, eskilstuna, Munktellarena, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

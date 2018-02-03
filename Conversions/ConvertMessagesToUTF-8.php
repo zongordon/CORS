@@ -1,25 +1,10 @@
 <?php
+//Create DB connection
+require_once('Connections/DBconnection.php');
 
-ob_start();
-//Catch anything wrong with query
-try {
-// Select data for conversion
-require('../Connections/DBconnection.php');           
-$query_rsSelect = "SELECT message_id, message_subject, message FROM messages";
-$stmt_rsSelect = $DBconnection->query($query_rsSelect);
-}   catch(PDOException $ex) {
-        echo "An Error occured with queryX: ".$ex->getMessage();
-    }
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<?php
-// Includes Several code functions
-include_once('../includes/functions.php');
-
+$sql = ' SELECT `message_id`, `message_subject`, `message` FROM `messages` ';
+mysql_select_db($database_DBconnection, $DBconnection);
+$Result1 = mysql_query($sql, $DBconnection) or die(mysql_error());
 echo '<table><thead><tr><td>Id</td>
 <td>Old message_subject</td>
 <td>New message_subject</td>
@@ -28,13 +13,12 @@ echo '<table><thead><tr><td>Id</td>
 </tr>
 </thead>
 <tbody>';
-while($row = $row_rsSelect = $stmt_rsSelect->fetch(PDO::FETCH_ASSOC)) {
+while($row = mysql_fetch_array($Result1)){
 $ID = $row["message_id"];
-$message_subject = $row["message_subject"];
-$message = $row["message"];
-$newmessage_subject = encodeToUtf8($row["message_subject"]);
-$newmessage = encodeToUtf8($row["message"]);
-
+$message_subject = stripslashes($row["message_subject"]);
+$newmessage_subject = utf8_encode($message_subject);
+$message = stripslashes($row["message"]);
+$newmessage = utf8_encode($message);
 echo "
 <tr>
 <td>$ID</td>
@@ -44,14 +28,9 @@ echo "
 <td>$newmessage</td>
 </tr>
 ";
-
- //UPDATE with parameters  
-$query = "UPDATE messages SET message_subject = :message_subject, message = :message WHERE message_id = :message_id";
-$stmt = $DBconnection->prepare($query);                                  
-$stmt->bindValue(':message_subject', $message_subject, PDO::PARAM_STR);       
-$stmt->bindValue(':message', $message, PDO::PARAM_STR);    
-$stmt->bindValue(':message_id', $ID, PDO::PARAM_INT);   
-$stmt->execute(); 
+/*$sql2 = "UPDATE `messages` SET `message_subject` = '".addslashes($newmessage_subject)."',`message` = '".addslashes($newmessage)."' WHERE `message_id` = $ID ";
+  mysql_select_db($database_DBconnection, $DBconnection);
+  $Result2 = mysql_query($sql2, $DBconnection) or die(mysql_error());*/
 }
 echo '</tbody>
 </table>'

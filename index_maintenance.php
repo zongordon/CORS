@@ -1,5 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Added header.php and news_sponsors_nav.php as includes.
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -11,7 +11,9 @@ $query_rsCompetition = "SELECT comp_raffled FROM competition WHERE comp_current 
 $rsCompetition = mysql_query($query_rsCompetition, $DBconnection) or die(mysql_error());
 $row_rsCompetition = mysql_fetch_assoc($rsCompetition);
 
-$pagetitle="&Aring;rets t&auml;vling";
+$pagetitle="Tuna Karate Cup";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
+$pagekeywords="tuna karate cup inställd, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several other code functions
 //include_once('includes/functions.php');
 // Includes HTML Head

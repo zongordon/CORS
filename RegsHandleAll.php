@@ -1,5 +1,7 @@
 <?php
-//Moved meta description and keywords to header.php
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Added session_start() to prevent "Notice: Undefined variable: _SESSION"
 
 ob_start();
 session_start();
@@ -65,6 +67,8 @@ $totalRows_rsSelectedClub = $stmt_rsSelectedClub->rowCount();
 $_SESSION['MM_Account'] = $row_rsSelectedClub['account_id'];
 
 $pagetitle="Registrera t&auml;vlande - admin";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Muntellarena.";
+$pagekeywords="tuna karate cup, Registrera tävlande - admin, karate, Muntellarenan, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

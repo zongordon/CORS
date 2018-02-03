@@ -1,6 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
 ob_start();
 
 //Access level top administrator
@@ -36,6 +36,8 @@ catch(PDOException $ex) {
     echo "An Error occured with queryX: ".$ex->getMessage();
 }
 $pagetitle="Hantera meddelanden";
+$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
+$pagekeywords="tuna karate cup, hantera meddelanden till registrerade användare och nyheter på sajt, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -158,7 +160,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
             $contact_email = $row_rsClubEmails['contact_email'];
   
             //Email to to selected Club Contacts
-            $headers = "From: $comp_name <$comp_email>\r\n" .
+            $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
             "MIME-Version: 1.0\r\n" . 
             'X-Mailer: PHP/' . phpversion() . "\r\n" .        
             "Content-Type: text/plain; charset=utf-8\r\n" . 
@@ -169,7 +171,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
             "\n" .
             "\n" .        
             "Med vänliga hälsningar,\n" .
-            "Administrationen för $comp_name, $comp_url";
+            "Administrationen för Tuna Karate Cup, http://tunacup.karateklubben.com";
             $msg = "Hej $contact_name,\n$message";
         
             // Send email to club contact
