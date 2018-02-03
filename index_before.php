@@ -1,6 +1,5 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php and news_sponsors_nav.php as includes.
+//Moved meta description and keywords to header.php
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -17,9 +16,7 @@ $row_rsCompetition = $stmt_rsCompetition->fetch(PDO::FETCH_ASSOC);
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
-$pagetitle="Tuna Karate Cup";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
-$pagekeywords="tuna karate cup, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+$pagetitle="&Aring;rets t&auml;vling";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
@@ -31,9 +28,9 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="content">    
   <div class="feature">
     <img height="199" width="300" alt="" src="img/rotating/rotate.php" />
-    <h1>V&auml;lkomna till Tuna Karate Cup 2013</h1>
+    <h1>V&auml;lkomna till <?php echo $row_rsCurrentComp['comp_name'];?></h1>
     <p>En t&auml;vling &ouml;ppen f&ouml;r samtliga karatestilar.</p>
-    <p>Tuna Karate Cup &auml;r en barn- &amp; ungdomst&auml;vling, &ouml;ppen f&ouml;r deltagare mellan 7-17 &aring;r, som anordnas av Eskilstuna Karateklubb.    </p>
+    <p><?php echo $row_rsCurrentComp['comp_name'];?> &auml;r en barn- &amp; ungdomst&auml;vling, &ouml;ppen f&ouml;r deltagare mellan 7-17 &aring;r, som anordnas av Eskilstuna Karateklubb.    </p>
     <p>Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats!</p>
     <p>L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>

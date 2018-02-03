@@ -1,7 +1,5 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-//Changed way of sorting
+//Moved meta description and keywords to header.php
 ob_start();
 
 //Declare and initialise variables
@@ -10,10 +8,6 @@ $editFormAction = '';
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
-
-$pagetitle="T&auml;vlingsklasser - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, lista tävlingsklasser för administratörer, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 
 //Set initial sorting (ORDER BY) and change if new sort order is selected in dropdown list
 $sorting = "class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
@@ -31,7 +25,8 @@ try {
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     }               
-
+    
+$pagetitle="T&auml;vlingsklasser - admin";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

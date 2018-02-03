@@ -1,13 +1,11 @@
 <?php 
-//Added header.php and news_sponsors_nav.php as includes.
+//Moved meta description and keywords to header.php
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
-$pagetitle="Tuna Karate Cup";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
-$pagekeywords="tuna karate cup, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+$pagetitle="&Aring;rets t&auml;vling";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
@@ -19,7 +17,7 @@ include_once("includes/news_sponsors_nav.php");?>
   <div class="feature">
     <img src="img/DSC_0069.jpg" alt="" width="300" height="253" />
     <h1>&nbsp;</h1>
-    <h1>Tredje upplagan av Tuna Karate Cup  &auml;r genomf&ouml;rd</h1>
+    <h1><?php echo $row_rsCurrentComp['comp_name'];?> &auml;r genomf&ouml;rd</h1>
     <p>Vi tackar alla deltagare, klubbledare, domare, &aring;sk&aring;dare och funktion&auml;rer f&ouml;r ett v&auml;l genomf&ouml;rt Tuna Karate Cup 2013! Ett stort tack fr&aring;n Eskilstuna Karateklubb!</p>
     <p>Vi hoppas att vi f&aring;r se er alla och fler d&auml;rtill n&auml;sta &aring;r! Tills dess kommer sajten att vara f&ouml;rb&auml;ttrad ytterligare och ni kommer &auml;ven forts&auml;ttningsvis att kunna dra nytta av att redan ha skapat ett konto hos oss och lagt in en hel del t&auml;vlande. Vi kommer givetvis att arbeta med att hela arrangemanget flyter &auml;nnu b&auml;ttre n&auml;sta g&aring;ng.</p>
     <p>H&ouml;r g&auml;rna av er med f&ouml;rslag p&aring; hur vi kan f&ouml;rb&auml;ttra t&auml;vlingen till n&auml;sta &aring;r! Stort som sm&aring;tt, alla f&ouml;rslag &auml;r v&auml;lkomna och kommer att tas upp vid v&aring;r interna utv&auml;rdering.</p>

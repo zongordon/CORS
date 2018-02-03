@@ -1,3 +1,3 @@
-<div id="siteInfo">v3.1.0 - &copy;2014 zongordon</div>
+<div id="siteInfo">v3.1.2 - &copy;2014 zongordon</div>
 
 

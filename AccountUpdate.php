@@ -1,6 +1,7 @@
 <?php 
 //v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
-
+//Re-introduced encodeToUtf8() to contact_name and club_name
+//Moved meta description and keywords to header.php
 ob_start();
 
 //Access level admin
@@ -28,8 +29,6 @@ catch(PDOException $ex) {
 }
 
 $pagetitle="&Auml;ndra anv&auml;ndarkonto - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, ändra uppgifterna i valt användarkonto, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -54,12 +53,10 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
     $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
     $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
     $confirmed = filter_input(INPUT_POST, 'confirmed');    
-    $contact = trim(filter_input(INPUT_POST, 'contact_name'));
-    $contact_name = mb_convert_case($contact, MB_CASE_TITLE,"UTF-8");
+    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8"));
     $email = filter_input(INPUT_POST, trim('contact_email'));
     $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
-    $club = trim(filter_input(INPUT_POST, 'club_name'));    
-    $club_name = mb_convert_case($club, MB_CASE_TITLE,"UTF-8");
+    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
     $active = filter_input(INPUT_POST, 'active');
     $access_level = filter_input(INPUT_POST, 'access_level');
     $account_id = filter_input(INPUT_POST, 'account_id');			

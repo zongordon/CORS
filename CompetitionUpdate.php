@@ -1,6 +1,6 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Moved meta description and keywords to header.php
+//Added function to handle more input: comp_aranger, comp_email and comp_url
 ob_start();
 
 //Access level top administrator
@@ -16,8 +16,6 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 $colname_rsCompetition = filter_input(INPUT_GET,'comp_id');
 
 $pagetitle="&Auml;ndra t&auml;vling";
-$pagedescription="Tävling som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
-$pagekeywords="tuna karate cup, ändra tävling, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -41,6 +39,9 @@ include_once("includes/news_sponsors_nav.php");?>
     $comp_start_date = filter_input(INPUT_POST,'comp_start_date');
     $comp_end_date = filter_input(INPUT_POST,'comp_end_date');
     $comp_end_reg_date = filter_input(INPUT_POST,'comp_end_reg_date');
+    $comp_arranger = encodeToUtf8(filter_input(INPUT_POST,'comp_arranger'));
+    $comp_email = filter_input(INPUT_POST,'comp_email');
+    $comp_url = filter_input(INPUT_POST,'comp_url');
     $comp_max_regs = filter_input(INPUT_POST,'comp_max_regs');
     $output_form = 'no';
 
@@ -78,7 +79,42 @@ include_once("includes/news_sponsors_nav.php");?>
     // $comp_end_reg_date is wrong format
     echo '<h3>Du anv&auml;nde fel format p&aring; sista anm&auml;lningsdag!</h3>';
     $output_form = 'yes';
-    }	            
+    }
+    if (empty($comp_arranger)) {
+      // $comp_arranger is blank
+      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens arrang&ouml;r!</h3>';
+      $output_form = 'yes';
+    }
+    if (empty($comp_email)) {
+      // $comp_email is blank
+      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingsarrang&ouml;rens mejladresss!</h3>';
+      $output_form = 'yes';
+    }
+    //If comp_email is not blank validate the input 
+    else {
+      // Validate contact_email
+      if(!valid_email($comp_email)){
+        // comp_email is invalid because LocalName is bad  
+        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
+        $output_form = 'yes';
+      }
+    }
+    if (empty($comp_url)) {
+      // $comp_url is blank
+      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens webbadress!</h3>';
+      $output_form = 'yes';
+    }  
+    //If comp_url is not blank validate the input 
+    else {
+      // Remove all illegal characters from a url
+      $comp_url = filter_var($comp_url, FILTER_SANITIZE_URL);        
+      // Validate comp_url
+      if(!filter_var($comp_url, FILTER_VALIDATE_URL)){
+        // comp_url is invalid   
+        echo '<h3>Den ifyllda webbadressen &auml;r inte giltig.</h3>';
+        $output_form = 'yes';
+      } 
+    }     
     if (empty($comp_max_regs)) {
       // $comp_max_regs is blank
       echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens maximala antal anm&auml;lningar!</h3>';
@@ -136,6 +172,21 @@ if ($output_form == 'yes') {
           <td><input name="comp_end_reg_date" type="text" value="<?php echo $row_rsCompetition['comp_end_reg_date']; ?>" size="32" /></td>
         </tr>
         <tr>
+          <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens arrang&ouml;r:</td>
+          <td>&nbsp;</td>
+          <td><input name="comp_arranger" type="text" value="<?php echo $row_rsCompetition['comp_arranger']; ?>" size="32" /></td>
+        </tr>
+        <tr>
+          <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingsarrang&ouml;rens mejladress:</td>
+          <td>&nbsp;</td>
+          <td><input name="comp_email" type="text" value="<?php echo $row_rsCompetition['comp_email']; ?>" size="32" /></td>
+        </tr>
+        <tr>
+          <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens webbadress:</td>
+          <td>&nbsp;</td>
+          <td><input name="comp_url" type="text" value="<?php echo $row_rsCompetition['comp_url']; ?>" size="32" /></td>
+        </tr>
+        <tr>
             <td align="right" valign="baseline" nowrap="nowrap">Max antal anm&auml;lningar:</td>
             <td>&nbsp;</td> 
             <td><label>
@@ -176,7 +227,7 @@ else if ($output_form == 'no') {
         if (filter_input(INPUT_POST,'MM_update') == 'update_competition') {
             $comp_current = filter_input(INPUT_POST,'comp_current');
             // Set all competitions first to non-current (0) if competition is changed to active ($comp_current == "on")
-            if ($comp_current == "on") {
+            if ($comp_current === "on") {
                 //Catch anything wrong with query
                 try {
                 // Set all competitions first to non-current (0)   
@@ -200,6 +251,9 @@ else if ($output_form == 'no') {
             comp_start_date = :comp_start_date, 
             comp_end_date = :comp_end_date, 
             comp_end_reg_date = :comp_end_reg_date, 
+            comp_arranger = :comp_arranger, 
+            comp_email = :comp_email, 
+            comp_url = :comp_url, 
             comp_max_regs = :comp_max_regs, 
             comp_current = :comp_current
             WHERE comp_id = :comp_id"; 
@@ -209,6 +263,9 @@ else if ($output_form == 'no') {
             $stmt->bindValue(':comp_start_date', $comp_start_date, PDO::PARAM_STR);
             $stmt->bindValue(':comp_end_date', $comp_end_date, PDO::PARAM_STR);
             $stmt->bindValue(':comp_end_reg_date', $comp_end_reg_date, PDO::PARAM_STR);
+            $stmt->bindValue(':comp_arranger', $comp_arranger, PDO::PARAM_STR);
+            $stmt->bindValue(':comp_email', $comp_email, PDO::PARAM_STR);
+            $stmt->bindValue(':comp_url', $comp_url, PDO::PARAM_STR);
             $stmt->bindValue(':comp_max_regs', $comp_max_regs, PDO::PARAM_INT);            
             $stmt->bindValue(':comp_current', $comp_current, PDO::PARAM_INT);                             
             $stmt->execute();        
@@ -223,7 +280,6 @@ else if ($output_form == 'no') {
             $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
             } 
         header(sprintf("Location: %s", $updateGoTo));
-//      echo 'Aktiv?'.$comp_current.'!';
         //Kill statement 
         $stmt->closeCursor();
         }
