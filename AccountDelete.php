@@ -1,6 +1,6 @@
 <?php 
-//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Moved meta description and keywords to header.php
+//Corrected position for code $stmt_rsDeleteAccount->closeCursor() and $DBconnection = null
 
 ob_start();
 //Access level top administrator
@@ -29,14 +29,15 @@ if (filter_input(INPUT_GET,'account_id') != "") {
     $deleteGoTo .= $_SERVER['QUERY_STRING'];
   }
   header(sprintf("Location: %s", $deleteGoTo));
+//Kill statement and DB connection
+$stmt_rsDeleteAccount->closeCursor();
+$DBconnection = null;  
 }
 
 if (!isset($_SESSION)) {
   session_start();
 }
 $pagetitle="Ta bort anv&auml;ndarkonton";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, ta bort användarkonton, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes several code functions
 include_once('includes/functions.php');
 // Includes HTML Head
@@ -62,7 +63,4 @@ include_once("includes/news_sponsors_nav.php");?>
 </body>
 </html>
 <?php 
-//Kill statement and DB connection
-$stmt_rsDeleteAccount->closeCursor();
-$DBconnection = null;
 ob_end_flush()?>

@@ -1,8 +1,6 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-//Added session_start() to prevent "Notice: Undefined variable: _SESSION"
-
+//Moved meta description and keywords to header.php
+//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
 ob_start();
 session_start();
 
@@ -40,8 +38,6 @@ if ($endEnrolmentDate < $now) {
 	$passedDate = 1;
 }
 $pagetitle="Registrera egna t&auml;vlande";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
-$pagekeywords="tuna karate cup, Registrera egna tävlande, karate, eskilstuna, Munktellarena, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -441,23 +437,23 @@ if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
     <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $totalRows_rsCompActive; ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
     </div>
 <?php
-    //Email to to Tuna Karate Cup Admin if the maximum number of registrations is reached
+    //Email to to competition Admin if the maximum number of registrations is reached
     $club_name = $row_rsClubReg['club_name'];
-    $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+    $headers = "From: $comp_name <$comp_email>\r\n" .
     "MIME-Version: 1.0\r\n" . 
     'X-Mailer: PHP/' . phpversion() . "\r\n" .        
     "Content-Type: text/plain; charset=utf-8\r\n" . 
     "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-    $adm_email = "tunacup@karateklubben.com";
-    $subject_adm = 'Max antal anmälningar registrerade på: http://tunacup.karateklubben.com';
-    $text_adm = "Nu har det maximalt tillåtna antalet ($totalRows_rsCompActive st.) anmälningar registrerats på tunacup.karateklubben.com:\n" .
+    $adm_email = $comp_email;
+    $subject_adm = 'Max antal anmälningar registrerade på: '.$comp_url;
+    $text_adm = "Nu har det maximalt tillåtna antalet ($totalRows_rsCompActive st.) anmälningar registrerats på $comp_url:\n" .
     "Sista anmälningen gjordes av $club_name.\n" .        
     "\n" .
     "Med vänliga hälsningar,\n" .
-    "Eskilstuna Karateklubb, http://www.karateklubben.com";
+    "$comp_arranger, $comp_url";
     $msg_adm = "Max antal anmälningar registrerade!\n$text_adm";
 
-    // Send email to Tuna Karate Cup Admin
+    // Send email to Competition Admin
     mail($adm_email, $subject_adm, $msg_adm, $headers);                
 } ?>           
 </p>

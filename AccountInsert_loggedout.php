@@ -1,7 +1,6 @@
 <?php
-//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
-//Added header.php and news_sponsors_nav.php as includes.
-//Removed globally defined variables
+//Moved meta description and keywords to header.php
+//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
 
 if (!isset($_SESSION)) {
   session_start();
@@ -13,8 +12,6 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 }
 
 $pagetitle="L&auml;gga till eget konto";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, karate, eskilstuna, lägga till ett konto, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 //Includes Several code functions
 include_once('includes/functions.php');
 // Includes HTML Head
@@ -250,17 +247,18 @@ if ($output_form == 'yes') {
 $stmt_rsAccounts->closeCursor();
 $DBconnection = null;      
 } 
+        
 	//Send the account information to the users email address and save it
-  	else if ($output_form == 'no') {
-        //Email to to Tuna Karate Cup Admin    
-        $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+  	else if ($output_form === 'no') {
+        //Email to Competition Admin    
+        $headers = "From: $comp_name <$comp_email>\r\n" .
         "MIME-Version: 1.0\r\n" . 
         'X-Mailer: PHP/' . phpversion() . "\r\n" .        
         "Content-Type: text/plain; charset=utf-8\r\n" . 
         "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-        $adm_email = "tunacup@karateklubben.com";
-        $subject_adm = 'Nytt konto registrerat: http://tunacup.karateklubben.com';
-	$text_adm = "Detta konto har registrerats på tunacup.karateklubben.com:\n" .
+        $adm_email = "$comp_email";
+        $subject_adm = 'Nytt konto registrerat: '.$comp_url;
+	$text_adm = "Detta konto har registrerats på $comp_url:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
         "E-post: $email\n" .
@@ -269,17 +267,17 @@ $DBconnection = null;
 	"\n";
         $msg_adm = "Nytt konto registrerat!\n$text_adm";
 
-        // Send email to Tuna Karate Cup Admin
+        // Send email to Competition Admin
         mail($adm_email, $subject_adm, $msg_adm, $headers);                
         
-        //Email to to Club Contact
-        $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+        //Email to Club Contact
+        $headers = "From: $comp_name <$comp_email>\r\n" .
         "MIME-Version: 1.0\r\n" . 
         'X-Mailer: PHP/' . phpversion() . "\r\n" .        
         "Content-Type: text/plain; charset=utf-8\r\n" . 
         "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-        $subject = 'Ditt nya konto: http://tunacup.karateklubben.com';
-        $text = "Tack för att du registrerat ett konto på tunacup.karateklubben.com!\n" .
+        $subject = 'Ditt nya konto: '.$comp_url;
+        $text = "Tack för att du registrerat ett konto på $comp_url!\n" .
         "Här är de inloggningsuppgifter som du registrerade:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
@@ -287,16 +285,16 @@ $DBconnection = null;
         "Telefon: $contact_phone\n" .
 	"Användarnamn: $user_name\n" .
 	"Lösenord: $user_password\n" .
-	"Använd ovanstående till att logga in och anmäla tävlande till Tuna Karate Cup.\n" .
+	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
 	"\n" .
 	"Med vänliga hälsningar,\n" .
-	"Eskilstuna Karateklubb, http://www.karateklubben.com";
+	"$comp_arranger, $comp_url";
         $msg = "Hej $contact_name,\n$text";
         
         // Send email to club contact
         mail($email, $subject, $msg, $headers);                
    
- 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
+ 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_url.'!<br />Dina uppgifter skickades till: '. $email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
        //Catch anything wrong with query
             try {
             require('Connections/DBconnection.php');           

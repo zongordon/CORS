@@ -1,7 +1,5 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-//Added check of access level
+//Moved meta description and keywords to header.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -63,8 +61,6 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
     }
     
 $pagetitle="Rapport: summering &ouml;ver antal anm&auml;lda klubbar, t&auml;vlingsklasser, anm&auml;lningar och t&auml;vlande";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Munktellarena.";
-$pagekeywords="tuna karate cup, rapport om antal klubbar, tävlande, klasser och starter för aktiv tävling, karate, eskilstuna, Munktellarena, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function

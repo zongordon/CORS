@@ -1,5 +1,5 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
+//Moved meta description and keywords to header.php
 ob_start();
 
 //Access level top administrator
@@ -7,8 +7,6 @@ $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 $pagetitle="Ta bort t&auml;vling";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, ta bort tävling, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes HTML Head, and several other code functions
 include_once('includes/functions.php');
 
