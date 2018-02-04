@@ -1,15 +1,9 @@
 <?php
-//Removed HTML header and use includes/functions.php instead
+//Moved meta description and keywords to header.php
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
-
-$pagetitle="Lista konton - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, lista alla användarkonton, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
 
 $colname_rsAccount = "-1";
 if (isset($_GET['account_id'])) {
@@ -30,9 +24,15 @@ $colname_rsActiveCompetitions = "-1";
 if (isset($_GET['1'])) {
   $colname_rsActiveCompetitions = $_GET['1'];
 }
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$pagetitle="Lista konton - admin";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->

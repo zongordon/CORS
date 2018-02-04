@@ -1,6 +1,5 @@
 <?php
-//Moved news and sponsor code from header.php file
-//Adapted sql query to PHP 7 (PDO) and added minor error handling.
+//Changed to same width regardless competition and to img/Banner_R.png instead if .gif
 
 require_once('Connections/DBconnection.php');
 
@@ -8,9 +7,9 @@ if (!isset($_SESSION)) {
   session_start();
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
 //Catch anything wrong with DB connection
 try {
@@ -26,8 +25,8 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
 <body>
 <div id="masthead">
     <a href="/"><img src="img/Banner_L.png" alt="Left Logo" width="98" height="90" hspace="10"></a>
-    <a href="/"><img src="img/Banner_M.jpg" alt="Middle Logo" width="553" height="90"></a>
-    <a href="/"><img src="img/Banner_R.gif" alt="Right Logo" width="91" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
+    <a href="/"><img src="img/Banner_R.png" alt="Right Logo" width="91" height="90" hspace="10"></a>
 </div>
 <div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a>|<a href="Results.php">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>

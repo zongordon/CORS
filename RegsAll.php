@@ -1,7 +1,5 @@
 <?php
-//Adapted sql query to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1. 
-//Added header.php and news_sponsors_nav.php as includes.
-//Removed function GetSQLValueString
+///Moved meta description and keywords to header.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -32,8 +30,6 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
     }
     
 $pagetitle="Samtliga t&auml;vlande";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
-$pagekeywords="tuna karate cup, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 // Includes HTML Head

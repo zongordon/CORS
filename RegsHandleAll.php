@@ -1,7 +1,6 @@
 <?php
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-//Added session_start() to prevent "Notice: Undefined variable: _SESSION"
+//Moved meta description and keywords to header.php
+//Changed how to handle $colname_rsSelectedClub
 
 ob_start();
 session_start();
@@ -45,11 +44,15 @@ $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC);
     }    
     
 //Select information regarding the selected account
-$colname_rsSelectedClub = $_SESSION['MM_Account'];
+//$colname_rsSelectedClub = $_SESSION['MM_Account'];
 
     if (filter_input(INPUT_POST,'account_id')) {
     $colname_rsSelectedClub = filter_input(INPUT_POST,'account_id');    
     }
+    else {
+            $colname_rsSelectedClub = "";
+    }
+    
 //Catch anything wrong with query
 try {
 // Select account data for the selected club
@@ -67,8 +70,6 @@ $totalRows_rsSelectedClub = $stmt_rsSelectedClub->rowCount();
 $_SESSION['MM_Account'] = $row_rsSelectedClub['account_id'];
 
 $pagetitle="Registrera t&auml;vlande - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Muntellarena.";
-$pagekeywords="tuna karate cup, Registrera tävlande - admin, karate, Muntellarenan, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -614,6 +615,7 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
         }            
         $stmt_rsClassData->closeCursor();
         $stmt_rsCompActive->closeCursor();
+        $stmt_rsClubReg->closeCursor(); 
     // Show if rsClubReg recordset not empty
     }
 // If recordset rsClasses is NOT empty 
@@ -628,7 +630,6 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 //Kill statements and DB connection
 $stmt_rsAccounts->closeCursor();
 $stmt_rsClasses->closeCursor();
-$stmt_rsClubReg->closeCursor(); 
 $stmt_rsSelectedClub->closeCursor();
 $DBconnection = null;
 ob_end_flush();?>

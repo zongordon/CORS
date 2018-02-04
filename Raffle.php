@@ -1,7 +1,6 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
-
+//Moved meta description and keywords to header.php
+//Added code to handle situation with no registrations
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -62,8 +61,6 @@ $stmt_rsClubRegs = $DBconnection->query($query1);
 $totalRows_rsClubRegs = $stmt_rsClubRegs->rowCount();   
 
 $pagetitle="Hantera lottning";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
-$pagekeywords="tuna karate cup, Hantera lottning, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -78,6 +75,12 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class="feature">
+<?php 
+if ($totalRows_rsClubRegs === 0){
+     echo '<h3>Finns inga anm&auml;ningar att lotta &auml;n!</h3>';
+}
+else {
+?>    
 <h3>Hantera lottningen av klubbarnas inb&ouml;rdes startordning</h3>
 <p>V&auml;lj startordning f&ouml;r  klubben och klicka p&aring; Spara!</p>
     <table width="300" border="0">
@@ -128,6 +131,10 @@ $row_rsRaffle = $stmt_rsRaffle->fetch(PDO::FETCH_ASSOC);
     <input type="hidden" name="MM_RaffleDone" value="RaffleDone"/>
   </form>
     </table>
+<?php
+$stmt_rsRaffle->closeCursor();
+}
+?>
   </div>
   <div class="story">
     <h3>&nbsp;</h3>
@@ -140,6 +147,5 @@ $row_rsRaffle = $stmt_rsRaffle->fetch(PDO::FETCH_ASSOC);
 <?php
 //Kill statements and DB connection
 $stmt_rsClubRegs->closeCursor();
-$stmt_rsRaffle->closeCursor();
 $DBconnection = null; 
 ob_end_flush();?>
