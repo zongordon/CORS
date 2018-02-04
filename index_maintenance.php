@@ -5,11 +5,6 @@ ob_start();
 if (!isset($_SESSION)) {
   session_start();
 }
-require_once('Connections/DBconnection.php');
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsCompetition = "SELECT comp_raffled FROM competition WHERE comp_current = 1";
-$rsCompetition = mysql_query($query_rsCompetition, $DBconnection) or die(mysql_error());
-$row_rsCompetition = mysql_fetch_assoc($rsCompetition);
 
 $pagetitle="&Aring;rets t&auml;vling";
 // Includes Several other code functions

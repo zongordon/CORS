@@ -32,6 +32,8 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class ="feature">    
         <div class="error">
 <?php
+//Initiate global variables
+global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_arranger, $comp_email, $comp_url, $comp_max_regs;
  //Validate the form if button is clicked
  if (filter_input(INPUT_POST,'MM_update') === 'update_competition') {
     $comp_id = filter_input(INPUT_POST,'comp_id');     

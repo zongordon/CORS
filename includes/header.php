@@ -1,10 +1,26 @@
 <?php 
-//Moved news and sponsor code to separate news_sponsors_nav.php file
+//Added DB selection to get competition data
+//Added meta description and keywords 
 //Added error diplay code
 
 //Display errors! NOTE! Turn-off for production sites!!
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+//Catch anything wrong with query
+try {
+// Select number of classes including last date for registrations, for the active competition
+require('Connections/DBconnection.php');           
+$query_rsCurrentComp = "SELECT * FROM competition WHERE comp_current = 1";
+$stmt_rsCurrentComp = $DBconnection->query($query_rsCurrentComp);
+$row_rsCurrentComp = $stmt_rsCurrentComp->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+$comp_name = $row_rsCurrentComp['comp_name'];
+$comp_arranger = $row_rsCurrentComp['comp_arranger'];
+$pagedescription="$comp_name som arrangeras av $comp_arranger.";
+$pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >

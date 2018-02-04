@@ -1,6 +1,5 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling. 
-//Added header.php, restrict_access.php and news_sponsors_nav.php as includes.
+//Moved meta description and keywords to header.php
 
 ob_start();
 //Access level top administrator
@@ -62,8 +61,6 @@ $stmt_rsClubRegs = $DBconnection->query($query1);
 $totalRows_rsClubRegs = $stmt_rsClubRegs->rowCount();   
 
 $pagetitle="Hantera lottning";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan.";
-$pagekeywords="tuna karate cup, Hantera lottning, karate, eskilstuna, Munktellarenan, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
