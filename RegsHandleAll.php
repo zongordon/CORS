@@ -1,5 +1,6 @@
 <?php
 //Moved meta description and keywords to header.php
+//Changed how to handle $colname_rsSelectedClub
 
 ob_start();
 session_start();
@@ -43,11 +44,15 @@ $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC);
     }    
     
 //Select information regarding the selected account
-$colname_rsSelectedClub = $_SESSION['MM_Account'];
+//$colname_rsSelectedClub = $_SESSION['MM_Account'];
 
     if (filter_input(INPUT_POST,'account_id')) {
     $colname_rsSelectedClub = filter_input(INPUT_POST,'account_id');    
     }
+    else {
+            $colname_rsSelectedClub = "";
+    }
+    
 //Catch anything wrong with query
 try {
 // Select account data for the selected club

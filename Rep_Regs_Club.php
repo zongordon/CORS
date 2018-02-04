@@ -1,13 +1,19 @@
 <?php 
 //Moved meta description and keywords to header.php
-ob_start();
-
+//Granted access to all levels of registered users
 if (!isset($_SESSION)) {
   session_start();
 }
-
+if (!isset($_SESSION)) {
+  session_start();
+}
 //Access level registered user
-$MM_authorizedUsers = "0";
+if ($_SESSION['MM_Level'] === 0) {
+$MM_authorizedUsers = "0";    
+}
+if ($_SESSION['MM_Level'] === 1) {
+$MM_authorizedUsers = "1";    
+}
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query

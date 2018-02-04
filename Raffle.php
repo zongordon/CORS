@@ -1,6 +1,6 @@
 <?php 
 //Moved meta description and keywords to header.php
-
+//Added code to handle situation with no registrations
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -75,6 +75,12 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class="feature">
+<?php 
+if ($totalRows_rsClubRegs === 0){
+     echo '<h3>Finns inga anm&auml;ningar att lotta &auml;n!</h3>';
+}
+else {
+?>    
 <h3>Hantera lottningen av klubbarnas inb&ouml;rdes startordning</h3>
 <p>V&auml;lj startordning f&ouml;r  klubben och klicka p&aring; Spara!</p>
     <table width="300" border="0">
@@ -125,6 +131,10 @@ $row_rsRaffle = $stmt_rsRaffle->fetch(PDO::FETCH_ASSOC);
     <input type="hidden" name="MM_RaffleDone" value="RaffleDone"/>
   </form>
     </table>
+<?php
+$stmt_rsRaffle->closeCursor();
+}
+?>
   </div>
   <div class="story">
     <h3>&nbsp;</h3>
@@ -137,6 +147,5 @@ $row_rsRaffle = $stmt_rsRaffle->fetch(PDO::FETCH_ASSOC);
 <?php
 //Kill statements and DB connection
 $stmt_rsClubRegs->closeCursor();
-$stmt_rsRaffle->closeCursor();
 $DBconnection = null; 
 ob_end_flush();?>

@@ -6,7 +6,7 @@ if (!isset($_SESSION)) {
   session_start();
 }
 //Access level registered user
-$MM_authorizedUsers = "0";
+$MM_authorizedUsers = 0;
 $MM_donotCheckaccess = "false";
 
 $colname_rsAccountId = "";
