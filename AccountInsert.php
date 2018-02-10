@@ -1,6 +1,8 @@
 <?php
 //Moved meta description and keywords to header.php
-
+//Re-introduced 'ob_start() and 'ob_end_flush()' to enable redirect
+//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
@@ -231,13 +233,13 @@ if ($output_form == 'yes') { ?>
 } 
 	//Send the account information to the users email address and save it
   	else if ($output_form == 'no') {
-        $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+        $headers = "From: $comp_name <$comp_email>\r\n" .
         "MIME-Version: 1.0\r\n" . 
         'X-Mailer: PHP/' . phpversion() . "\r\n" .        
         "Content-Type: text/plain; charset=utf-8\r\n" . 
         "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-        $subject = 'Ditt nya konto: http://tunacup.karateklubben.com';
-        $text = "Tack för att du ville registrera ett konto på tunacup.karateklubben.com!\n" .
+        $subject = 'Ditt nya konto: '.$comp_name;
+        $text = "Tack för att du ville registrera ett konto på $comp_url!\n" .
         "Här är de inloggningsuppgifter som vi registrerade åt dig:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
@@ -245,16 +247,16 @@ if ($output_form == 'yes') { ?>
         "Telefon: $contact_phone\n" .
 	"Användarnamn: $user_name\n" .
 	"Lösenord: $user_password\n" .
-	"Använd ovanstående till att logga in och anmäla tävlande till Tuna Karate Cup.\n" .
+	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
 	"\n" .
 	"Med vänliga hälsningar,\n" .
-	"Eskilstuna Karateklubb, http://www.karateklubben.com";
+	"$comp_arranger, $comp_name, $comp_email";
         $msg = "Hej $contact_name,\n$text";
         
         // Send email to club contact
         mail($email, $subject, $msg, $headers);                
     
-        echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; tunacup.karateklubben.com!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';
+        echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';
        //Catch anything wrong with query
             try {
             require('Connections/DBconnection.php');           
@@ -284,3 +286,4 @@ if ($output_form == 'yes') { ?>
 <?php include("includes/footer.php");?>
 </body>
 </html>
+<?php ob_end_flush();?>

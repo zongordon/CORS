@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 
 //Catch anything wrong with query
 try {
-// Select number of classes including last date for registrations, for the active competition
+// Select all data for the active competition
 require('Connections/DBconnection.php');           
 $query_rsCurrentComp = "SELECT * FROM competition WHERE comp_current = 1";
 $stmt_rsCurrentComp = $DBconnection->query($query_rsCurrentComp);
@@ -18,7 +18,15 @@ $row_rsCurrentComp = $stmt_rsCurrentComp->fetch(PDO::FETCH_ASSOC);
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 $comp_name = $row_rsCurrentComp['comp_name'];
+$comp_start_date = $row_rsCurrentComp['comp_start_date'];
+$comp_end_date = $row_rsCurrentComp['comp_end_date'];
+$comp_end_reg_date = $row_rsCurrentComp['comp_end_reg_date'];
 $comp_arranger = $row_rsCurrentComp['comp_arranger'];
+$comp_email = $row_rsCurrentComp['comp_email'];
+$comp_url = $row_rsCurrentComp['comp_url'];
+$comp_raffled = $row_rsCurrentComp['comp_raffled'];
+$comp_max_regs = $row_rsCurrentComp['comp_max_regs'];
+
 $pagedescription="$comp_name som arrangeras av $comp_arranger.";
 $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 ?>

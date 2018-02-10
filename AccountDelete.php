@@ -1,7 +1,7 @@
 <?php 
 //Moved meta description and keywords to header.php
 //Corrected position for code $stmt_rsDeleteAccount->closeCursor() and $DBconnection = null
-
+//Added ' - admin' in pagetitle
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -37,7 +37,7 @@ $DBconnection = null;
 if (!isset($_SESSION)) {
   session_start();
 }
-$pagetitle="Ta bort anv&auml;ndarkonton";
+$pagetitle="Ta bort anv&auml;ndarkonton - admin";
 // Includes several code functions
 include_once('includes/functions.php');
 // Includes HTML Head
@@ -62,5 +62,4 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php include("includes/footer.php");?>
 </body>
 </html>
-<?php 
-ob_end_flush()?>
+<?php ob_end_flush()?>

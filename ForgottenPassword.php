@@ -1,5 +1,6 @@
 <?php
 //Moved meta description and keywords to header.php
+//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails: AccountInsert.php/ForgottenPassword.php
 ob_start();
 
 $pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?";
@@ -107,21 +108,27 @@ $user_name = $row_rsAccount['user_name'];
 $user_password = $row_rsAccount['user_password'];	
 
 echo '<h3>' . $contact_name . ',<br />Dina inloggningsuppgifter skickades till: '. $contact_email .'. Logga in och g&ouml;r dina anm&auml;lningar.<h3/>';
-        $subject = 'Login till kontot: tunacup.karateklubben.com';
-	$text = "Här är de inloggningsuppgifter som är registrerade på http://tunacup.karateklubben.com:\n" .
+       // Send email to club contact
+        $headers = "From: $comp_name <$comp_email>\r\n" .
+        "MIME-Version: 1.0\r\n" . 
+        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
+        "Content-Type: text/plain; charset=utf-8\r\n" . 
+        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
+        $subject = 'Ditt nya konto: '.$comp_name;
+        $text = "Tack för att du registrerat ett konto på $comp_url!\n" .
+        "Här är de inloggningsuppgifter som du registrerade:\n" .                
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
         "E-post: $contact_email\n" .
         "Telefon: $contact_phone\n" .
 	"Användarnamn: $user_name\n" .
 	"Lösenord: $user_password\n" .
-	"Använd ovanstående till att logga in och anmäla tävlande till Tuna Karate Cup.\n" .
+	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
 	"\n" .
 	"Med vänliga hälsningar,\n" .
-	"Eskilstuna Karateklubb, http://www.karateklubben.com";
+	"$comp_arranger, $comp_name, $comp_email";
         $msg = "Hej $contact_name,\n$text";
 
-        $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>";
         // Send email to Club Contact
         mail($contact_email, $subject, $msg, $headers);                
 

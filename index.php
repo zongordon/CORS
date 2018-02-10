@@ -21,7 +21,7 @@ include_once("includes/news_sponsors_nav.php");
   <div class="feature">
     <img height="199" width="300" alt="" src="img/rotating/rotate.php" />
     <h1>V&auml;lkomna till <?php echo $row_rsCurrentComp['comp_name'];?>!</h1>
-    <p>En barn- &amp; ungdomst&auml;vling f&ouml;r samtliga karatestilar, &ouml;ppen f&ouml;r deltagare mellan 7-17 &aring;r, som anordnas av Eskilstuna Karateklubb.    </p>
+    <p>En barn-, ungdoms- &amp; vuxent&auml;vling f&ouml;r samtliga karatestilar, &ouml;ppen f&ouml;r deltagare som tillh&ouml;r Mellersta Karatef&ouml;rbundet och anordnas av <?php echo $row_rsCurrentComp['comp_arranger'];?>.    </p>
     <p>Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></p>
     <p>L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
@@ -50,8 +50,8 @@ include_once("includes/news_sponsors_nav.php");
         <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
       <li>Kadetter och juniorer har inga krav p&aring; shitei kata, men ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
       <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
-      <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter och juniorer (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>
-      <li>&Aring;terkval g&auml;ller f&ouml;r kadetter och juniorer</li>
+      <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter, juniorer och vuxna (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>
+      <li>&Aring;terkval g&auml;ller f&ouml;r kadetter, juniorer och vuxna</li>
       <li>Vi f&ouml;rbeh&aring;ller oss r&auml;tten att &auml;ndra t&auml;vlingsklasserna vid f&ouml;r f&aring; deltagare</li>
     </ul>
     <h2>Boende i Eskilstuna</h2>

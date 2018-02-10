@@ -4,16 +4,8 @@
 if (!isset($_SESSION)) {
   session_start();
 }
-if (!isset($_SESSION)) {
-  session_start();
-}
 //Access level registered user
-if ($_SESSION['MM_Level'] === 0) {
-$MM_authorizedUsers = "0";    
-}
-if ($_SESSION['MM_Level'] === 1) {
-$MM_authorizedUsers = "1";    
-}
+$MM_authorizedUsers = $_SESSION['MM_Level']; 
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query

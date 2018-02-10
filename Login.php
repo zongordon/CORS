@@ -132,4 +132,4 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
 include_once("includes/footer.php");?>
 </body>
 </html>
-<?php \ob_end_flush();
+<?php ob_end_flush();

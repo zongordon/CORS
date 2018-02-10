@@ -1,5 +1,6 @@
 <?php 
 //Moved meta description and keywords to header.php
+//Changed 'foreach(filter_input(INPUT_POST,'to_comp_id') as $class_id)' and 'input name="copy_class" type="checkbox" id="copy_class"...' to make the copy function work  
 
 ob_start();
 //Access level top administrator
@@ -21,6 +22,7 @@ $colname_rsCompetition = filter_input(INPUT_GET, 'comp_id');
         $query1 = "SELECT com.comp_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
         $stmt_rsClasses = $DBconnection->prepare($query1);
         $stmt_rsClasses->execute(array(':comp_id' => $colname_rsCompetition));
+        $row_rsClasses = $stmt_rsClasses->fetchAll(PDO::FETCH_ASSOC);        
         $totalRows_rsClasses = $stmt_rsClasses->rowCount();
     }   
     catch(PDOException $ex) {
@@ -65,7 +67,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
   <div class="feature">
-  <?php if ($totalRows_rsClasses == 0) { // Show if recordset empty ?>
+  <?php if ($totalRows_rsClasses === 0) { // Show if recordset empty ?>
     <p>Det finns inga t&auml;vlingsklasser att visa!</p>
   <?php } // Show if recordset empty ?>
 <?php 
@@ -75,10 +77,10 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
       <div class="error">    
 <?php    
 //If "Kopiera" button is clicked then validate and execute the below
-if (filter_input(INPUT_POST,'MM_CopyClasses') && filter_input(INPUT_POST,'MM_CopyClasses') == 'copy_classes') {
+if (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes') {
 $output_form = 'no';
 
-        if (filter_input(INPUT_POST,'copy_class') == '') {
+        if (filter_input(INPUT_POST,'copy_class') === "") {
         // all copy_class fields are blank
         echo '<h3>Du gl&ouml;mde att v&auml;lja n&aring;gon klass att kopiera!</h3><br/>';            
         $output_form = 'yes';    
@@ -87,7 +89,7 @@ $output_form = 'no';
 else {  
    $output_form = 'yes';
 }    
-if ($output_form == 'yes') {    
+if ($output_form === 'yes') {    
 ?>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" name="copy_classes" id="copy_classes">
     <table width="100%" border="1">
@@ -99,21 +101,22 @@ if ($output_form == 'yes') {
         <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
         <td><strong>Kopiera</strong></td>
       </tr>
-<?php while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) { ?>
+<?php //reset ($row_rsClasses);
+      foreach($row_rsClasses As $row_rsClass) { ?>
   <tr>
-          <td><?php echo $row_rsClasses['class_discipline']; ?></td>
-          <td><?php echo $row_rsClasses['class_gender_category']; ?></td>
-          <td><?php echo $row_rsClasses['class_category']; ?></td>
-          <td><?php echo $row_rsClasses['class_age']; ?></td>
-          <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
+          <td><?php echo $row_rsClass['class_discipline']; ?></td>
+          <td><?php echo $row_rsClass['class_gender_category']; ?></td>
+          <td><?php echo $row_rsClass['class_category']; ?></td>
+          <td><?php echo $row_rsClass['class_age']; ?></td>
+          <td><?php echo $row_rsClass['class_weight_length']; ?></td>
           <td><label>
-              <input name="copy_class" type="checkbox" id="copy_class" value="<?php echo $row_rsClasses['class_id'];?>" checked />
-            </label>
+        <input name="copy_class[]" type="checkbox" id="copy_class[]" value="<?php echo $row_rsClass['class_id'];?>" checked />
+              </label>
           </td>
   </tr>
 <?php } ?>
     <tr>
-      <td valign="top">V&auml;lj t&auml;vling att kopiera till</td>
+      <td valign="top">V&auml;lj t&auml;vling att kopiera till:</td>
       <td><label>
         <select name="to_comp_id" id="to_comp_id">
 <?php
@@ -131,22 +134,15 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
     </tr>
     </table>
     </form>
-        </div>          
-  </div>
-  <div class="story">
-    <p>&nbsp;</p>
-  </div>
-</div>    
+      </div>              
 <?php 
 }       
 //If the form shall not be displayed execute below    
-else if ($output_form == 'no') {
+    else if ($output_form === 'no') {
           //If the "Kopiera" button is clicked and classes chosen for copy, then copy those classes to the selected competition  
-          if (filter_input(INPUT_POST,'MM_CopyClasses') && filter_input(INPUT_POST,'MM_CopyClasses') == 'copy_classes') {               
-              $comp_id = filter_input(INPUT_POST,'to_comp_id');
-              $class_ids = filter_input(INPUT_POST,'copy_class');
-//            foreach(array($class_ids) as $class_id) {  
-            foreach($class_ids as $class_id) {
+          if (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes') {
+            foreach($_POST['copy_class'] as $class_id) {              
+            $comp_id = filter_input(INPUT_POST,'to_comp_id');                
              //Catch anything wrong with query
             try {
             //INSERT new class in the database    
@@ -156,26 +152,33 @@ else if ($output_form == 'no') {
             FROM classes WHERE class_id = :class_id";
             $stmt = $DBconnection->prepare($insertSQL);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
-            $stmt->bindValue(':class_id', $class_ids, PDO::PARAM_INT);
+            $stmt->bindValue(':class_id', $class_id, PDO::PARAM_INT);
             $stmt->execute();
             }   
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
             }                  
-            echo 'SQL: '.$insertSQL;               
+                
               $updateGoTo = "ClassesList.php";
                     if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                     $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
                     $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
                     }        
               header(sprintf("Location: %s", $updateGoTo));
-              $stmt->closeCursor();
-            }             
+            //Kill statement
+            $stmt->closeCursor();                          
+            } 
           }
-} 
-} // Show if recordset not empty 
-ob_end_flush();
-include("includes/footer.php");?>
+    }
+} // Show if recordset of classes not empty 
+
+?>
+  </div>
+  <div class="story">
+    <p>&nbsp;</p>
+  </div>
+</div>
+<?php include("includes/footer.php");?>
 </body>
 </html>
 <?php
@@ -184,4 +187,5 @@ $stmt_rsClasses->closeCursor();
 $stmt_rsCompetition->closeCursor();
 $stmt_rsOtherCompetitions->closeCursor();
 $DBconnection = null;
+ob_end_flush();
 ?> 

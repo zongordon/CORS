@@ -1,5 +1,8 @@
 <?php
 //Moved meta description and keywords to header.php
+//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+//Used competition data from header.php instead and corrected bug miscalculating number of registrations for active competition
+
 ob_start();
 session_start();
 
@@ -395,12 +398,11 @@ $totalRows_rsClassData = $stmt_rsClassData->rowCount();
 
 //Catch anything wrong with query
 try {
-//Select current actual and max number of registrations for the current competition
+//Select actual number of registrations for the current competition
 require('Connections/DBconnection.php');           
-$query_rsCompActive = "SELECT comp_max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
-$stmt_rsCompActive = $DBconnection->query($query_rsCompActive);
-$row_rsCompActive = $stmt_rsCompActive->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsCompActive = $stmt_rsCompActive->rowCount();   
+$query_rsCurrRegs = "SELECT COUNT(reg_id) AS max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
+$stmt_rsCurrRegs = $DBconnection->query($query_rsCurrRegs);
+$row_rsCurrRegs = $stmt_rsCurrRegs->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
@@ -412,7 +414,6 @@ require('Connections/DBconnection.php');
 $query_rsMax_startnumber = "SELECT MAX(contestant_startnumber)AS max_startnumber FROM registration INNER JOIN classes AS cl USING (class_id) JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1";
 $stmt_rsMax_startnumber = $DBconnection->query($query_rsMax_startnumber);
 $row_rsMax_startnumber = $stmt_rsMax_startnumber->fetch(PDO::FETCH_ASSOC);
-//$totalRows_rsMax_startnumber = $stmt_rsMax_startnumber->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
@@ -430,26 +431,27 @@ else {
 <h3><a name="registration_insert" id="registration_insert"></a>3. Anm&auml;l till t&auml;vlingklasser</h3>
 <p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
 <?php 
+echo $row_rsCurrRegs['max_regs'];
 //Show if the maximum number of registrations is reached
-if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
+if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
     <div class="error">
-    <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $totalRows_rsCompActive; ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
+    <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $comp_max_regs ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
     </div>
 <?php
-    //Email to to Tuna Karate Cup Admin if the maximum number of registrations is reached
+    //Email to competition Admin if the maximum number of registrations is reached
     $club_name = $row_rsClubReg['club_name'];
-    $headers = "From: Tuna Karate Cup <tunacup@karateklubben.com>\r\n" .
+    $headers = "From: $comp_name <$comp_email>\r\n" .
     "MIME-Version: 1.0\r\n" . 
     'X-Mailer: PHP/' . phpversion() . "\r\n" .        
     "Content-Type: text/plain; charset=utf-8\r\n" . 
     "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-    $adm_email = "tunacup@karateklubben.com";
-    $subject_adm = 'Max antal anmälningar registrerade på: http://tunacup.karateklubben.com';
-    $text_adm = "Nu har det maximalt tillåtna antalet ($totalRows_rsCompActive st.) anmälningar registrerats på tunacup.karateklubben.com:\n" .
+    $adm_email = "$comp_email";
+    $subject_adm = 'Max antal anmälningar registrerade på: '.$comp_name;
+    $text_adm = "Nu har det maximalt tillåtna antalet ($comp_max_regs st.) anmälningar registrerats på $comp_name:\n" .
     "Sista anmälningen gjordes av $club_name.\n" .        
     "\n" .
     "Med vänliga hälsningar,\n" .
-    "Eskilstuna Karateklubb, http://www.karateklubben.com";
+    "$comp_arranger, $comp_name, $comp_email";
     $msg_adm = "Max antal anmälningar registrerade!\n$text_adm";
 
     // Send email to Tuna Karate Cup Admin
@@ -507,7 +509,7 @@ if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
           //Show if the last date for registrations is NOT passed
           if ($passedDate === 0) { 
                 //Show if the maximum number of registrations is NOT reached
-                if ($totalRows_rsCompActive < ($row_rsCompActive['comp_max_regs'])) { ?>
+                if ($row_rsCurrRegs['max_regs'] < $comp_max_regs) { ?>
                 <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
     <?php       } 
           } ?>                  
@@ -588,9 +590,11 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
         // Show if recordset $totalRows_rsContestants not empty 
         }            
         $stmt_rsClassData->closeCursor();
-        $stmt_rsCompActive->closeCursor();
+        $stmt_rsCurrRegs->closeCursor();
     // Show if rsClubReg recordset not empty
     }
+    //Kill statements 
+    $stmt_rsClubReg->closeCursor();
   // Show if last registration date is NOT passed
   }
 // If recordset rsClasses is NOT empty 
@@ -604,7 +608,6 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 <?php
 //Kill statements and DB connection
 $stmt_rsClasses->closeCursor();
-$stmt_rsClubReg->closeCursor();
 $DBconnection = null;
 ob_end_flush();
 ?>

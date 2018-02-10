@@ -1,19 +1,12 @@
 <?php 
 //Moved meta description and keywords to header.php
 //Granted access to all levels of registered users
-if (!isset($_SESSION)) {
-  session_start();
-}
+
 if (!isset($_SESSION)) {
   session_start();
 }
 //Access level registered user
-if ($_SESSION['MM_Level'] === 0) {
-$MM_authorizedUsers = "0";    
-}
-if ($_SESSION['MM_Level'] === 1) {
-$MM_authorizedUsers = "1";    
-}
+$MM_authorizedUsers = $_SESSION['MM_Level']; 
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
@@ -152,6 +145,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
     <?php
   }
   ?>
+    <p><a href="Rep_Summary.php">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>    
   </div>
 </div>
 <?php include("includes/footer.php");?>

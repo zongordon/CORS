@@ -1,6 +1,7 @@
 <?php
 //Moved meta description and keywords to header.php
 //Added function to handle more input: comp_arranger, comp_email and comp_url
+
 ob_start();
 
 //Access level top administrator
@@ -30,7 +31,15 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php
 //Initiate global variables
 global $comp_name, $comp_start_date, $comp_end_date, $comp_end_reg_date, $comp_current, $comp_arranger, $comp_email, $comp_url, $comp_max_regs;
-
+    $comp_name = "";
+    $comp_start_date = "";
+    $comp_end_date = "";
+    $comp_end_reg_date = "";
+    $comp_arranger = "";
+    $comp_email = "";
+    $comp_url = "";
+    $comp_max_regs = "";
+    $comp_current = "";
 //Validate the form if button is clicked
  if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
     $comp_name = encodeToUtf8(filter_input(INPUT_POST,'comp_name'));

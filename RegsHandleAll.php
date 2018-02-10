@@ -1,6 +1,8 @@
 <?php
 //Moved meta description and keywords to header.php
 //Changed how to handle $colname_rsSelectedClub
+//Used competition data from header.php instead and corrected bug miscalculating number of registrations for active competition
+//Corrected logic to keep data for selected club in a correct way
 
 ob_start();
 session_start();
@@ -42,16 +44,14 @@ $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }    
-    
-//Select information regarding the selected account
-//$colname_rsSelectedClub = $_SESSION['MM_Account'];
+  
+//Select information regarding the selected account after the $_SESSION['MM_Account'] has been created
+$colname_rsSelectedClub = $_SESSION['MM_Account'];
 
-    if (filter_input(INPUT_POST,'account_id')) {
+//When a club is selected and "Välj klubb" clicked, initiate variable to select data from DB, to enable changing clubs
+if (filter_input(INPUT_POST,'account_id')) {
     $colname_rsSelectedClub = filter_input(INPUT_POST,'account_id');    
-    }
-    else {
-            $colname_rsSelectedClub = "";
-    }
+} 
     
 //Catch anything wrong with query
 try {
@@ -448,12 +448,11 @@ $totalRows_rsClassData = $stmt_rsClassData->rowCount();
         
 //Catch anything wrong with query
 try {
-//Select current actual and max number of registrations for the current competition
+//Select actual number of registrations for the current competition
 require('Connections/DBconnection.php');           
-$query_rsCompActive = "SELECT comp_max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
-$stmt_rsCompActive = $DBconnection->query($query_rsCompActive);
-$row_rsCompActive = $stmt_rsCompActive->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsCompActive = $stmt_rsCompActive->rowCount();   
+$query_rsCurrRegs = "SELECT COUNT(reg_id) AS max_regs FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1";
+$stmt_rsCurrRegs = $DBconnection->query($query_rsCurrRegs);
+$row_rsCurrRegs = $stmt_rsCurrRegs->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
@@ -483,9 +482,9 @@ else {
 <h3><a name="registration_insert" id="registration_insert"></a>4. Anm&auml;l till t&auml;vlingklasser</h3>
 <p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 7-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
 <?php //Show if the maximum number of registrations is reached
-      if ($totalRows_rsCompActive > ($row_rsCompActive['comp_max_regs']-1)) { ?>
+      if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
         <div class="error">
-            <h3>Maximala antalet anm&auml;lningar (<?php echo $row_rsCompActive['comp_max_regs']; ?> st.) &auml;r uppn&aring;tt. &Auml;ndra inst&auml;ningar under "TAuml;vlingar" f&ouml;r att andra ska kunna g&ouml&ra till&auml;gg online!</h3>
+            <h3>Maximala antalet anm&auml;lningar (<?php echo $comp_max_regs ?> st.) &auml;r uppn&aring;tt. &Auml;ndra inst&auml;ningar under "TAuml;vlingar" f&ouml;r att andra ska kunna g&ouml&ra till&auml;gg online!</h3>
         </div>
 <?php
       } ?>           
@@ -614,7 +613,7 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
         // Show if recordset $totalRows_rsContestants not empty 
         }            
         $stmt_rsClassData->closeCursor();
-        $stmt_rsCompActive->closeCursor();
+        $stmt_rsCurrRegs->closeCursor();
         $stmt_rsClubReg->closeCursor(); 
     // Show if rsClubReg recordset not empty
     }

@@ -1,19 +1,12 @@
 <?php 
 //Moved meta description and keywords to header.php
 //Granted access to all levels of registered users
-if (!isset($_SESSION)) {
-  session_start();
-}
+
 if (!isset($_SESSION)) {
   session_start();
 }
 //Access level registered user
-if ($_SESSION['MM_Level'] === 0) {
-$MM_authorizedUsers = "0";    
-}
-if ($_SESSION['MM_Level'] === 1) {
-$MM_authorizedUsers = "1";    
-}
+$MM_authorizedUsers = $_SESSION['MM_Level']; 
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
@@ -68,7 +61,7 @@ echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
         </tr>
       <?php }  ?>        
     </table>
-      <p>&nbsp;</p>
+    <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
   </div>
   <div class="story">
     <p>&nbsp;</p>

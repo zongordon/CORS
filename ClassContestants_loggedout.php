@@ -1,5 +1,6 @@
 <?php
 //Moved meta description and keywords to header.php
+//Added link to go to previous page
 
 if (!isset($_SESSION)) {
   session_start();
@@ -84,6 +85,7 @@ echo ' | '.$row_rsClass['class_weight_length'];
 </tr>
 <?php } ?>
   </table>
+<p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
 <?php } // Show if recordset not empty ?>
   </div>
 </div>

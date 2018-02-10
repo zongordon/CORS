@@ -257,7 +257,7 @@ $DBconnection = null;
         "Content-Type: text/plain; charset=utf-8\r\n" . 
         "Content-Transfer-Encoding: 8bit\r\n\r\n";         
         $adm_email = "$comp_email";
-        $subject_adm = 'Nytt konto registrerat: '.$comp_url;
+        $subject_adm = 'Nytt konto registrerat: '.$comp_name;
 	$text_adm = "Detta konto har registrerats på $comp_url:\n" .
 	"Klubbnamn: $club_name\n" .
         "Kontaktperson: $contact_name\n" .
@@ -276,7 +276,7 @@ $DBconnection = null;
         'X-Mailer: PHP/' . phpversion() . "\r\n" .        
         "Content-Type: text/plain; charset=utf-8\r\n" . 
         "Content-Transfer-Encoding: 8bit\r\n\r\n";         
-        $subject = 'Ditt nya konto: '.$comp_url;
+        $subject = 'Ditt nya konto: '.$comp_name;
         $text = "Tack för att du registrerat ett konto på $comp_url!\n" .
         "Här är de inloggningsuppgifter som du registrerade:\n" .
 	"Klubbnamn: $club_name\n" .
@@ -288,7 +288,7 @@ $DBconnection = null;
 	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
 	"\n" .
 	"Med vänliga hälsningar,\n" .
-	"$comp_arranger, $comp_url";
+	"$comp_arranger, $comp_name, $comp_email";
         $msg = "Hej $contact_name,\n$text";
         
         // Send email to club contact

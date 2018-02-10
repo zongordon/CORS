@@ -1,5 +1,5 @@
 <?php
-
+//Changed default redirect page from "LogIn.php"
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -30,30 +30,30 @@ function isAuthorized($strUsers, $strGroups, $AccountId, $UserGroup) {
   return $isValid; 
 }
     //Default redirection page
-    $MM_restrictGoTo = "LogIn.php";
-    //Select redirect page depending on target page if user not correctly logged in
-    if ($pagetitle == "L&auml;gga till ett konto - admin") {
+    $MM_restrictGoTo = "Login.php";
+    //Select specific redirect page depending on target page if user not correctly logged in
+    if ($pagetitle === "L&auml;gga till ett konto - admin") {
     $MM_restrictGoTo = "AccountInsert_loggedout.php";
     }
-    if ($pagetitle == "Lista konton - admin") {
+    if ($pagetitle === "Lista konton - admin") {
     $MM_restrictGoTo = "AccountList_reg.php";
     }
-    if ($pagetitle == "&Auml;ndra anv&auml;ndarkonto - admin") {
+    if ($pagetitle === "&Auml;ndra anv&auml;ndarkonto - admin") {
     $MM_restrictGoTo = "AccountUpdate_reg.php";
     }
-    if ($pagetitle == "T&auml;vlande i klassen - admin") {
+    if ($pagetitle === "T&auml;vlande i klassen - admin") {
     $MM_restrictGoTo = "ClassContestants_loggedout.php";
     }
-    if ($pagetitle == "T&auml;vlingsklasser - admin") {
+    if ($pagetitle === "T&auml;vlingsklasser - admin") {
     $MM_restrictGoTo = "ClassesList_loggedout.php";
     } 
-    if ($pagetitle == "Ta bort anm&auml;lan - admin") {
+    if ($pagetitle === "Ta bort anm&auml;lan - admin") {
     $MM_restrictGoTo = "LogedIn.php";
     }
-    if ($pagetitle == "Registrera t&auml;vlande - admin") {
+    if ($pagetitle === "Registrera t&auml;vlande - admin") {
     $MM_restrictGoTo = "RegInsert_reg.php";
     }
-    if ($pagetitle == "Inloggad - admin") {
+    if ($pagetitle === "Inloggad - admin") {
     $MM_restrictGoTo = "LogedIn_reg.php";
     }
     

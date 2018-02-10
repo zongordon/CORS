@@ -1,6 +1,5 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling. Changed from charset=ISO-8859-1.
-//Changed from array_key_exists(0, $contestantsArray) to isset($startnumberArray[0]) to enable identifying NULL when no start numbers exist. Changed database default value to NULL.
+//Replaced hard code in header with DB data
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -9,7 +8,7 @@ $colname_rsClassData = filter_input(INPUT_GET,'class_id');
 try {
 //SELECT competitor data för the competition class
 require('Connections/DBconnection.php');         
-$query = "SELECT com.comp_name, com.comp_start_date, a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1 ORDER BY club_startorder, reg_id";
+$query = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1 ORDER BY club_startorder, reg_id";
 $stmt_rsClassContestants = $DBconnection->prepare($query);
 $stmt_rsClassContestants->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsClassContestants = $stmt_rsClassContestants->fetch(PDO::FETCH_ASSOC);
@@ -31,19 +30,23 @@ catch(PDOException $ex) {
 }   
 
 $comp_name = $row_rsClassContestants['comp_name'];
+$comp_arranger = $row_rsClassContestants['comp_arranger'];
 $class_discipline = $row_rsClassContestants['class_discipline']; 
 $class_gender_category = $row_rsClassContestants['class_gender_category']; 
 $class_category = $row_rsClassContestants['class_category']; 
 $class_age = $row_rsClassContestants['class_age']; 
 $class_weight_length = $row_rsClassContestants['class_weight_length']; 
 $comp_start_date = $row_rsClassContestants['comp_start_date']; 
+$pagetitle="T&auml;vlingsstege";
+$pagedescription="$comp_name som arrangeras av $comp_arranger.";
+$pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="T&auml;vlingsstege"?>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Munktellarenan." />
-<meta name="keywords" content="tuna karate cup, tävlingsstege per klass, karate, eskilstuna, munktellarenan, wado, sj&auml;lvf&ouml;rsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
+<meta name="description" content="<?php echo $pagedescription ?>" />
+<meta name="keywords" content="<?php echo $pagekeywords ?>" />
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="print.css" type="text/css" media="print" /> 
 <link rel="stylesheet" href="3_elimladder.css" type="text/css" media="screen"/>
