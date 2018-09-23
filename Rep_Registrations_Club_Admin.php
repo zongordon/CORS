@@ -1,24 +1,23 @@
 <?php 
-//Removed '$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)'to show all data in recordset 
 
 if (!isset($_SESSION)) {
   session_start();
 }
-//Access level registered user
-$MM_authorizedUsers = $_SESSION['MM_Level']; 
+//Access level top administrator
+$MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
 try {
-// Select number of registrations for each club, for the active competition
+// Select registrations for each club and all competitions
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT club_name, COUNT(reg_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
+$query_rsContestants = "SELECT comp_name, club_name, contestant_name,class_discipline FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN contestants USING (contestant_id) INNER JOIN account USING(account_id) ORDER BY comp_start_date DESC, club_name, contestant_name Asc";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
-$pagetitle="Rapport: antal t&auml;vlande som anm&auml;lts till aktuell t&auml;vling, per klubb";
+$pagetitle="Rapport: anm&auml;lda per klubb";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -33,17 +32,21 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class="feature">
-<h3>Antal t&auml;vlande (som &auml;r anm&auml;lda till n&aring;gon klass) per klubb</h3>
-<p>Rapporten visar antal t&auml;vlande (som anm&auml;lts till n&aring;gon t&auml;vlingsklass) vid aktuell t&auml;vling per klubb.</p>
+<h3>Anm&auml;lda till n&aring;gon klass per klubb</h3>
+<p>Rapporten visar vilka anm&auml;lda per klubb (som anm&auml;lts till n&aring;gon t&auml;vlingsdisciplin) vid n&aring;gon t&auml;vling.</p>
 <table width="40%" border="1">
     <tr>
+          <td><strong>T&auml;vling</strong></td>        
           <td><strong>Klubb</strong></td>
-          <td><strong>Antal&nbsp;t&auml;vlande</strong></td>
+          <td><strong>T&auml;vlande</strong></td>
+          <td><strong>T&auml;vlingsdisciplin</strong></td>
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['comp_name']; ?></td>
         <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(reg_id)']; ?></td>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_name']; ?></td>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['class_discipline']; ?></td>
         </tr>
     <?php } ?>
 </table>

@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Added $colname_rsClass = filter_input(INPUT_POST,'class_id') to update the class as that only worked locally and not on the testsite
 
 ob_start();
 //Access level top administrator
@@ -33,6 +33,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php 
 // Update class data if button is clicked and all fields are validated to be correct
  if (filter_input(INPUT_POST,'MM_insert') == 'update_class') {
+    $colname_rsClass = filter_input(INPUT_POST,'class_id');
     $comp_id = filter_input(INPUT_POST,'comp_id');         
     $class_category = filter_input(INPUT_POST,'class_category');             
     $class_discipline = filter_input(INPUT_POST,'class_discipline');         

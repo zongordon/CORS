@@ -1,12 +1,12 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Changed title
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
 
-$pagetitle="&Aring;rets t&auml;vling";
+$pagetitle="T&auml;vling";
 // Includes Several other code functions
 //include_once('includes/functions.php');
 // Includes HTML Head

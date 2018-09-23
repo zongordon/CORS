@@ -1,6 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Granted access to all levels of registered users
+//Removed $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC) to show all data in recordset
 
 if (!isset($_SESSION)) {
   session_start();
@@ -14,8 +13,7 @@ try {
 // Select number of registrations for each class, for the active competition
 require('Connections/DBconnection.php');           
 $query_rsRegistrations = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
-$stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
-$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC); 
+$stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations); 
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }

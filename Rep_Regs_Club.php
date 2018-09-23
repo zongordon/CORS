@@ -1,6 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Granted access to all levels of registered users
+//Removed '$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)' to show all data in recordset 
 
 if (!isset($_SESSION)) {
   session_start();
@@ -57,7 +56,6 @@ require('Connections/DBconnection.php');
 $query_rsRegistrations = "SELECT a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, co.contestant_name";
 $stmt_rsRegistrations = $DBconnection->prepare($query_rsRegistrations);
 $stmt_rsRegistrations->execute(array(':account_id'=>$colname_rsSelectedClub));
-$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC); 
 $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();

@@ -1,9 +1,7 @@
 <?php
-//Moved meta description and keywords to header.php
-//Changed how to handle $colname_rsSelectedClub
-//Used competition data from header.php instead and corrected bug miscalculating number of registrations for active competition
-//Corrected logic to keep data for selected club in a correct way
-
+//Changed where code for Kill statements were located due to error messages
+//Changed from <div id="content"> due to no footer showing
+//Corrected spelling under point '4. Anmäl till tävlingklasser'
 ob_start();
 session_start();
 
@@ -82,7 +80,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div id="content">  
+<div class="content">  
      <div class="feature">
 <?php 
 // Show if recordset (classes) rsClasses empty 
@@ -484,7 +482,7 @@ else {
 <?php //Show if the maximum number of registrations is reached
       if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
         <div class="error">
-            <h3>Maximala antalet anm&auml;lningar (<?php echo $comp_max_regs ?> st.) &auml;r uppn&aring;tt. &Auml;ndra inst&auml;ningar under "TAuml;vlingar" f&ouml;r att andra ska kunna g&ouml&ra till&auml;gg online!</h3>
+            <h3>Maximala antalet anm&auml;lningar (<?php echo $comp_max_regs ?> st.) &auml;r uppn&aring;tt. &Auml;ndra inst&auml;llningar under "T&auml;vlingar" f&ouml;r att andra ska kunna g&ouml;ra till&auml;gg online!</h3>
         </div>
 <?php
       } ?>           
@@ -532,6 +530,9 @@ else {
       } ?>
       </option>
 <?php
+    //Kill statement
+    $stmt_rsClassData->closeCursor();
+    $stmt_rsCurrRegs->closeCursor();
     } ?>
                    </select>
                 </label></td>
@@ -612,8 +613,6 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
             $stmt_rsMax_startnumber->closeCursor();  
         // Show if recordset $totalRows_rsContestants not empty 
         }            
-        $stmt_rsClassData->closeCursor();
-        $stmt_rsCurrRegs->closeCursor();
         $stmt_rsClubReg->closeCursor(); 
     // Show if rsClubReg recordset not empty
     }

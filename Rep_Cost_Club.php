@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Granted access to all levels of registered users
+//Removed '$row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC)' to show all data in recordset 
 
 if (!isset($_SESSION)) {
   session_start();
@@ -15,7 +14,6 @@ try {
 require('Connections/DBconnection.php');           
 $query_rsCost = "SELECT club_name, coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
 $stmt_rsCost = $DBconnection->query($query_rsCost);
-$row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
