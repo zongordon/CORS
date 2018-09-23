@@ -1,6 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+//Minor cosmetic changes
+//Changed from <div id="content"> 
 ob_start();
 
 //Access level top administrator
@@ -48,7 +48,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div id="content">    
+<div class ="content">    
     <div class="story">
 <?php if ($totalRows_rsMessages == 0) { // Show if recordset empty ?>
         <div class="error">        
@@ -89,7 +89,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
       $output_form = 'yes';
     }
     // $insert_message_how is set to send emails
-    if ($insert_message_how == 'EmailOnly' || $insert_message_how == 'SiteAndEmail') {
+    if ($insert_message_how === 'EmailOnly' || $insert_message_how === 'SiteAndEmail') {
         if (empty($insert_message_to)) {
         // $insert_message_to is blank
         echo '<h3>Du gl&ouml;mde att v&auml;lja till vilka meddelandet ska skickas.</h3>';    
@@ -97,7 +97,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
         }
     }
     // Insert new message if the button is clicked and the form is validated ok
-    if ($output_form == 'no') {
+    if ($output_form === 'no') {
     //Get comp_id from active competition    
     $comp_id = $row_rsCompActive['comp_id'];
     //Set timestamp for Now()
@@ -120,13 +120,11 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
     catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }   
+        //Select who to send email to (clubs with registered contestants to the current competition or all registered users)                
+        if ($insert_message_how === 'EmailOnly' || $insert_message_how === 'SiteAndEmail') {
+            //Select email addresses from clubs with registered coaches to the current competition
+            if ($insert_message_to === 'CurrentComp') {
                 
-        if ($insert_message_how == 'EmailOnly' || $insert_message_how == 'SiteAndEmail') {
-            //Select who to send email to (clubs with registered contestants to the current competition or all registered users)
-            if ($insert_message_to == 'CurrentComp') {
-                //Select email addresses from clubs with registered coaches to the current competition
-                $contact_name ='Frank';    
-                $contact_email = 'frank.staffas@gmail.com';    
                 //Catch anything wrong with query
                 try {
                 require('Connections/DBconnection.php');           
@@ -139,9 +137,8 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
                 }    
             }
             //Select email addresses from all clubs 
-            if ($insert_message_to == 'All') {
-                //$contact_email = 'tunacup@karateklubben.com';    
-                //$contact_name ='Tuna';    
+            if ($insert_message_to === 'All') {
+
                 //Catch anything wrong with query
                 try {
                 require('Connections/DBconnection.php');           
@@ -202,13 +199,13 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
             <td valign ="top">S&auml;tt att spara/skicka meddelandet:</td>
           <td valign="top">
               <label>
-              <input type="radio" name="message_how" id="message_how" value="SiteOnly" <?php if ($insert_message_how == "SiteOnly") echo "checked='checked'"; ?>//>
+              <input type="radio" name="message_how" id="message_how" value="SiteOnly" <?php if ($insert_message_how == "SiteOnly"){ echo "checked='checked'"; }?>/>
               Spara som nyhet</label><br>
             <label>
-              <input type="radio" name="message_how" id="message_how" value="EmailOnly" <?php if ($insert_message_how == "EmailOnly") echo "checked='checked'"; ?>/>
+              <input type="radio" name="message_how" id="message_how" value="EmailOnly" <?php if ($insert_message_how == "EmailOnly"){ echo "checked='checked'";} ?>/>
               Skicka som e-post</label><br>
             <label>
-              <input type="radio" name="message_how" id="message_how" value="SiteAndEmail" <?php if ($insert_message_how == "SiteAndEmail") echo "checked='checked'"; ?>/>
+              <input type="radio" name="message_how" id="message_how" value="SiteAndEmail" <?php if ($insert_message_how == "SiteAndEmail"){ echo "checked='checked'";} ?>/>
               Spara som nyhet och skicka som e-post</label>              
           </td>
         </tr>
@@ -216,10 +213,10 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
             <td valign ="top">S&auml;tt att spara/skicka meddelandet:</td>
           <td valign="top">
             <label>
-              <input type="radio" name="message_to" id="message_to" value="CurrentComp" <?php if ($insert_message_to == "CurrentComp") echo "checked='checked'"; ?>/>
+              <input type="radio" name="message_to" id="message_to" value="CurrentComp" <?php if ($insert_message_to == "CurrentComp"){ echo "checked='checked'";} ?>/>
               Registrerade till aktuell t&auml;vling</label><br>
             <label>
-              <input type="radio" name="message_to" id="message_to" value="All" <?php if ($insert_message_to == "All") echo "checked='checked'"; ?>/>
+              <input type="radio" name="message_to" id="message_to" value="All" <?php if ($insert_message_to === "All"){ echo "checked='checked'";} ?>/>
               Alla registrerade anv&auml;ndare</label>
             <label>
           </td>
@@ -250,13 +247,13 @@ if ($totalRows_rsMessages > 0) { // Show if recordset not empty ?>
           <tr>
             <td valign ="top"><?php echo $row_rsMessages['message_subject']; ?></td>
             <td valign ="top"><?php echo $row_rsMessages['message']; ?></td>
-            <td valign ="top"><?php if ($row_rsMessages['message_how'] == "SiteOnly") {
+            <td valign ="top"><?php if ($row_rsMessages['message_how'] === "SiteOnly") {
                                     echo 'Sparat som nyhet';
                                     }
-                                    if ($row_rsMessages['message_how'] == "EmailOnly") {
+                                    if ($row_rsMessages['message_how'] === "EmailOnly") {
                                     echo 'Skickat som e-post';
                                     }
-                                    if ($row_rsMessages['message_how'] == "SiteAndEmail") {
+                                    if ($row_rsMessages['message_how'] === "SiteAndEmail") {
                                     echo 'Sparat som nyhet och skickat som e-post';
                                     } ?></td>
             <td valign ="top"><?php echo $row_rsMessages['message_timestamp']; ?></td>            

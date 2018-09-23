@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+//Changed from $xxx = encodeToUtf8(filter_input(INPUT_POST, trim('xxx')));
 
 if (!isset($_SESSION)) {
   session_start();
@@ -30,17 +29,17 @@ include_once("includes/news_sponsors_nav.php");
 //Declare and initialise variables
   $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
 // Validate insert account data if button is clicked
- if (filter_input(INPUT_POST, 'MM_insert' == 'new_account')) {
-    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
-    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
-    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
-    $confirmed = filter_input(INPUT_POST, 'confirmed');     
-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8")); 
-    $email = filter_input(INPUT_POST, trim('contact_email'));
-    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
-    $active = filter_input(INPUT_POST, 'active');
-    $access_level = filter_input(INPUT_POST, 'access_level');		
+ if (filter_input(INPUT_POST,'MM_insert') == 'new_account') {
+    if (filter_input(INPUT_POST,'user_name')) { $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));}
+    if (filter_input(INPUT_POST,'user_password')) { $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));}
+    if (filter_input(INPUT_POST,'confirm_user_password')) { $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');}
+    if (filter_input(INPUT_POST,'confirmed')) { $confirmed = filter_input(INPUT_POST,'confirmed');}     
+    if (filter_input(INPUT_POST,'contact_name')) { $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));}
+    if (filter_input(INPUT_POST,'contact_email')) { $email = filter_input(INPUT_POST,'contact_email');}
+    if (filter_input(INPUT_POST,'contact_phone')) { $contact_phone = filter_input(INPUT_POST,'contact_phone');}
+    if (filter_input(INPUT_POST,'club_name')) { $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));}
+    if (filter_input(INPUT_POST,'active')) { $active = filter_input(INPUT_POST,'active');}
+    if (filter_input(INPUT_POST,'access_level')) { $access_level = filter_input(INPUT_POST,'access_level');}    
     $output_form = 'no';
 	    
     if (empty($email)) {
@@ -123,7 +122,7 @@ include_once("includes/news_sponsors_nav.php");
     if (empty($user_password)) {
       // $user_password is blank
       echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
-      $output_form = 'yes';
+    $output_form = 'yes';
     }
 	
     if (empty($confirm_user_password)) {

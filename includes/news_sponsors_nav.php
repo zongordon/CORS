@@ -1,5 +1,5 @@
 <?php
-//Changed to same width regardless competition and to img/Banner_R.png instead if .gif
+//Changed all sponsors to 'Huvudsponsorer'
 
 require_once('Connections/DBconnection.php');
 
@@ -24,11 +24,11 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
 ?>
 <body>
 <div id="masthead">
-    <a href="/"><img src="img/Banner_L.png" alt="Left Logo" width="98" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
     <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
-    <a href="/"><img src="img/Banner_R.png" alt="Right Logo" width="91" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
 </div>
-<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a>|<a href="Results.php">Resultat</a>|<a href="http://tunacup.karateklubben.com/support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="http://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a>|<a href="Results.php">Resultat</a>|<a href="https://karateklubben.com/Support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
 <div id="headlines">
   <div id="latestnews">
@@ -50,9 +50,8 @@ $DBconnection = null;
 ?>
   </div><br/>
   <div id="sponsors">
-      <h3>Huvudsponsor</h3>
-      <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-Logo.png" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
-      <h3>&Ouml;vriga sponsorer</h3>
+      <h3>Huvudsponsorer</h3>
+      <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
       <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
       <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
 <!--Hide code       

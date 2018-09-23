@@ -1,6 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Added code to handle situation with no registrations
+//Changed sql to retrieve only club registrations where contestants have been registered
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -56,7 +55,7 @@ $DBconnection = null;
 }
 //Select the current raffle data from the active competition
 require('Connections/DBconnection.php');           
-$query1 = "SELECT comp_id, club_reg_id, club_name, club_startorder FROM clubregistration INNER JOIN account USING (account_id) INNER JOIN competition USING (comp_id) WHERE comp_current = 1 ORDER BY club_startorder, club_name";
+$query1 = "SELECT DISTINCT club_reg_id, club_name, club_startorder, comp_id FROM clubregistration INNER JOIN registration USING (club_reg_id) INNER JOIN account USING (account_id) INNER JOIN competition USING (comp_id) WHERE comp_current = 1 ORDER BY club_startorder, club_name";
 $stmt_rsClubRegs = $DBconnection->query($query1);
 $totalRows_rsClubRegs = $stmt_rsClubRegs->rowCount();   
 

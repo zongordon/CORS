@@ -1,6 +1,6 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Changed 'foreach(filter_input(INPUT_POST,'to_comp_id') as $class_id)' and 'input name="copy_class" type="checkbox" id="copy_class"...' to make the copy function work  
+//Changed to show if recordset not empty OR "Kopiera" button is clicked and classes chosen for copy
+//Changed to only select data if $colname_rsCompetition <> NULL
 
 ob_start();
 //Access level top administrator
@@ -12,9 +12,9 @@ if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
 $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
 
-//Catch comp_id sent from previous page to select correct competion's classes
+//Catch comp_id sent from previous page to select competition classes to copy if $colname_rsCompetition <> NULL
 $colname_rsCompetition = filter_input(INPUT_GET, 'comp_id');
-
+if ($colname_rsCompetition <> NULL) {
 //Catch anything wrong with query
     try {
         //Select all classes for selected competition and the competition's name
@@ -51,7 +51,7 @@ $colname_rsCompetition = filter_input(INPUT_GET, 'comp_id');
     catch(PDOException $ex) {
         echo "An Error occured with query3: ".$ex->getMessage();
     }
-
+}
 $pagetitle="Kopiera T&auml;vlingklasser";
 // Includes Several code functions
 include_once('includes/functions.php');
@@ -71,7 +71,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <p>Det finns inga t&auml;vlingsklasser att visa!</p>
   <?php } // Show if recordset empty ?>
 <?php 
-if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
+if ($totalRows_rsClasses > 0 OR (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes')) { // Show if recordset not empty OR "Kopiera" button is clicked and classes chosen for copy?>
     <h3>Befintliga t&auml;vlingsklasser i <?php echo $row_rsCompetition['comp_name'] ?></h3>
     <p>Kopiera t&auml;vlingsklasser med ifyllda checkboxar genom att klicka p&aring; "Kopiera"!</p>  
       <div class="error">    
@@ -158,7 +158,6 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
             }                  
-                
               $updateGoTo = "ClassesList.php";
                     if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                     $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";

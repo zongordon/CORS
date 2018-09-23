@@ -1,24 +1,23 @@
 <?php 
-//Removed '$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)'to show all data in recordset 
 
 if (!isset($_SESSION)) {
   session_start();
 }
-//Access level registered user
-$MM_authorizedUsers = $_SESSION['MM_Level']; 
+//Access level top administrator
+$MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
 try {
-// Select number of registrations for each club, for the active competition
+// Select registrations for each club and all competitions
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT club_name, COUNT(reg_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
+$query_rsContestants = "SELECT club_name, contact_email, contestant_name FROM contestants INNER JOIN account USING(account_id) WHERE active = 1 ORDER BY club_name, contact_email, contestant_name";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
-$pagetitle="Rapport: antal t&auml;vlande som anm&auml;lts till aktuell t&auml;vling, per klubb";
+$pagetitle="Rapport: t&auml;vlande per klubb, totalt";
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -33,17 +32,19 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
     <div class="feature">
-<h3>Antal t&auml;vlande (som &auml;r anm&auml;lda till n&aring;gon klass) per klubb</h3>
-<p>Rapporten visar antal t&auml;vlande (som anm&auml;lts till n&aring;gon t&auml;vlingsklass) vid aktuell t&auml;vling per klubb.</p>
+<h3>T&auml;vlande per klubb</h3>
+<p>Rapporten visar t&auml;vlande per klubb (aktiva konton), vare sig anm&auml;lda till en t&auml;vling eller inte.</p>
 <table width="40%" border="1">
     <tr>
           <td><strong>Klubb</strong></td>
-          <td><strong>Antal&nbsp;t&auml;vlande</strong></td>
+          <td><strong>E-post kontakt</strong></td>
+          <td><strong>T&auml;vlande</strong></td>          
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
         <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(reg_id)']; ?></td>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['contact_email']; ?></td>        
+        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_name']; ?></td>
         </tr>
     <?php } ?>
 </table>

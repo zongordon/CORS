@@ -1,13 +1,11 @@
 <?php 
-//Adapted code to PHP 7 (PDO) and added minor error handling.
-//Replaced plain text strings with DB selects
-//Moved meta description and keywords to header.php
+//Changed title
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
-$pagetitle = "&Aring;rets t&auml;vling";
+$pagetitle = "T&auml;vling";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
@@ -40,7 +38,7 @@ include_once("includes/news_sponsors_nav.php");
     <h2>T&auml;vlingsstegar</h2>
     <p>N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten, via l&auml;nken t&auml;vlingsklasser ovan<?php if ($row_rsCurrentComp['comp_raffled'] === 1) { echo " eller som pdf <a href='pdf/Stegar.pdf' target='_blank'>h&auml;r</a>";} ?>! <strong>Inga stegar delas ut p&aring; plats!</strong></p>
     <h2>Startavgift och inbetalning</h2>
-    <p>Avgiften &auml;r 200 kr per klass 7-13 &aring;r och 250 kr 14-17 &aring;r. Anv&auml;nd bankgironummer 176-6526 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
+    <p>Avgiften &auml;r 200 kr per klass 7-13 &aring;r och 250 kr fr&aring;n 14 &aring;r. Anv&auml;nd bankgironummer 176-6526 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
     <h2>Registrering, strykningar och inv&auml;gning</h2>
     <p>Klubben registreras p&aring; t&auml;vlingsdagen av <strong>en</strong> lagledare eller coach vid p&aring;visad plats i t&auml;vlingshallen. Coach/lagledare f&aring;r h&auml;r ta emot coachbrickor och tidsplanering. Eventuella strykningar meddelar ni vid registrering eller direkt p&aring; respektive matta. Obs! De t&auml;vlande m&aring;ste inte sj&auml;lva vara p&aring; plats vid registreringen! Inv&auml;gning och registrering sker p&aring; t&auml;vlingsdagen 08.30-09.30 samt 12.00- 12.30.</p>
     <h2>Entr&eacute; 40 kr</h2>

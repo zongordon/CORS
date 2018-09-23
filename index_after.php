@@ -1,11 +1,11 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Changed title
 ob_start();
 
 if (!isset($_SESSION)) {
   session_start();
 }
-$pagetitle="&Aring;rets t&auml;vling";
+$pagetitle="T&auml;vling";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections

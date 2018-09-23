@@ -78,10 +78,10 @@ if ($totalRows_rsCompetitions > 0) { // Show if recordset not empty ?>
       <td><strong>T&auml;vling</strong></td>
       <td><strong>Startdatum</strong></td>
       <td><strong>Slutdatum</strong></td>
-      <td><strong>Sista anm&auml;lningsdatum</strong></td>
+      <td><strong>Sista anm&auml;lnings-datum</strong></td>
       <td><strong>Max antal anm&auml;lningar</strong></td>
       <td><strong>Antal anm&auml;lningar</strong></td>      
-      <td><strong>Antal t&auml;vlingsklasser</strong></td>
+      <td><strong>Antal t&auml;vlings-klasser</strong></td>
       <td><strong>Aktiv</strong></td>
       <td><strong>Kopiera klasser</strong></td>
       <td><strong>&Auml;ndra</strong></td>

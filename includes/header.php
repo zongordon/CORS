@@ -27,7 +27,7 @@ $comp_url = $row_rsCurrentComp['comp_url'];
 $comp_raffled = $row_rsCurrentComp['comp_raffled'];
 $comp_max_regs = $row_rsCurrentComp['comp_max_regs'];
 
-$pagedescription="$comp_name som arrangeras av $comp_arranger.";
+$pagedescription="$comp_name som arrangeras av $comp_arranger";
 $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

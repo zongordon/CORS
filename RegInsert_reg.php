@@ -1,7 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
-//Used competition data from header.php instead and corrected bug miscalculating number of registrations for active competition
+//Changed where code for Kill statements were located due to error messages
+//Changed from <div id="content"> due to no footer showing    
 
 ob_start();
 session_start();
@@ -52,11 +51,11 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div id="content">    
+<div class ="content">    
        <div class="feature">    
 <?php 
 // Show if recordset (classes) rsClasses empty 
-if ($totalRows_rsClasses == 0) {?>
+if ($totalRows_rsClasses === 0) {?>
     <p>Det finns inga klasser att anm&auml;la till &auml;n!</p>
 <?php
 }
@@ -64,14 +63,14 @@ if ($totalRows_rsClasses == 0) {?>
 if ($totalRows_rsClasses > 0) {
 
     //Show if the last date for registration is passed
-    if ($passedDate == 1) { ?>
+    if ($passedDate === 1) { ?>
 	<div class="error">
         <h3>Sista anm&auml;lningsdagen &auml;r passerad och inga till&auml;gg eller &auml;ndringar g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
 	</div>
 <?php
     }
   //Show if the last date for registration is NOT passed
-  if ($passedDate == 0) { ?> 
+  if ($passedDate === 0) { ?> 
         <h3>Registera t&auml;vlande klubbmedlemmar och anm&auml;l dem till deras t&auml;vlingsklasser</h3>
         <p>Anm&auml;lan g&ouml;rs i fyra steg:</p>
         <ol>
@@ -95,7 +94,7 @@ if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") |
       echo '<h3>Du gl&ouml;mde att fylla i klubbens coacher!</h3>';
       $output_form = 'yes';
     } 
-    if ($output_form == 'no') {
+    if ($output_form === 'no') {
         //Insert new club registration if form validated ok
 	if (filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") {
             //Catch anything wrong with query
@@ -169,7 +168,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
           <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $row_rsClasses['comp_id']; ?>" />
           <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />        </td>
         <td><label>
-	<?php if ($totalRows_rsClubReg == 0) { // Show if recordset empty ?>   
+	<?php if ($totalRows_rsClubReg === 0) { // Show if recordset empty ?>   
           <input type="submit" name="new_club_reg" id="new_club_reg" value="Spara" />
           <input type="hidden" name="MM_insert_clubregistration" value="new_club_reg" />
 	<?php } ?> 
@@ -280,7 +279,7 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
         <tr>
           <td><input type="hidden" name="MM_insert_contestant" value="new_contestant" /></td>
           <td><label>
-          <?php if ($passedDate == 0) { ?>
+          <?php if ($passedDate === 0) { ?>
               <input type="submit" name="new_contestant" id="new_contestant" value="Ny t&auml;vlande" />
           <?php } ?>
           </label></td>
@@ -288,7 +287,7 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
       </table>
 </form>   
         <div class="error">            
-<?php        
+<?php       
 // Show if recordset not empty 
 if ($totalRows_rsContestants > 0) {
     // Validate the contestant form if the button is clicked
@@ -391,7 +390,7 @@ require('Connections/DBconnection.php');
 $query_rsClassData = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
 $stmt_rsClassData = $DBconnection->query($query_rsClassData);
 $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);
-$totalRows_rsClassData = $stmt_rsClassData->rowCount();   
+//$totalRows_rsClassData = $stmt_rsClassData->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
@@ -431,14 +430,13 @@ else {
 <h3><a name="registration_insert" id="registration_insert"></a>3. Anm&auml;l till t&auml;vlingklasser</h3>
 <p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 10-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
 <?php 
-echo $row_rsCurrRegs['max_regs'];
 //Show if the maximum number of registrations is reached
 if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
     <div class="error">
     <h3>Maximala antalet till&aring;tna anm&auml;lningar (<?php echo $comp_max_regs ?> st.) &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.</h3>
     </div>
 <?php
-    //Email to competition Admin if the maximum number of registrations is reached
+    //Email to competition admin if the maximum number of registrations is reached
     $club_name = $row_rsClubReg['club_name'];
     $headers = "From: $comp_name <$comp_email>\r\n" .
     "MIME-Version: 1.0\r\n" . 
@@ -454,9 +452,10 @@ if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
     "$comp_arranger, $comp_name, $comp_email";
     $msg_adm = "Max antal anmälningar registrerade!\n$text_adm";
 
-    // Send email to Tuna Karate Cup Admin
+    // Send email to competition admin
     mail($adm_email, $subject_adm, $msg_adm, $headers);                
-} ?>           
+} 
+?>           
 </p>
       <table width="100%" border="1">
         <tr>
@@ -500,6 +499,9 @@ if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
       } ?>
       </option>
 <?php
+    //Kill statement
+    $stmt_rsClassData->closeCursor();
+    $stmt_rsCurrRegs->closeCursor();    
     }   
 ?>
                    </select>
@@ -511,8 +513,9 @@ if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
                 //Show if the maximum number of registrations is NOT reached
                 if ($row_rsCurrRegs['max_regs'] < $comp_max_regs) { ?>
                 <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
-    <?php       } 
-          } ?>                  
+<?php           } 
+          } 
+?>                  
                 </label>
                 </td>
                 <td nowrap="nowrap">
@@ -562,13 +565,13 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
             <td><?php echo $row_rsRegistrations['contestant_birth']; ?></td>
             <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>
       <td><?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
-      if ($row_rsRegistrations['class_age'] == "") { 
+      if ($row_rsRegistrations['class_age'] === "") { 
           echo "";          
       } 
       if ($row_rsRegistrations['class_age'] <> "") { 
           echo $row_rsRegistrations['class_age'].' &aring;r'.' | '; 
       }
-      if ($row_rsRegistrations['class_weight_length'] == "-") {
+      if ($row_rsRegistrations['class_weight_length'] === "-") {
           echo "";                    
       }
       if ($row_rsRegistrations['class_weight_length'] <> "-") {
@@ -576,25 +579,25 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
       }
       ?></td>
             <td nowrap="nowrap">
-			<?php if ($passedDate == 0) { ?>
+			<?php if ($passedDate === 0) { ?>
            	<a href="RegDelete_reg.php?reg_id=<?php echo $row_rsRegistrations['reg_id']; ?>">Ta bort</a>
           	<?php } ?>
             </td></tr>
         <?php } ?>
       </table>
-<?php       $stmt_rsRegistrations->closeCursor();
+<?php       //Kill statement
+            $stmt_rsRegistrations->closeCursor();
             // Show if rsRegistrations recordset not empty
             }
+            //Kill statements
             $stmt_rsContestants->closeCursor();
             $stmt_rsMax_startnumber->closeCursor();   
         // Show if recordset $totalRows_rsContestants not empty 
-        }            
-        $stmt_rsClassData->closeCursor();
-        $stmt_rsCurrRegs->closeCursor();
+        }  
+        //Kill statement
+        $stmt_rsClubReg->closeCursor();        
     // Show if rsClubReg recordset not empty
     }
-    //Kill statements 
-    $stmt_rsClubReg->closeCursor();
   // Show if last registration date is NOT passed
   }
 // If recordset rsClasses is NOT empty 
@@ -609,5 +612,4 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 //Kill statements and DB connection
 $stmt_rsClasses->closeCursor();
 $DBconnection = null;
-ob_end_flush();
-?>
+ob_end_flush();?>

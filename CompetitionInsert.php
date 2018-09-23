@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Added function to handle more input: comp_arranger, comp_email and comp_url
+//Adjusted sql for correct insert into DB
 
 ob_start();
 
@@ -237,8 +236,8 @@ else if ($output_form == 'no') {
     // Insert all competition data  
     require('Connections/DBconnection.php');         
     $insertSQL = "INSERT INTO competition  (comp_name, comp_start_date, comp_end_date, comp_end_reg_date, comp_arranger, comp_email, "
-            . "comp_url, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_date, :comp_end_date, :comp_arranger, :comp_email, "
-            . ":comp_url, :comp_end_reg_date, :comp_max_regs, :comp_current)";
+            . "comp_url, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_date, :comp_end_date, :comp_end_reg_date, :comp_arranger, :comp_email, "
+            . ":comp_url, :comp_max_regs, :comp_current)";
     $stmt = $DBconnection->prepare($insertSQL);
     $stmt->bindValue(':comp_name', $comp_name, PDO::PARAM_STR);
     $stmt->bindValue(':comp_start_date', $comp_start_date, PDO::PARAM_STR);
