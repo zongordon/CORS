@@ -1,5 +1,5 @@
 <?php 
-//Removed '$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)' to show all data in recordset 
+//Changed to only select accounts with registered contestants, to select in drop list
 
 if (!isset($_SESSION)) {
   session_start();
@@ -12,7 +12,7 @@ $MM_donotCheckaccess = "false";
 try {
 // Select information regarding active accounts
 require('Connections/DBconnection.php');           
-$query_rsAccounts = "SELECT account_id, club_name, active FROM account WHERE active = 1 ORDER BY club_name ASC";
+$query_rsAccounts = "SELECT DISTINCT account_id, club_name FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY club_name ASC";
 $stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
 $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC); 
 }   catch(PDOException $ex) {

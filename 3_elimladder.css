@@ -1,5 +1,5 @@
-/*  Added masthead classes
-    Changed to white text on start numbers
+/*  Added code to add repechage picture through #apDivRepechage but commented it out - is only for printing
+
 */
 /***********************************************/
 /* 3col_leftNav.css                             */
@@ -957,35 +957,36 @@ label{
 }
 
 #apDivFinal {
-
 	position:absolute;
-
-	width:147px;
-
-	height:50px;
-
 	z-index:4;
-
 	left: 493px;
-
 	top: 300px;
-
-	background-image: url(img/Final.gif);
-
+	width:147px;
+	height:50px;
+        background-image: url("img/Final.gif");
+        background-repeat: no-repeat;
 }
 
 #apDivResultat {
-
 	position:absolute;
-
 	width:220px;
-
 	height:115px;
-
 	z-index:5;
-
 	left: 465px;
-
 	top: 480px;
-
 }
+
+
+/*
+#apDivRepechage {
+	position:absolute;
+	z-index:1;
+	left: 315px;
+	top: 560px;
+	width:500px;
+	height:114px;
+        background-image: url("img/Repechage.png");
+        background-repeat: no-repeat;
+}
+*/
+

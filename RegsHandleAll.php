@@ -1,7 +1,5 @@
 <?php
-//Changed where code for Kill statements were located due to error messages
-//Changed from <div id="content"> due to no footer showing
-//Corrected spelling under point '4. Anmäl till tävlingklasser'
+//Removed commented (hidden) code 
 ob_start();
 session_start();
 
@@ -462,7 +460,6 @@ require('Connections/DBconnection.php');
 $query_rsMax_startnumber = "SELECT MAX(contestant_startnumber)AS max_startnumber FROM registration INNER JOIN classes AS cl USING (class_id) JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1";
 $stmt_rsMax_startnumber = $DBconnection->query($query_rsMax_startnumber);
 $row_rsMax_startnumber = $stmt_rsMax_startnumber->fetch(PDO::FETCH_ASSOC);
-//$totalRows_rsMax_startnumber = $stmt_rsMax_startnumber->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }

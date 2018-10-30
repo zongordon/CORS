@@ -1,5 +1,6 @@
 <?php 
-//Changed title
+// Removed navigation: include_once("includes/navigation.php")
+//Inserted top banner
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -11,10 +12,13 @@ $pagetitle="T&auml;vling";
 //include_once('includes/functions.php');
 // Includes HTML Head
 include_once('includes/header.php');
-//Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");
 ?>
 <!-- start page -->
+<div id="masthead">
+    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
+    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
+</div>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>    
 <div id="content">
