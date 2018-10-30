@@ -1,6 +1,6 @@
 <?php 
-//Split query for class data and contestant data into two and adjusted the contestant array accordingly, preventing error with only one contestant
-//Changed misspelling of $startnumberArray to $startnumbersArray to display start numbers when available
+// Added apDivRepechage 
+//Removed hidden code
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -326,34 +326,9 @@ $stmt_rsClassContestants->closeCursor();
 $stmt_rsResult->closeCursor();
 $DBconnection = null;
 ?>
-<!--        
-        <tr>
-          <td><form method="post" target="_blank" action="http://pdfservices.net/gateway.php">
-<input type="hidden" name="apikey" value="8gnd6o478cfvk0bo1s0euv3e46"/>	 <!-- your apikey of pdfservices.net-->
-<!-- <input type="hidden" name="textinputs" value="true"/> <!-- allow paint forms object , you can create a pdf with fiedls and write inside as user -->
-<!-- <input type="hidden" name="usemedia" value="false"/> <!-- use the media type css: @media display {, @media print { -->
-<!-- <input type="hidden" name="margin" value="2"/>	 <!-- margins page -->
-<!-- <input type="hidden" name="utf8" value="UTF-8" />
-<input type="hidden" name="forcedownload" value="true" /> <!-- Use for download directly (no open in browser) -->
-<!-- <input type="hidden" name="autoprint" value="true" /> <!-- Use for autoprint on show -->
-<!-- <input type="hidden" name="w" value="297" /> <!-- width of document -->
-<!-- <input type="hidden" name="h" value="210" /> <!-- height of document -->
-<!-- <textarea name="html" rows="5" cols="25"/> <!-- html to submit -->
-<!-- <h3>My title</h3><hr/><p>your text</p>
-</textarea> 
-<input type="submit" />
-</form></td>
-      </tr>                                                      
-      <tr>
-          <td></td>
-      </tr>                                              
-      <tr>
-          <td><a target="_blank" href="http://pdfservices.net/freegateway.php?apikey=free&url=urlbutton&autoprint=true"><img class="pdfprintbutton" alt="Print / PDF" src="http://www.pdfservices.net/images/pdfservices-printer.gif"></a>
-          </td>
-      </tr>
--->                                      
   </table>      
 </div>
+<div id="apDivRepechage"></div>
     </div> 
 </div>
 </body>

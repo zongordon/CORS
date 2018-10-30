@@ -1,6 +1,5 @@
 <?php
-//Changed where code for Kill statements were located due to error messages
-//Changed from <div id="content"> due to no footer showing    
+//Added setting timezone
 
 ob_start();
 session_start();
@@ -30,6 +29,9 @@ $totalRows_rsClasses = $stmt_rsClasses->rowCount();
 //Get comp_id for active competetion and account_id for logged-in user
 $Current_Comp_id = $row_rsClasses['comp_id'];
 $account_id = $_SESSION['MM_AccountId'];
+
+//Set timezone
+date_default_timezone_set("Europe/Stockholm");
 
 //Setting the date for today (including format), last enrolment date and check if the last enrolment date is passed or not
 $now = date('Y-m-d');

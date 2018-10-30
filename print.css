@@ -1,6 +1,6 @@
 /***********************************************/
-/*  Removed all floating 
-    Changed to white text on start numbers
+/*  Added apDivRepechage 
+
 */
 
 /* print.css                             */
@@ -1112,8 +1112,6 @@ color: #cccccc;
 
 	background-image: url(img/pool_A.gif);
 
-	display: block;
-
 }
 
 #apDivOmg2_2 {
@@ -1384,3 +1382,17 @@ color: #cccccc;
 
 }
 
+#apDivRepechage {
+	position:absolute;
+	z-index:1;
+	left: 315px;
+	top: 560px;
+	width:500px;
+	height:114px;
+        background-image: url("img/Repechage.png");
+        background-repeat: no-repeat;
+}
+
+/*
+
+*/
