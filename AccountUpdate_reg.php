@@ -1,83 +1,112 @@
 <?php 
-//Removed back-link to form for correction after validation and changed to show the form directly instead
+//v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
+//Changed from $colname_rsAccountId = filter_input(INPUT_SESSION, 'MM_AccountId');
+//Changed from  $updateGoTo = "AccountList.php";
+//Moved meta description and keywords to header.php
 ob_start();
 
+if (!isset($_SESSION)) {
+  session_start();
+}
 //Access level registered users
 $MM_authorizedUsers = "0";
 $MM_donotCheckaccess = "true";
 
-$pagetitle="&Auml;ndra anv&auml;ndarkonto";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, ändra användarkonto, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
-
-$colname_rsAccountId = "";
-if (isset($_SESSION['MM_AccountId'])) {
-  $colname_rsAccountId = $_SESSION['MM_AccountId'];
-}
+$colname_rsAccountId = $_SESSION['MM_AccountId'];
 
 $editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+if (filter_input(INPUT_SERVER, 'QUERY_STRING')) {
+  $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER, 'QUERY_STRING'));
 }
 
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccount = sprintf("SELECT * FROM account WHERE account_id = %s", GetSQLValueString($colname_rsAccountId, "int"));
-$rsAccount = mysql_query($query_rsAccount, $DBconnection) or die(mysql_error());
-$row_rsAccount = mysql_fetch_assoc($rsAccount);
-$totalRows_rsAccount = mysql_num_rows($rsAccount);
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+//Catch anything wrong with query
+try {
+require('Connections/DBconnection.php');            
+//Select data regarding all accounts
+$query = "SELECT * FROM account WHERE account_id = :account_id";
+$stmt_rsAccount = $DBconnection->prepare($query);
+$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
+$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+}   
+catch(PDOException $ex) {
+    echo "An Error occured: ".$ex->getMessage();
+}
+
+$pagetitle="&Auml;ndra anv&auml;ndarkonto";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
     <div class="feature">
         <div class="error">
 <?php
-// Convert to UTF-8 and validate the account form fields if the update button is clicked
-if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "AccountForm")) {
-    $club_name = encodeToISO(mb_convert_case($_POST['club_name'], MB_CASE_TITLE,"ISO-8859-1"));
-    $contact_name = encodeToISO(mb_convert_case($_POST['contact_name'], MB_CASE_TITLE,"ISO-8859-1"));
-    $contact_email = $_POST['contact_email'];
-    $contact_phone = $_POST['contact_phone'];
-    $user_name = encodeToISO($_POST['user_name']);
-    $user_password = encodeToISO($_POST['user_password']);	
-    $confirm_user_password = encodeToIso($_POST['confirm_user_password']);		
+//Declare and initialise variables
+    $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+// Update account data if button is clicked and all fields are validated to be correct
+if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
+    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
+    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
+    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
+    $confirmed = filter_input(INPUT_POST, 'confirmed');     
+    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8"));
+    $email = filter_input(INPUT_POST, trim('contact_email'));
+    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
+    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
+    $active = filter_input(INPUT_POST, 'active');
+    $access_level = filter_input(INPUT_POST, 'access_level');
+    $account_id = filter_input(INPUT_POST, 'account_id');				
     $output_form = 'no';
 
-	echo '<br />';	
-	
-    if (empty($club_name)) {
-      // $club_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn.</h3>';
+    if (empty($email)) {
+    // contact_email is blank
+      echo '<h3>Du gl&ouml;mde att fylla i e-post!</h3>';
       $output_form = 'yes';
-    }
-
-    if (empty($contact_name)) {
-      // $contact_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn.</h3>';
-      $output_form = 'yes';
-    }
-
-    if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', $contact_email)) {
-      // $contact_email is invalid because LocalName is bad
-      echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
-      $output_form = 'yes';
-    }
+    }  
+    //If contact_email is not blank validate the input and check if it's already registered 
     else {
-      // Strip out everything but the domain from the email
-      $domain = preg_replace('/^[a-zA-Z0-9][a-zA-Z0-9\._\-&!?=#]*@/', '', $contact_email);
-	  
-	 // Now check if $domain is registered ON A NON-WINDOWS SERVER
-      if (!checkdnsrr($domain)) {
-         echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
-         $output_form = 'yes';
-     	}
- 	}
+      // Validate contact_email
+      if(valid_email($email)){
+            $output_form = 'no';
+      } 
+      else {
+        // contact_email is invalid because LocalName is bad  
+        echo '<h3>Den ifyllda e-postadressen inneh&aring;ller felaktiga tecken.</h3>';
+        $output_form = 'yes';
+      }
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');               
+    // Validate insert account data    
+    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email AND account_id <> :account_id";
+    $stmt_rsContactemail = $DBconnection->prepare($query1);
+    $stmt_rsContactemail->execute(array(':contact_email' => $email, ':account_id' => $account_id));
+    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }   
+
+	if ($totalRows_rsContactemail > 0) {
+        // $contact_email is already in use
+        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
+        $output_form = 'yes';		
+	}
+
+         //Kill statement and DB connection
+        $stmt_rsContactemail->closeCursor();
+        $DBconnection = null;   
+      
+    }
 	 
     if (empty($contact_phone)) {
       // $contact_phone is blank
@@ -90,6 +119,31 @@ if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "AccountForm")) {
       echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn.</h3>';
       $output_form = 'yes';
     }
+    //If user_name is not blank validate the input and check if it's already registered    
+    else {        
+    //Catch anything wrong with query
+    try {
+    require('Connections/DBconnection.php');                   
+    //Validate account insert data against current accounts    
+    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name AND account_id <> :account_id";
+    $stmt_rsUsername = $DBconnection->prepare($query2);
+    $stmt_rsUsername->execute(array(':user_name' => $user_name, ':account_id' => $account_id));
+    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured: ".$ex->getMessage();
+    }       
+
+	if ($totalRows_rsUsername > 0) {
+        // $user_name is already in use
+            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+            $output_form = 'yes';		
+	}
+        //Kill statement and DB connection
+        $stmt_rsUsername->closeCursor();
+        $DBconnection = null;       
+    }	
 
     if (empty($user_password)) {
       // $user_password is blank
@@ -108,6 +162,18 @@ if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "AccountForm")) {
       echo '<h3>L&ouml;senorden var inte identiska.</h3>';
       $output_form = 'yes';
     }	
+    
+   if (empty($club_name)) {
+      // $club_name is blank
+      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn.</h3>';
+      $output_form = 'yes';
+    }
+
+    if (empty($contact_name)) {
+      // $contact_name is blank
+      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn.</h3>';
+      $output_form = 'yes';
+    }
 } 
 
   else {
@@ -172,36 +238,50 @@ if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "AccountForm")) {
 </div>
 <?php
 }
-	//Save the updated account information if the Update button is clicked and form validated correct
+	//Save the updated account information if the Update button is clicked and form validated correct 
   	else if ($output_form == 'no') {
- /*       $contact_name = encodeToUtf8($contact_name);
-        $club_name = encodeToUtf8($club_name);
-        $user_name = encodeToUtf8($user_name);    
-*/
-  $updateSQL = sprintf("UPDATE account SET user_name=%s, user_password=%s, contact_name=%s, contact_email=%s, contact_phone=%s, club_name=%s WHERE account_id=%s",
-                       GetSQLValueString($user_name, "text"),
-                       GetSQLValueString($user_password, "text"),
-                       GetSQLValueString($contact_name, "text"),
-                       GetSQLValueString($_POST['contact_email'], "text"),
-                       GetSQLValueString($_POST['contact_phone'], "text"),
-                       GetSQLValueString($club_name, "text"),
-                       GetSQLValueString($_POST['account_id'], "int"));
-
-  mysql_select_db($database_DBconnection, $DBconnection);
-  $Result1 = mysql_query($updateSQL, $DBconnection) or die(mysql_error());
-
-  $updateGoTo = "AccountList.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
-    $updateGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $updateGoTo));
-}
-?>
-<?php include("includes/footer.php");?>
+            //Catch anything wrong with query
+            try {
+            require('Connections/DBconnection.php');           
+            //UPDATE account according to changes
+            $query = "UPDATE account 
+            SET user_name=:user_name, 
+                user_password = :user_password, 
+                confirmed = :confirmed, 
+                contact_name = :contact_name, 
+                contact_email = :contact_email, 
+                contact_phone = :contact_phone, 
+                club_name = :club_name, 
+                active = :active, 
+                access_level = :access_level 
+                WHERE account_id = :account_id"; 
+            $stmt_rsAccount = $DBconnection->prepare($query);                                  
+            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+            $stmt_rsAccount->bindValue(':account_id', $account_id, PDO::PARAM_INT);
+            $stmt_rsAccount->execute();
+            }   
+            catch(PDOException $ex) {
+                echo "An Error occured: ".$ex->getMessage();
+            }
+            $updateGoTo = "AccountList_reg.php";
+            if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+                $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+                $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+            }
+            header(sprintf("Location: %s", $updateGoTo));
+        }
+include("includes/footer.php");
+//Kill statement and DB connection
+$stmt_rsAccount->closeCursor();
+$DBconnection = null;?>
 </body>
 </html>
-<?php
-mysql_free_result($rsAccount);
-?>
 <?php ob_end_flush();?>

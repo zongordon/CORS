@@ -1,37 +1,48 @@
 <?php
-//Added convertion to ISO-8859-1 for string input into DB
+//Moved meta description and keywords to header.php
 
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
-$pagetitle="L&auml;gga till t&auml;vlingsklass";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, lägga till tävlingsklasser, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
-
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+
+$pagetitle="L&auml;gga till t&auml;vlingsklass";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
     <div class="feature">
         <div class="error">     
 <?php
 // Insert new class if button is clicked and all fields are validated to be correct
- if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_class")) {
-    $class_fee = $_POST['class_fee'];	
-    $class_weight_length = encodeToISO($_POST['class_weight_length']);
-    $class_age = encodeToISO($_POST['class_age']);
+ if (filter_input(INPUT_POST,'MM_insert') && filter_input(INPUT_POST,'MM_insert') == 'new_class') {
+    $comp_id = filter_input(INPUT_POST,'comp_id');         
+    $class_category = filter_input(INPUT_POST,'class_category');             
+    $class_discipline = filter_input(INPUT_POST,'class_discipline');         
+    $class_gender = filter_input(INPUT_POST,'class_gender');         
+    $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
+    if (filter_input(INPUT_POST, trim('class_weight_length')) == '') { 
+        $class_weight_length = '-';            
+    } 
+    else {
+        $class_weight_length = encodeToUtf8(filter_input(INPUT_POST,trim('class_weight_length'))); 
+    }
+    $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
+    $class_fee = filter_input(INPUT_POST, trim('class_fee'));
     $output_form = 'no';
         
     if (empty($class_fee)) {
@@ -47,21 +58,22 @@ if (isset($_SERVER['QUERY_STRING'])) {
         }     
     }
  }
-    else {  
+ else {  
     $output_form = 'yes';
-    }
+ }
   	if ($output_form == 'yes') {
         
-        //Select current competitions
-        mysql_select_db($database_DBconnection, $DBconnection);
-        $query_rsActiveComp = "SELECT comp_id, comp_name FROM competition WHERE comp_current = 1 ORDER BY comp_start_date ASC";
-        $rsActiveComp = mysql_query($query_rsActiveComp, $DBconnection) or die(mysql_error());
-        $row_rsActiveComp = mysql_fetch_assoc($rsActiveComp);
-
-        $colname_rsActiveCompetitions = "-1";
-        if (isset($_GET['1'])) {
-        $colname_rsActiveCompetitions = $_GET['1'];
-        }
+          //Catch anything wrong with query
+            try {
+            require('Connections/DBconnection.php');                           
+            //Select all competitions
+            $query1 = "SELECT comp_id, comp_name FROM competition ORDER BY comp_start_date ASC";
+            $stmt_rsCompetitions = $DBconnection->query($query1);
+            $totalRows_rsCompetitions = $stmt_rsCompetitions->rowCount(); 
+            }   
+            catch(PDOException $ex) {
+                echo "An Error occured: ".$ex->getMessage();
+            }                     
 ?>
         </div>
 <h3>Skapa en ny t&auml;vlingsklass f&ouml;r att kunna anm&auml;la t&auml;vlande till</h3>
@@ -72,17 +84,12 @@ if (isset($_SERVER['QUERY_STRING'])) {
             <td>T&auml;vling</td>
             <td><label>
               <select name="comp_id" id="comp_id">
-                <?php
-do {  
+<?php
+while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {  
 ?>
-                <option value="<?php echo $row_rsActiveComp['comp_id']?>"<?php if (!(strcmp($row_rsActiveComp['comp_id'], $row_rsActiveComp['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsActiveComp['comp_name']?></option>
-                <?php
-} while ($row_rsActiveComp = mysql_fetch_assoc($rsActiveComp));
-  $rows = mysql_num_rows($rsActiveComp);
-  if($rows > 0) {
-      mysql_data_seek($rsActiveComp, 0);
-	  $row_rsActiveComp = mysql_fetch_assoc($rsActiveComp);
-  }
+<option value="<?php echo $row_rsCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsCompetitions['comp_id'], $row_rsCompetitions['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsCompetitions['comp_name']?></option>
+<?php
+} 
 ?>
 </select>
             </label></td>
@@ -140,7 +147,7 @@ do {
           <tr>
             <td>Vikt- eller l&auml;ngdkategori</td>
             <td><label>
-              <input name="class_weight_length" type="text" id="class_weight_length" value="-" size="15" />
+              <input name="class_weight_length" type="text" id="class_weight_length" size="15" />
             </label></td>
           </tr>
           <tr>
@@ -167,28 +174,41 @@ do {
 </html>
 <?php
   	} 
-  	else if ($output_form == 'no') {        
+  	else if ($output_form == 'no') {
+            
             if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_class")) {
-            $insertSQL = sprintf("INSERT INTO classes (comp_id, class_category, class_discipline, class_gender, class_gender_category, class_weight_length, class_age, class_fee) VALUES (%s,%s, %s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['comp_id'], "int"),
-                       GetSQLValueString($_POST['class_category'], "text"),
-                       GetSQLValueString($_POST['class_discipline'], "text"),
-                       GetSQLValueString($_POST['class_gender'], "text"),
-		       GetSQLValueString($_POST['class_gender_category'], "text"),
-                       GetSQLValueString($class_weight_length, "text"),
-                       GetSQLValueString($class_age, "text"),
-                       GetSQLValueString($_POST['class_fee'], "int"));
-
-            mysql_select_db($database_DBconnection, $DBconnection);
-            $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
+            //Catch anything wrong with query
+            try {
+            //INSERT new class in the database    
+            require('Connections/DBconnection.php');             
+            $query1 = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender, class_gender_category, class_weight_length, class_age, class_fee) VALUES (:comp_id, :class_category, :class_discipline, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee)";
+            $stmt = $DBconnection->prepare($query1);
+            $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
+            $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
+            $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
+            $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
+            $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
+            $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
+            $stmt->bindValue(':class_age', $class_age, PDO::PARAM_STR);            
+            $stmt->bindValue(':class_fee', $class_fee, PDO::PARAM_INT);                        
+            $stmt->execute();
+            }   
+            catch(PDOException $ex) {
+                echo "An Error occured: ".$ex->getMessage();
+            }   
   
             $insertGoTo = "ClassesList.php";
-                if (isset($_SERVER['QUERY_STRING'])) {
+                if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                 $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
-                $insertGoTo .= $_SERVER['QUERY_STRING'];
+                $insertGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
                 }
             header(sprintf("Location: %s", $insertGoTo));
+            //Kill statement 
+            $stmt->closeCursor();
             }
         }
-mysql_free_result($rsActiveComp);
-ob_end_flush();?>
+//Kill statement and DB connection
+$stmt_rsCompetitions->closeCursor();
+$DBconnection = null;
+ob_end_flush();
+?>

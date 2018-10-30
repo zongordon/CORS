@@ -1,67 +1,95 @@
 <?php 
+//Changed to show if recordset not empty OR "Kopiera" button is clicked and classes chosen for copy
+//Changed to only select data if $colname_rsCompetition <> NULL
+
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
+$editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+$editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
+}
+
+//Catch comp_id sent from previous page to select competition classes to copy if $colname_rsCompetition <> NULL
+$colname_rsCompetition = filter_input(INPUT_GET, 'comp_id');
+if ($colname_rsCompetition <> NULL) {
+//Catch anything wrong with query
+    try {
+        //Select all classes for selected competition and the competition's name
+        require('Connections/DBconnection.php');           
+        $query1 = "SELECT com.comp_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
+        $stmt_rsClasses = $DBconnection->prepare($query1);
+        $stmt_rsClasses->execute(array(':comp_id' => $colname_rsCompetition));
+        $row_rsClasses = $stmt_rsClasses->fetchAll(PDO::FETCH_ASSOC);        
+        $totalRows_rsClasses = $stmt_rsClasses->rowCount();
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured with query1: ".$ex->getMessage();
+    }   
+
+//Catch anything wrong with query
+    try {
+        //Select all competitions except the one from where the classes are copied           
+        $query2 = "SELECT comp_name, comp_id FROM competition WHERE comp_id <> :comp_id";
+        $stmt_rsOtherCompetitions = $DBconnection->prepare($query2);
+        $stmt_rsOtherCompetitions->execute(array(':comp_id' => $colname_rsCompetition));
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured with query2: ".$ex->getMessage();
+    }
+    
+    //Catch anything wrong with query
+    try {
+        //Select the competition name from where the classes are copied           
+        $query3 = "SELECT comp_name FROM competition WHERE comp_id = :comp_id";
+        $stmt_rsCompetition = $DBconnection->prepare($query3);
+        $stmt_rsCompetition->execute(array(':comp_id' => $colname_rsCompetition));
+        $row_rsCompetition = $stmt_rsCompetition->fetch(PDO::FETCH_ASSOC);
+    }   
+    catch(PDOException $ex) {
+        echo "An Error occured with query3: ".$ex->getMessage();
+    }
+}
 $pagetitle="Kopiera T&auml;vlingklasser";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, kopiera tävlingsklasser från en tävling till en annan, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-include_once('includes/functions.php'); 
-
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
-}
-//Catch comp_id sent from previous page to select correct competion's classes
-if (isset($_GET['comp_id'])) {
-  $comp_id = $_GET['comp_id'];
-}
-//Select all classes for selected competition and the competition's name
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsClasses = sprintf("SELECT com.comp_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id=%s ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category", GetSQLValueString($comp_id, "int"));
-$rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
-$row_rsClasses = mysql_fetch_assoc($rsClasses);
-$totalRows_rsClasses = mysql_num_rows($rsClasses);
-
-//Select all competitions except the one from where the classes are copied
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsCompetitions = sprintf("SELECT comp_name, comp_id FROM competition WHERE comp_id<>%s ", GetSQLValueString($comp_id, "int"));
-$rsCompetitions = mysql_query($query_rsCompetitions, $DBconnection) or die(mysql_error());
-$row_rsCompetitions = mysql_fetch_assoc($rsCompetitions);
-$totalRows_rsCompetitions = mysql_num_rows($rsCompetitions);
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php"); ?>
-
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
+<!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
-  <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<!-- Include different navigation links depending on authority  -->
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
   <div class="feature">
-  <?php if ($totalRows_rsClasses == 0) { // Show if recordset empty ?>
+  <?php if ($totalRows_rsClasses === 0) { // Show if recordset empty ?>
     <p>Det finns inga t&auml;vlingsklasser att visa!</p>
   <?php } // Show if recordset empty ?>
 <?php 
-if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
-    <h3>Befintliga t&auml;vlingsklasser i <?php echo $row_rsClasses['comp_name'] ?></h3>
-    <p>Kopiera t&auml;vlingsklasser genom att klicka i respektive ruta och klicka p&aring; "Kopiera"!</p>  
+if ($totalRows_rsClasses > 0 OR (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes')) { // Show if recordset not empty OR "Kopiera" button is clicked and classes chosen for copy?>
+    <h3>Befintliga t&auml;vlingsklasser i <?php echo $row_rsCompetition['comp_name'] ?></h3>
+    <p>Kopiera t&auml;vlingsklasser med ifyllda checkboxar genom att klicka p&aring; "Kopiera"!</p>  
       <div class="error">    
 <?php    
 //If "Kopiera" button is clicked then validate and execute the below
-if ((isset($_POST["MM_CopyClasses"])) && ($_POST["MM_CopyClasses"] == "copy_classes")) {
+if (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes') {
 $output_form = 'no';
 
-        if ($_POST['copy_class'] == "") {
+        if (filter_input(INPUT_POST,'copy_class') === "") {
         // all copy_class fields are blank
         echo '<h3>Du gl&ouml;mde att v&auml;lja n&aring;gon klass att kopiera!</h3><br/>';            
         $output_form = 'yes';    
         }
 }
-   else {  
+else {  
    $output_form = 'yes';
-   }    
-if ($output_form == 'yes') {    
+}    
+if ($output_form === 'yes') {    
 ?>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" name="copy_classes" id="copy_classes">
     <table width="100%" border="1">
@@ -73,35 +101,30 @@ if ($output_form == 'yes') {
         <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
         <td><strong>Kopiera</strong></td>
       </tr>
-      <?php do { ?>
+<?php //reset ($row_rsClasses);
+      foreach($row_rsClasses As $row_rsClass) { ?>
   <tr>
-          <td><?php echo $row_rsClasses['class_discipline']; ?></td>
-          <td><?php echo $row_rsClasses['class_gender_category']; ?></td>
-          <td><?php echo $row_rsClasses['class_category']; ?></td>
-          <td><?php echo $row_rsClasses['class_age']; ?></td>
-          <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
+          <td><?php echo $row_rsClass['class_discipline']; ?></td>
+          <td><?php echo $row_rsClass['class_gender_category']; ?></td>
+          <td><?php echo $row_rsClass['class_category']; ?></td>
+          <td><?php echo $row_rsClass['class_age']; ?></td>
+          <td><?php echo $row_rsClass['class_weight_length']; ?></td>
           <td><label>
-              <input name="copy_class[]" type="checkbox" id="copy_class[]" value="<?php echo $row_rsClasses['class_id'];?>" checked />
-            </label>
+        <input name="copy_class[]" type="checkbox" id="copy_class[]" value="<?php echo $row_rsClass['class_id'];?>" checked />
+              </label>
           </td>
   </tr>
-  <?php } while ($row_rsClasses = mysql_fetch_assoc($rsClasses)); ?>
+<?php } ?>
     <tr>
-      <td valign="top">V&auml;lj t&auml;vling att kopiera till</td>
+      <td valign="top">V&auml;lj t&auml;vling att kopiera till:</td>
       <td><label>
-        <select name="comp_id" id="comp_id">
-          <?php
-do {  
+        <select name="to_comp_id" id="to_comp_id">
+<?php
+while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASSOC)) {  
 ?>
-          <option value="<?php echo $row_rsCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsCompetitions['comp_id'], $_GET['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsCompetitions['comp_name']?></option>
-          <?php
-} while ($row_rsCompetitions = mysql_fetch_assoc($rsCompetitions));
-  $rows = mysql_num_rows($rsCompetitions);
-  if($rows > 0) {
-      mysql_data_seek($rsCompetitions, 0);
-	  $row_rsCompetitions = mysql_fetch_assoc($rsCompetitions);
-  }
-?>
+<option value="<?php echo $row_rsOtherCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsOtherCompetitions['comp_id'], $colname_rsCompetition))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsOtherCompetitions['comp_name']?></option>
+<?php
+} ?>
         </select>
       </label></td>
       <td>
@@ -111,41 +134,57 @@ do {
     </tr>
     </table>
     </form>
-        </div>          
+      </div>              
+<?php 
+}       
+//If the form shall not be displayed execute below    
+    else if ($output_form === 'no') {
+          //If the "Kopiera" button is clicked and classes chosen for copy, then copy those classes to the selected competition  
+          if (filter_input(INPUT_POST,'MM_CopyClasses') === 'copy_classes') {
+            foreach($_POST['copy_class'] as $class_id) {              
+            $comp_id = filter_input(INPUT_POST,'to_comp_id');                
+             //Catch anything wrong with query
+            try {
+            //INSERT new class in the database    
+            require('Connections/DBconnection.php');
+            $insertSQL = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee)
+            SELECT :comp_id AS comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee  
+            FROM classes WHERE class_id = :class_id";
+            $stmt = $DBconnection->prepare($insertSQL);
+            $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
+            $stmt->bindValue(':class_id', $class_id, PDO::PARAM_INT);
+            $stmt->execute();
+            }   
+            catch(PDOException $ex) {
+                echo "An Error occured: ".$ex->getMessage();
+            }                  
+              $updateGoTo = "ClassesList.php";
+                    if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+                    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+                    $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+                    }        
+              header(sprintf("Location: %s", $updateGoTo));
+            //Kill statement
+            $stmt->closeCursor();                          
+            } 
+          }
+    }
+} // Show if recordset of classes not empty 
+
+?>
   </div>
   <div class="story">
     <p>&nbsp;</p>
   </div>
-</div>    
-<?php 
-}       //If the form shall not be displayed execute below    
-  	else if ($output_form == 'no') {
-          //If the "Kopiera" button is clicked and classes chosen for copy, then copy those classes to the selected competition  
-          if ((isset($_POST["MM_CopyClasses"])) && ($_POST["MM_CopyClasses"] == "copy_classes")) {            
-            foreach($_POST['copy_class'] as $class_id) {
-            $comp_id = $_POST['comp_id'];
-            $insertSQL = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee)
-                          SELECT $comp_id AS comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee  
-                          FROM classes
-                          WHERE class_id = $class_id";                
-             mysql_select_db($database_DBconnection, $DBconnection);
-             $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
-                
-              $updateGoTo = "ClassesList.php";
-                    if (isset($_SERVER['QUERY_STRING'])) {
-                    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
-                    $updateGoTo .= $_SERVER['QUERY_STRING'];
-                    }        
-              header(sprintf("Location: %s", $updateGoTo));
-            } 
-          }
-        } 
-} // Show if recordset not empty 
-ob_end_flush();?>
+</div>
 <?php include("includes/footer.php");?>
 </body>
 </html>
 <?php
-mysql_free_result($rsClasses);
-mysql_free_result($rsCompetitions);
+//Kill statements and DB connection
+$stmt_rsClasses->closeCursor();
+$stmt_rsCompetition->closeCursor();
+$stmt_rsOtherCompetitions->closeCursor();
+$DBconnection = null;
+ob_end_flush();
 ?> 

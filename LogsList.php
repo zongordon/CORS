@@ -1,33 +1,36 @@
 <?php
-//Changed sorting order to latest log first
-//Selected sorting will remain in drop list
-
-global $editFormAction;
+//Moved meta description and keywords to header.php
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
-$pagetitle="Logglista - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, logglista över login för administratörer, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
-include_once('includes/functions.php');
-
 //Set initial sorting (ORDER BY) and change if new sort order is selected in dropdown list
 $sorting = "comp_current DESC, login_timestamp DESC";
-if (isset($_GET['sorting'])) {
-  $sorting = $_GET['sorting'];
+if (filter_input(INPUT_GET,'sorting')) {
+  $sorting = filter_input(INPUT_GET,'sorting');
 }
-//Select all logins and related data for respective competition
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsLogins = "SELECT com.comp_id, com.comp_name, com.comp_current, a.club_name, a.contact_name, l.ip_address, l.login_timestamp FROM loginlog AS l INNER JOIN competition AS com USING (comp_id) INNER JOIN account AS a USING (account_id) ORDER BY $sorting";
-$rsLogins = mysql_query($query_rsLogins, $DBconnection) or die(mysql_error());
-$row_rsLogins = mysql_fetch_assoc($rsLogins);
-$totalRows_rsLogins = mysql_num_rows($rsLogins);
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+//Catch anything wrong with query
+try {
+//Select all logins and related data for respective competition    
+require('Connections/DBconnection.php');           
+$query = "SELECT com.comp_id, com.comp_name, com.comp_current, a.club_name, a.contact_name, l.ip_address, l.login_timestamp FROM loginlog AS l INNER JOIN competition AS com USING (comp_id) INNER JOIN account AS a USING (account_id) ORDER BY $sorting";
+$stmt_rsLogins = $DBconnection->query($query);
+$totalRows_rsLogins = $stmt_rsLogins->rowCount();
+}   
+catch(PDOException $ex) {
+    echo "An Error occured with queryX: ".$ex->getMessage();
+}   
+
+$pagetitle="Logglista - admin";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -65,7 +68,7 @@ if ($totalRows_rsLogins > 0) { ?>
         <td><strong>IP-adress</strong></td>
         <td><strong>Login-tid</strong></td>
       </tr>
-      <?php do { ?>
+<?php while($row_rsLogins = $stmt_rsLogins->fetch(PDO::FETCH_ASSOC)) { ?>
   <tr>
     <td><?php echo $row_rsLogins['comp_name']; ?></td>      
           <td><?php echo $row_rsLogins['club_name']; ?></td>
@@ -73,15 +76,17 @@ if ($totalRows_rsLogins > 0) { ?>
           <td><?php echo $row_rsLogins['ip_address']; ?></td>
           <td><?php echo $row_rsLogins['login_timestamp']; ?></td>
   </tr>
-  <?php } while ($row_rsLogins = mysql_fetch_assoc($rsLogins)); ?>
+<?php } ?>
     </table>
 <?php 
-mysql_free_result($rsLogins);    
 // Show if recordset not empty
 }  
 ?>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php include("includes/footer.php");
+//Kill statements and DB connection
+$stmt_rsLogins->closeCursor();
+$DBconnection = null;?>
 </body>
 </html>

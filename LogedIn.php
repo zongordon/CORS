@@ -1,5 +1,5 @@
 <?php
-//Added log function of every login
+//Moved meta description and keywords to header.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -8,44 +8,67 @@ $MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 $pagetitle="Inloggad - admin";
-$pagedescription="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall.";
-$pagekeywords="tuna karate cup, inloggad som administratör, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
-// Includes HTML Head, and several other code functions
+// Includes several code functions
 include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
 
+//Fetch sessions account_id
 $colname_rsAccountId = "";
 if (isset($_SESSION['MM_AccountId'])) {
   $colname_rsAccountId = $_SESSION['MM_AccountId'];
 }
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccount = sprintf("SELECT contact_name, access_level FROM account WHERE account_id = %s", GetSQLValueString($colname_rsAccountId, "int"));
-$rsAccount = mysql_query($query_rsAccount, $DBconnection) or die(mysql_error());
-$row_rsAccount = mysql_fetch_assoc($rsAccount);
 
+//Catch anything wrong with query 
+try {
+require('Connections/DBconnection.php');        
+//Select user data based on account_id 
+$query1 = "SELECT contact_name, access_level FROM account WHERE account_id = :account_id";
+$stmt_rsAccount = $DBconnection->prepare($query1);
+$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
+$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+}   
+catch(PDOException $ex) {
+echo "An Error occured: ".$ex->getMessage();
+}  
+
+//Catch anything wrong with query
+try {
 //Select the current competition
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsCompActive = "SELECT comp_id FROM competition WHERE comp_current = 1";
-$rsCompActive = mysql_query($query_rsCompActive, $DBconnection) or die(mysql_error());
-$row_rsCompActive = mysql_fetch_assoc($rsCompActive);
+$query2 = "SELECT comp_id FROM competition WHERE comp_current = 1";
+$stmt_rsCompActive = $DBconnection->query($query2);
+$row_rsCompActive = $stmt_rsCompActive->fetch(PDO::FETCH_ASSOC);
+$colname_rsCompActive = $row_rsCompActive['comp_id'];
+    }   
+    catch(PDOException $ex) {
+    echo "An Error occured: ".$ex->getMessage();
+    }   
 
-//Insert login data in DB
-        $insertSQL = sprintf("INSERT INTO loginlog (account_id, comp_id, login_timestamp, ip_address) VALUES (%s,%s,%s,%s)",
-                       GetSQLValueString($colname_rsAccountId, "int"),
-                       GetSQLValueString($row_rsCompActive['comp_id'], "int"),
-                       GetSQLValueString($now, "date"),
-                       GetSQLValueString($user_ip, "text"));
-        mysql_select_db($database_DBconnection, $DBconnection);
-        $Result1 = mysql_query($insertSQL, $DBconnection) or die(mysql_error());
+//Catch anything wrong with query 
+try {
+//Insert login data in DB 
+$query3 = "INSERT INTO loginlog (account_id, comp_id, login_timestamp, ip_address) VALUES (:account_id, :comp_id, NOW(), :ip_address)";
+$stmt = $DBconnection->prepare($query3);
+$stmt->bindValue(':account_id', $colname_rsAccountId, PDO::PARAM_INT);
+$stmt->bindValue(':comp_id', $colname_rsCompActive, PDO::PARAM_INT);
+$stmt->bindValue(':ip_address', $user_ip, PDO::PARAM_STR);
+$stmt->execute();
+}   
+catch(PDOException $ex) {
+echo "An Error occured: ".$ex->getMessage();
+}      
         
 //Creating Session variable
 $_SESSION['MM_Level'] = $row_rsAccount['access_level'];
-?>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
-<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">    
   <div class="feature">
 <h3>V&auml;lkommen <?php echo $row_rsAccount['contact_name']; ?>!</h3>
@@ -54,9 +77,11 @@ $_SESSION['MM_Level'] = $row_rsAccount['access_level'];
   <div class="story">
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php include_once("includes/footer.php");?>
 </body>
 </html>
 <?php
-mysql_free_result($rsAccount);
+//Kill statement and DB connection
+$stmt->closeCursor();
+$DBconnection = null;
 ?>

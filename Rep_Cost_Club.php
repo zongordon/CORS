@@ -1,62 +1,32 @@
 <?php
-//Removed nowrap for coach column and increased table width to 100%
-
-ob_start();
+//Removed '$row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC)' to show all data in recordset 
 
 if (!isset($_SESSION)) {
   session_start();
 }
+//Access level registered user
+$MM_authorizedUsers = $_SESSION['MM_Level']; 
+$MM_donotCheckaccess = "false";
 
-require_once('Connections/DBconnection.php'); 
-
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-//Select data from each club in active competition
-mysql_select_db($database_DBconnection, $DBconnection);
+//Catch anything wrong with query
+try {
+//Select number of registrations and cost for each club in active competition
+require('Connections/DBconnection.php');           
 $query_rsCost = "SELECT club_name, coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
-$rsCost = mysql_query($query_rsCost, $DBconnection) or die(mysql_error());
-$row_rsCost = mysql_fetch_assoc($rsCost);
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Rapport: antal anm&auml;lningar och kostnad per klubb"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
-<meta name="keywords" content="tuna karate cup, rapport med antal anmälningar, coachnamn och kostnad per klubb, karate, eskilstuna, sporthallen, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
-</head>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+$stmt_rsCost = $DBconnection->query($query_rsCost);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+
+$pagetitle="Rapport: anm&auml;lningar och kostnad per klubb";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>    
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -72,21 +42,24 @@ $row_rsCost = mysql_fetch_assoc($rsCost);
           <td><strong>Coacher</strong></td>
           <td><strong>Kostnad</strong></td>
         </tr>
-    <?php do { ?>
+    <?php while($row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC)) { 
+ ?>
       <tr>
         <td nowrap="nowrap"><?php echo $row_rsCost['club_name']; ?></td>
         <td nowrap="nowrap"><?php echo $row_rsCost['COUNT(reg_id)']; ?></td>
         <td><?php echo $row_rsCost['coach_names']; ?></td>
         <td nowrap="nowrap"><?php echo $row_rsCost['SUM(class_fee)'].' kr'; ?></td>
       </tr>
-      <?php } while ($row_rsCost = mysql_fetch_assoc($rsCost)); ?>
+    <?php } ?>
 </table>
-      <p>&nbsp;</p>
+    <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
   </div>
 </div>
 <?php include("includes/footer.php");?>
 </body>
 </html>
 <?php
-mysql_free_result($rsCost);
+//Kill statements and DB connection
+$stmt_rsCost->closeCursor();
+$DBconnection = null;
 ?>

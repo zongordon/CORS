@@ -1,77 +1,71 @@
 <?php 
-//Adjusted to display page title
-
+//Moved meta description and keywords to header.php
+//Granted access to all levels of registered users
 if (!isset($_SESSION)) {
   session_start();
 }
-require_once('Connections/DBconnection.php');
+//Access level registered user
+$MM_authorizedUsers = $_SESSION['MM_Level']; 
+$MM_donotCheckaccess = "false";
 
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
+//Catch anything wrong with query
+try {
+// Select clubs, for the active competition
+require('Connections/DBconnection.php');           
+$query_rsAccounts = "SELECT a.account_id FROM account AS a INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS c USING(comp_id) WHERE comp_current = 1 ORDER BY account_id";
+$stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
+$row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC);
+$totalRows_rsAccounts = $stmt_rsAccounts->rowCount();   
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsAccounts = "SELECT a.account_id FROM account AS a INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS c USING(comp_id) WHERE comp_current = 1 ORDER BY account_id";  
-$rsAccounts = mysql_query($query_rsAccounts, $DBconnection) or die(mysql_error());
-//$row_rsAccounts = mysql_fetch_assoc($rsAccounts);
-$totalRows_rsAccounts = mysql_num_rows($rsAccounts);
-
-mysql_select_db($database_DBconnection, $DBconnection);
+//Catch anything wrong with query
+try {
+// Select classes, for the active competition
+require('Connections/DBconnection.php');           
 $query_rsClasses = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, co.comp_name FROM classes AS c INNER JOIN competition AS co USING (comp_id) WHERE comp_current = 1";
-$rsClasses = mysql_query($query_rsClasses, $DBconnection) or die(mysql_error());
-//$row_rsClasses = mysql_fetch_assoc($rsClasses);
-$totalRows_rsClasses = mysql_num_rows($rsClasses);
-
-mysql_select_db($database_DBconnection, $DBconnection);
+$stmt_rsClasses = $DBconnection->query($query_rsClasses);
+$row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
+$totalRows_rsClasses = $stmt_rsClasses->rowCount();   
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+    
+//Catch anything wrong with query
+try {
+// Select registrations for the active competition
+require('Connections/DBconnection.php');           
 $query_rsRegistrations = "SELECT re.reg_id FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
-$rsRegistrations = mysql_query($query_rsRegistrations, $DBconnection) or die(mysql_error());
-//$row_rsRegistrations = mysql_fetch_assoc($rsRegistrations);
-$totalRows_rsRegistrations = mysql_num_rows($rsRegistrations);
+$stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
+$row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC);
+$totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();   
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
 
 global $colname_rsContestants;
-mysql_select_db($database_DBconnection, $DBconnection);
-$query_rsContestants = sprintf("SELECT co.contestant_id FROM contestants AS co INNER JOIN account AS ac USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) WHERE comp_current = 1 ORDER BY contestant_id", GetSQLValueString($colname_rsContestants, "text"));
-$rsContestants = mysql_query($query_rsContestants, $DBconnection) or die(mysql_error());
-//$row_rsContestants = mysql_fetch_assoc($rsContestants);
-$totalRows_rsContestants = mysql_num_rows($rsContestants);
-?> 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head><?php $pagetitle="Rapport: summering &ouml;ver antal anm&auml;lda klubbar, t&auml;vlingsklasser, anm&auml;lningar och t&auml;vlande"?>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="description" content="Tuna Karate Cup som arrangeras av Eskilstuna Karateklubb i Eskilstuna Sporthall." />
-<meta name="keywords" content="tuna karate cup, karate, eskilstuna, sporthallen, wado, sj&auml;lvf&ouml;rsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp" />
-<title><?php echo $pagetitle ?></title>
-<link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
-</head>
-<!-- Include top navigation links, News and sponsor sections -->
-<?php include("includes/header.php");?> 
+//Catch anything wrong with query
+try {
+// Select contestants for the active competition
+require('Connections/DBconnection.php');           
+$query_rsContestants = "SELECT co.contestant_id FROM contestants AS co INNER JOIN account AS ac USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) WHERE comp_current = 1 ORDER BY contestant_id";
+$stmt_rsContestants = $DBconnection->query($query_rsContestants);
+$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
+$totalRows_rsContestants = $stmt_rsContestants->rowCount();   
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+    
+$pagetitle="Rapport: summering &ouml;ver antal anm&auml;lda klubbar, t&auml;vlingsklasser, anm&auml;lningar och t&auml;vlande";
+// Includes Several code functions
+include_once('includes/functions.php');
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");?>    
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -112,8 +106,10 @@ $totalRows_rsContestants = mysql_num_rows($rsContestants);
 <?php include("includes/footer.php");?>
 </body>
 </html><?php
-mysql_free_result($rsAccounts);
-mysql_free_result($rsClasses);
-mysql_free_result($rsContestants);
-mysql_free_result($rsRegistrations);
+//Kill statements and DB connection
+$stmt_rsAccounts->closeCursor();
+$stmt_rsClasses->closeCursor();
+$stmt_rsContestants->closeCursor();
+$stmt_rsRegistrations->closeCursor();
+$DBconnection = null;
 ?>
