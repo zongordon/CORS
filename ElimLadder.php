@@ -1,6 +1,6 @@
 <?php 
-// Added apDivRepechage 
-//Removed hidden code
+//Added DomPDF.php to render PDF file
+//Added div result_tbl contestant tables to be able to make font size smaller in PDF
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -31,7 +31,7 @@ catch(PDOException $ex) {
 //Catch anything wrong with query
 try {
 //SELECT result data for the class
-$query_Result = "SELECT a.club_name, co.contestant_name, clu.club_startorder, re.contestant_result FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND contestant_result <> 0 ORDER BY contestant_result";
+$query_Result = "SELECT a.club_name, co.contestant_name, clu.club_startorder, cl.class_id, re.contestant_result FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND contestant_result <> 0 ORDER BY contestant_result";
 $stmt_rsResult = $DBconnection->prepare($query_Result);
 $stmt_rsResult->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsResult = $stmt_rsResult->fetch(PDO::FETCH_ASSOC);
@@ -113,6 +113,7 @@ $contestantsArray[] = $str;
 $startnumbersArray[] = $startnumber;
 } 
 ?>
+<div class ="result_tbl">
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
@@ -122,7 +123,7 @@ $startnumbersArray[] = $startnumber;
        <td class="AO_blue"><?php if (isset($startnumbersArray[16])) { echo $startnumbersArray[16]; } else { echo "17"; }?><!--17--></td><td nowrap="nowrap" class="result_tbl"><?php if (array_key_exists(16, $contestantsArray)) { echo $contestantsArray[16]; } else { /*it does not exist*/ }?></td>
     </tr>
   </table>
-</div>
+</div>    
 <div id="apDivOmg2_1"></div>
 <div id="apDiv2">
   <table width="100%" border="0">
@@ -288,6 +289,7 @@ $startnumbersArray[] = $startnumber;
     </tr>
   </table>
 </div>
+</div>
 <div id="apDivResultat">
   <table width="100%">
       <tr><td><h2 align="center">Resultat</h2></td></tr>
@@ -329,6 +331,9 @@ $DBconnection = null;
   </table>      
 </div>
 <div id="apDivRepechage"></div>
+<div id="apDivPDF">
+<?php echo '<a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a>';?>    
+</div>
     </div> 
 </div>
 </body>
