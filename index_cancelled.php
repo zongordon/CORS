@@ -1,7 +1,5 @@
-<?php 
-///Replaced $row_rsCurrentComp['xxx'] with $xxx defined in header.php
-// Removed navigation: include_once("includes/navigation.php")
-//Inserted top banner
+<?php
+// Removed echo $comp_name
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -22,8 +20,8 @@ include_once('includes/header.php');?>
   <div class="feature">
     <img src="img/DSC_0069.jpg" alt="" width="300" height="253" />
     <h1>&nbsp;</h1>
-    <h1><?php echo $comp_name;?>  &auml;r INST&Auml;LLD!</h1>
-    <p>Med respekt f&ouml;r de t&auml;vlande och v&aring;ra egna sponsorer beslutade idag t&auml;vlingsledningen att st&auml;lla in &aring;rets upplaga av t&auml;vlingen. Vi har f&aring;tt allt f&ouml;r f&aring; anm&auml;lningar, vilket orsakade mycket f&aring; deltagare i flertalet klasser. Det vore inte r&auml;ttvist mot de t&auml;vlande som reser hit f&ouml;r att f&aring; t&auml;vla, anser vi.</p>
+    <h1>T&auml;vlingen &auml;r INST&Auml;LLD!</h1>
+    <p>Med respekt f&ouml;r de t&auml;vlande och v&aring;ra egna sponsorer beslutade t&auml;vlingsledningen att st&auml;lla in t&auml;vlingen. Vi har f&aring;tt allt f&ouml;r f&aring; anm&auml;lningar, vilket orsakade mycket f&aring; deltagare i flertalet klasser. Det vore inte r&auml;ttvist mot de t&auml;vlande som reser hit f&ouml;r att f&aring; t&auml;vla, anser vi.</p>
     <p>Vi ska f&ouml;rs&ouml;ka analysera orsaken till de f&aring; anm&auml;lningarna och tar g&auml;rna emot hj&auml;lp av er ledare i den fr&aring;gan. Om analysen visar att v&aring;r t&auml;vling trots allt har en plats i karate-Sverige kommer vi att f&ouml;rs&ouml;ka igen.</p>
   </div>
   <div class="story"></div>

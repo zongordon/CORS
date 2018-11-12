@@ -1,5 +1,7 @@
-/*  Added code to add repechage picture through #apDivRepechage but commented it out - is only for printing
-
+/*  Re-added apDivRepechage
+    Added link to DOMPDF through #apDivPDF, 0 px margin through @page and DejaVu Sans font
+    Reduced size och "Final om 1:a pris" picture from 150px 50px and moved right-hand elimination ladder 20px left to fit in A4 
+    Changed code for div result_tbl to 12px font size
 */
 /***********************************************/
 /* 3col_leftNav.css                             */
@@ -14,236 +16,113 @@
 
 /* HTML tag styles                             */
 
-/***********************************************/ 
-
-
+/***********************************************/
 
 body{
-
-	font-family: Tahoma, Arial, sans-serif;
-
+	font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
 	color: #333333;
-
 	line-height: 1.166;
-
 	margin: 0px;
-
 	padding: 0px;
-
-	width: 100%;
-        
-        /*
-        background-color: #D2ECF0;        
-
-        background-color: #FFFFFF;
-                */
+	width: 100%;        
 }
+
+  @page { 
+      margin: 0px; 
+  }
 
 a{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:link{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:visited{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:hover{
-
 	color: #006699;
-
 	text-decoration: underline;
-
 }
-
-
 
 h1{
-
  font-family: Tahoma, Arial, sans-serif;
-
  font-size: 115%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h2{
-
  font-family: Tahoma, Arial, sans-serif;
-
  font-size: 114%;
-
  color: #333333;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h3{
-
  font-family: Tahoma, Arial, sans-serif;
-
  font-size: 100%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h4{
-
- font-family: Tahoma, Arial, sans-serif;
-
- font-size: 100%;
-
+ font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
+ font-size: 80%;
  font-weight: normal;
-
  color: #333333;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h5{
-
  font-family: Tahoma, Arial, sans-serif;
-
  font-size: 100%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 ul{
-
  list-style-type: square;
-
 }
-
-
 
 ul ul{
-
  list-style-type: disc;
-
 }
-
-
 
 ul ul ul{
-
  list-style-type: circle;
-
 }
-
-
 
 label{
-
  font-family: Tahoma, Arial, sans-serif;
-
  font-size: 100%;
-
  font-weight: bold;
-
  color: #334d55;
-
 }
 
-
-
 /***********************************************/
-
 /* Layout Divs                                 */
-
 /***********************************************/
-
-
-
 #masthead{
-
 	padding: 10px 0px 10px 0px;
-/*
-	border-bottom: 1px solid #cccccc;
-
-	border-left: 1px solid #cccccc;
-
-	border-right: 1px solid #cccccc;
-        
-        background-color: #FFFFFF;
-
-
-*/
         width: 1130px;
-
         margin-left: 1%;
 }
 
 #content{
-
         float: left;
-
         width: 90%;
-        
-        
-/*
-        width: 75%;
-
-        margin-left: 5%;
-
-        border-left: 1px solid #cccccc;
-        
-        border-bottom: 1px solid #cccccc;
-        
-        background-color: #FFFFFF;
-*/
 }
 
 /***********************************************/
@@ -319,641 +198,360 @@ label{
 
 /************** .feature styles ***************/
 
-
-
 .feature{
-
 	padding: 0px 0px 10px 10px;
-
 	font-size: 80%;
-
 }
-
-
 
 .feature h3{
-
 	padding: 30px 0px 5px 0px;
-
 	text-align: left;
-
 }
-
-
 
 .feature h1{
-
 	color: #000000;
-
 }
 
-
-
 .feature img{
-
 	float: left;
-
 	padding: 10px 10px 0px 0px;
-
 }
 
 
 /************** .story styles *****************/
 
-
-
 .story{
-
 	clear: both;
-
 	padding: 10px 0px 0px 10px;
-
-	font-size: 80%;
-
+	font-size: 12px;
 	border-top-style: none;
-
 	border-right-style: none;
-
 	border-bottom-style: none;
-
 	border-left-style: none;
-
 }
-
-
 
 .story p{
-
 	padding: 0px 0px 10px 0px;
-
 }
 
-
-
 #masthead h1{
-
 	text-align: center;
-
 }
 
 /************** .error styles *****************/
 
 .error h3{
-
 	padding: 10px 10px 10px 0px;
-
 	text-align: left;
-
 	color: #FF0000;
-
 	font-size: 100%;	
-
 }
 
 /************** .result_tbl styles *****************/
 
 .result_tbl  {
-
 	border-top-width: 1px;
-
 	border-right-width: 1px;
-
 	border-bottom-width: 1px;
-
 	border-left-width: 1px;
-
 	border-top-style: solid;
-
 	border-right-style: solid;
-
 	border-bottom-style: solid;
-
 	border-left-style: solid;
-
 	empty-cells: show;
-
 	table-layout: auto;
-
 	visibility: visible;
-
 	text-align: left;
-
-	font-size: 100%;	
-
+        font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
+        font-weight: normal;
+        color: #333333;
+	font-size: 12px;		
 }
 
 /*********** Elimination Ladder positioning Divs ***********/
 
-
-
 #apDiv1 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 100px;
-
 }
 
 #apDiv2 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 160px;
-
 }
 
 #apDiv3 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 220px;
-
 }
 
 #apDiv4 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 280px;
-
 }
 
 #apDiv5 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 340px;
-
 }
 
 #apDiv6 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 400px;
-
 }
 
 #apDiv7 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 460px;
-
 }
 
 #apDiv8 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 520px;
-
 }
 
-
-
 #apDiv9 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 100px;
-
 }
 
 #apDiv10 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 160px;
-
 }
 
 #apDiv11 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 220px;
-
 }
 
 #apDiv12 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 280px;
-
 }
 
 #apDiv13 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 340px;
-
 }
 
 #apDiv14 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 400px;
-
 }
 
 #apDiv15 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 460px;
-
 }
 
 #apDiv16 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 520px;
-
 }
 
 #apDivOmg2_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 123px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 243px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 363px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 483px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_5 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 123px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_6 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 243px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_7 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 363px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_8 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 483px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg3_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
 	left: 330px;
-
 	top: 154px;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
 	left: 330px;
-
 	top: 394px;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
-	left: 720px;
-
+	left: 700px;
 	top: 154px;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg3_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
-	left: 720px;
-
+	left: 700px;
 	top: 394px;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg4_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:4;
-
 	left: 410px;
-
 	top: 210px;
-
 	background-image: url(img/pool_A_3.gif);
-
 }
 
 #apDivOmg4_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:4;
-
-	left: 639px;
-
+	left: 619px;
 	top: 210px;
-
 	background-image: url(img/pool_B_3.gif);
-
 }
 
 #apDivFinal {
@@ -961,8 +559,8 @@ label{
 	z-index:4;
 	left: 493px;
 	top: 300px;
-	width:147px;
-	height:50px;
+	width:130px;
+	height:43px;
         background-image: url("img/Final.gif");
         background-repeat: no-repeat;
 }
@@ -972,21 +570,27 @@ label{
 	width:220px;
 	height:115px;
 	z-index:5;
-	left: 465px;
+	left: 445px;
 	top: 480px;
 }
 
-
-/*
 #apDivRepechage {
 	position:absolute;
 	z-index:1;
-	left: 315px;
+	left: 305px;
 	top: 560px;
 	width:500px;
 	height:114px;
         background-image: url("img/Repechage.png");
         background-repeat: no-repeat;
 }
-*/
 
+#apDivPDF {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 600px;        
+}
+/*
+
+*/
