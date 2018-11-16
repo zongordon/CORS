@@ -1,5 +1,5 @@
 <?php 
-//Removed '$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)'to show all data in recordset 
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -50,11 +50,10 @@ include_once("includes/news_sponsors_nav.php");?>
     <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsContestants->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsContestants->closeCursor();
-$DBconnection = null;
-?>

@@ -1,5 +1,5 @@
 <?php 
-//Removed $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC) to show all data in recordset
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -65,11 +65,10 @@ echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
     <p>&nbsp;</p>
 </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsRegistrations->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsRegistrations->closeCursor();
-$DBconnection = null;
-?>

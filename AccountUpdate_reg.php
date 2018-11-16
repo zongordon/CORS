@@ -1,8 +1,5 @@
 <?php 
-//v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
-//Changed from $colname_rsAccountId = filter_input(INPUT_SESSION, 'MM_AccountId');
-//Changed from  $updateGoTo = "AccountList.php";
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -102,10 +99,8 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
         $output_form = 'yes';		
 	}
 
-         //Kill statement and DB connection
+         //Kill statement
         $stmt_rsContactemail->closeCursor();
-        $DBconnection = null;   
-      
     }
 	 
     if (empty($contact_phone)) {
@@ -140,9 +135,8 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
             echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
             $output_form = 'yes';		
 	}
-        //Kill statement and DB connection
+        //Kill statement
         $stmt_rsUsername->closeCursor();
-        $DBconnection = null;       
     }	
 
     if (empty($user_password)) {
@@ -278,10 +272,10 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
             }
             header(sprintf("Location: %s", $updateGoTo));
         }
-include("includes/footer.php");
-//Kill statement and DB connection
+//Kill statement
 $stmt_rsAccount->closeCursor();
-$DBconnection = null;?>
+include("includes/footer.php");
+?>
 </body>
 </html>
 <?php ob_end_flush();?>

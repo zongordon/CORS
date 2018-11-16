@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 //Access level top administrator
 $MM_authorizedUsers = "0";
@@ -20,9 +20,8 @@ if (filter_input(INPUT_GET,'contestant_id') != "") {
         }
     $deleteGoTo = "RegInsert_reg.php#registration_insert";
     header(sprintf("Location: %s", $deleteGoTo));
-//Kill statements and DB connection
+//Kill statement
 $stmt_rsDelete->closeCursor();
-$DBconnection = null;    
 }
 $pagetitle="Ta bort deltagare";
 // Includes Several code functions

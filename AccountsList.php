@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 //Access level admin
 $MM_authorizedUsers = "1";
@@ -73,12 +73,10 @@ if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
   </div>
   <div class="story"></div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsAccounts->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statement and DB connection
-$stmt_rsAccounts->closeCursor();
-$DBconnection = null; 
-
-?>

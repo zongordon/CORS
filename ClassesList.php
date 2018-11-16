@@ -1,5 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
+//Reinstalled function and links to elimination ladders to have access as admin
+
 ob_start();
 
 //Declare and initialise variables
@@ -98,9 +99,9 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
   </div>
 </div>
 <?php
-//Kill statement and DB connection
+//Kill statement
 $stmt_rsClasses->closeCursor();
-$DBconnection = null;
-include("includes/footer.php");?>
+include("includes/footer.php");
+?>
 </body>
 </html>

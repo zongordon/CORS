@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -76,13 +76,11 @@ include_once("includes/news_sponsors_nav.php");?>
   <div class="story">
   </div>
 </div>
-<?php include_once("includes/footer.php");?>
-</body>
-</html>
-<?php
-//Kill statement and DB connection
+<?php 
+//Kill statements
 $stmt_rsAccount->closeCursor();
 $stmt_rsCompActive->closeCursor();
 $stmt->closeCursor();
-$DBconnection = null;
-?>
+include_once("includes/footer.php");?>
+</body>
+</html>

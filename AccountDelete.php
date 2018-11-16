@@ -1,7 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Corrected position for code $stmt_rsDeleteAccount->closeCursor() and $DBconnection = null
-//Added ' - admin' in pagetitle
+//Removed kill DB as it's included in footer.php
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -31,7 +29,6 @@ if (filter_input(INPUT_GET,'account_id') != "") {
   header(sprintf("Location: %s", $deleteGoTo));
 //Kill statement and DB connection
 $stmt_rsDeleteAccount->closeCursor();
-$DBconnection = null;  
 }
 
 if (!isset($_SESSION)) {

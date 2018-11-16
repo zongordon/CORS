@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails: AccountInsert.php/ForgottenPassword.php
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 $pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?";
@@ -132,9 +131,8 @@ echo '<h3>' . $contact_name . ',<br />Dina inloggningsuppgifter skickades till: 
         // Send email to Club Contact
         mail($contact_email, $subject, $msg, $headers);                
 
-//Kill statements and DB connection
+//Kill statement
 $stmt_rsAccount->closeCursor();
-$DBconnection = null;
 } ?>
     <div class="story">
     <p>&nbsp;</p>

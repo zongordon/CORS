@@ -1,5 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -36,7 +36,6 @@ $MM_donotCheckaccess = "false";
     //Kill statements and DB connection
     $stmt_rsReset->closeCursor();            
     $stmt_rsCurrent->closeCursor();            
-    $DBconnection = null;
     }
 //Catch anything wrong with query
 try {    
@@ -155,12 +154,10 @@ catch(PDOException $ex) {
   </div>
   <div class="story"></div>
 </div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
-<?php
-//Kill statements and DB connection
+<?php 
+//Kill statements
 $stmt_rsCompetitions->closeCursor();
 $stmt_rsClasses->closeCursor();
-$DBconnection = null;
-?> 
+include("includes/footer.php");?>
+</body>
+</html> 

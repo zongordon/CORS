@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Added function to handle more input: comp_aranger, comp_email and comp_url
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 //Access level top administrator
@@ -289,12 +288,12 @@ else if ($output_form == 'no') {
 ?>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement 
+$stmt_rsCompetition->closeCursor();
+include("includes/footer.php");?>
 </body>
 </html>
 <?php
-//Kill statement 
-$stmt_rsCompetition->closeCursor();
-$DBconnection = null;
 ob_end_flush();
 ?>

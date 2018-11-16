@@ -1,5 +1,6 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed function and links to elimination ladders as that are replaced by Draws.php
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -16,16 +17,6 @@ $totalRows_rsClasses = $stmt_rsClasses->rowCount();
         echo "An Error occured: ".$ex->getMessage();
     }
     
-//Catch anything wrong with query
-try {
-// Select if the current competition is raffled
-$query2 = "SELECT comp_id FROM competition WHERE comp_current = 1 AND comp_raffled = 1";
-$stmt_rsRaffled = $DBconnection->query($query2);
-$totalRows_rsRaffled = $stmt_rsRaffled->rowCount();
-}   catch(PDOException $ex) {
-        echo "An Error occured: ".$ex->getMessage();
-    }    
-    
 $pagetitle="T&auml;vlingsklasser";
 // Includes HTML Head
 include_once('includes/header.php');
@@ -40,12 +31,7 @@ include_once("includes/news_sponsors_nav.php");
     <div class="feature">
 <?php if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
     <h3>Befintliga t&auml;vlingsklasser</h3>
-  <?php if ($totalRows_rsRaffled == 0) {
-    echo '<p>Se startlistan &ouml;ver t&auml;vlande genom att klicka p&aring; l&auml;nken. <strong>Obs! T&auml;vlingsstegarna visas efter sista anm&auml;lningsdagen och d&aring; lottningen &auml;r gjord!</strong></p>';     
-        }
-        if ($totalRows_rsRaffled == 1) {
-    echo '<p>Se startlistan &ouml;ver t&auml;vlande eller hela t&auml;vlingsstegen genom att klicka p&aring; respektive l&auml;nk. <strong>Lottningen &auml;r nu avklarad!</strong></p>';     
-        } ?>
+    <p>Se startlistan &ouml;ver t&auml;vlande genom att klicka p&aring; l&auml;nken.<br> <strong>Obs! T&auml;vlingsstegarna visas p&aring; separat sida efter sista anm&auml;lningsdagen och d&aring; lottningen &auml;r gjord!</strong></p>     
     <table width="100%" border="1">
       <tr>
         <td><strong>Disciplin</strong></td>
@@ -54,9 +40,6 @@ include_once("includes/news_sponsors_nav.php");
         <td><strong>&Aring;lder</strong></td>
         <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
         <td><strong>Startlista</strong></td>
-        <?php if ($totalRows_rsRaffled == 1) {
-        echo "<td><strong>T&auml;vlingsstege</strong></td>";
-              } ?>
       </tr>
 <?php while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) {;?>
         <tr>
@@ -66,9 +49,6 @@ include_once("includes/news_sponsors_nav.php");
           <td><?php echo $row_rsClasses['class_age']; ?></td>
           <td><?php echo $row_rsClasses['class_weight_length']; ?></td>
           <td><a href="ClassContestants_loggedout.php?class_id=<?php echo $row_rsClasses['class_id']; ?>">Startlista</a></td>
-          <?php if ($totalRows_rsRaffled == 1) {
-                echo "<td><a href=javascript:MM_openBrWindow('ElimLadder.php?class_id=".$row_rsClasses['class_id']."','T&auml;vlingsstege','',1145,800,'true')>T&auml;vlingsstege</a></td>";
-                } ?>          
         </tr>
 <?php }; ?>
     </table>
@@ -78,8 +58,6 @@ include_once("includes/news_sponsors_nav.php");
     <p>Det finns inga t&auml;vlingsklasser att visa &auml;n!</p>
  <?php  } // Show if recordset empty 
  $stmt_rsClasses->closeCursor();
- $stmt_rsRaffled->closeCursor();
- $DBconnection = null;
     ?>
   </div>
 </div>
