@@ -1,7 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Re-introduced 'ob_start() and 'ob_end_flush()' to enable redirect
-//Replaced 'Eskilstuna Karateklubb', 'Tuna Karate Cup', 'http://tunacup.karateklubben.com' and 'tunacup@karateklubben.com' with DB data when sending emails
+//Removed kill DB as it's included in footer.php
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -84,7 +82,6 @@ include_once("includes/news_sponsors_nav.php");?>
 	}
          //Kill statement and DB connection
         $stmt_rsContactemail->closeCursor();
-        $DBconnection = null;   
     }   
     
     if (empty($contact_phone)) {
@@ -121,7 +118,6 @@ include_once("includes/news_sponsors_nav.php");?>
 	}
         //Kill statement and DB connection
         $stmt_rsUsername->closeCursor();
-        $DBconnection = null;   
     }	
     
     if (empty($user_password)) {
@@ -279,7 +275,6 @@ if ($output_form == 'yes') { ?>
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
             }
-            $DBconnection = null;   
 	} ?>  
    </div>
 </div>    

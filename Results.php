@@ -1,5 +1,5 @@
-<?php
-//Moved meta description and keywords to header.php
+<?php //Removed kill DB as it's included in footer.php
+
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -112,9 +112,9 @@ if ($totalRows_rsResult > 0) { // Show if recordset not empty ?>
 ?>      
 </table>
 <?php  
-} // Show if recordset not empty 
+} // Show if recordset not empty
+//Kill statement
 $stmt_rsResult->closeCursor();
-$DBconnection = null;
 ?>
   </div>
 </div>

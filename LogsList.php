@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -84,9 +84,10 @@ if ($totalRows_rsLogins > 0) { ?>
 ?>
   </div>
 </div>
-<?php include("includes/footer.php");
-//Kill statements and DB connection
+<?php 
+//Kill statement
 $stmt_rsLogins->closeCursor();
-$DBconnection = null;?>
+include("includes/footer.php");
+?>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
  ob_start();
 
@@ -100,7 +100,6 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
      $stmt_LoginRS->closeCursor();        
      }                  
    $stmt_rsUserexists->closeCursor();
-   $DBconnection = null;        
    }
 }
 ?>

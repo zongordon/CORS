@@ -1,6 +1,5 @@
 <?php 
-//Changed to show if recordset not empty OR "Kopiera" button is clicked and classes chosen for copy
-//Changed to only select data if $colname_rsCompetition <> NULL
+//Removed kill DB as it's included in footer.php
 
 ob_start();
 //Access level top administrator
@@ -177,14 +176,14 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
     <p>&nbsp;</p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
 <?php
-//Kill statements and DB connection
+//Kill statements
 $stmt_rsClasses->closeCursor();
 $stmt_rsCompetition->closeCursor();
 $stmt_rsOtherCompetitions->closeCursor();
-$DBconnection = null;
+include("includes/footer.php");?>
+</body>
+</html>
+<?php
 ob_end_flush();
 ?> 

@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Added kill statement
 
 ob_start();
 //Access level top administrator
@@ -43,7 +43,11 @@ include_once("includes/news_sponsors_nav.php");?>
 <p><a href="ClassesList.php">Tillbaka till T&auml;vlingsklasser</a> </p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsUserexists->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
 <?php ob_end_flush();?>

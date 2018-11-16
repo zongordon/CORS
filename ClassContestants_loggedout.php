@@ -1,6 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
-//Added link to go to previous page
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -82,18 +81,16 @@ echo ' | '.$row_rsClass['class_weight_length'];
         <td><?php echo $row_rsRegistrations['club_name']; ?></td>
         <td><?php echo $row_rsRegistrations['contestant_name']; ?></td>
         <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>
-</tr>
+      </tr>
 <?php } ?>
   </table>
 <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
 <?php } // Show if recordset not empty ?>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php
+//Kill statement
+$stmt_rsRegistrations->closeCursor();
+include("includes/footer.php");?>
 </body>
 </html>
-<?php
-//Kill statement and DB connection
-$stmt_rsRegistrations->closeCursor();
-$DBconnection = null;
-?>

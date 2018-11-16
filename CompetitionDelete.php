@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 //Access level top administrator
@@ -26,9 +26,8 @@ $stmt_rsCompDelete->execute();
     $deleteGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
   }
   header(sprintf("Location: %s", $deleteGoTo));
-  //Kill statements and DB connection
+  //Kill statement
   $stmt_rsCompDelete->closeCursor();
-  $DBconnection = null;
 ?>
 <!-- Include top navigation links, News and sponsor sections -->
 <?php include("includes/header.php");?> 

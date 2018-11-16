@@ -1,5 +1,5 @@
 <?php
-//Adjusted sql for correct insert into DB
+//Removed kill DB as it's included in footer.php
 
 ob_start();
 
@@ -257,9 +257,8 @@ else if ($output_form == 'no') {
         }
         header(sprintf("Location: %s", $insertGoTo));
     }
-    //Kill statements and DB connection
+    //Kill statement
     $stmt->closeCursor();
-    $DBconnection = null;
 }
 ?>
   </div>

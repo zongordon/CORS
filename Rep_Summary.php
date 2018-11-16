@@ -1,6 +1,7 @@
 <?php 
-//Moved meta description and keywords to header.php
-//Granted access to all levels of registered users
+//Removed kill DB as it's included in footer.php
+//Changed queries to SELECT COUNT(*) instead of simple SELECT
+//Added numerous queries for statistics
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -10,53 +11,115 @@ $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
 try {
-// Select clubs, for the active competition
+// Count clubs with registered contestants, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsAccounts = "SELECT a.account_id FROM account AS a INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS c USING(comp_id) WHERE comp_current = 1 ORDER BY account_id";
+$query_rsAccounts = "SELECT COUNT(DISTINCT account_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
 $stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
 $row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsAccounts = $stmt_rsAccounts->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
 //Catch anything wrong with query
 try {
-// Select classes, for the active competition
-require('Connections/DBconnection.php');           
-$query_rsClasses = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, co.comp_name FROM classes AS c INNER JOIN competition AS co USING (comp_id) WHERE comp_current = 1";
+// Count classes with registered contestants, for the active competition
+$query_rsClasses = "SELECT COUNT(DISTINCT class_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
 $stmt_rsClasses = $DBconnection->query($query_rsClasses);
 $row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsClasses = $stmt_rsClasses->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
     
 //Catch anything wrong with query
 try {
-// Select registrations for the active competition
-require('Connections/DBconnection.php');           
-$query_rsRegistrations = "SELECT re.reg_id FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+// Count registrations for the active competition
+$query_rsRegistrations = "SELECT COUNT(reg_id) as total FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
 $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
-global $colname_rsContestants;
 //Catch anything wrong with query
 try {
-// Select contestants for the active competition
-require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT co.contestant_id FROM contestants AS co INNER JOIN account AS ac USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) WHERE comp_current = 1 ORDER BY contestant_id";
-$stmt_rsContestants = $DBconnection->query($query_rsContestants);
-$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsContestants = $stmt_rsContestants->rowCount();   
+// Count potential contestants for the active competition  
+$query_rsMembers = "SELECT COUNT(DISTINCT contestant_id) as total FROM contestants AS co INNER JOIN account AS ac USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) WHERE comp_current = 1";
+$stmt_rsMembers = $DBconnection->query($query_rsMembers);
+$row_rsMembers = $stmt_rsMembers->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
     
+//Catch anything wrong with query
+try {
+// Count contestants for the active competition
+$query_rsContestants = "SELECT COUNT(DISTINCT contestant_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+$stmt_rsContestants = $DBconnection->query($query_rsContestants);
+$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+
+//Catch anything wrong with query
+try {
+// Count contestants in Kata in the active competition
+$query_rsKata = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND comp_current = 1";
+$stmt_rsKata = $DBconnection->query($query_rsKata);
+$row_rsKata = $stmt_rsKata->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+
+//Catch anything wrong with query
+try {
+// Count adult contestants in Kata in the active competition
+$query_rsKataAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND class_category <> 'Barn' AND comp_current = 1";
+$stmt_rsKataAdult = $DBconnection->query($query_rsKataAdult);
+$row_rsKataAdult = $stmt_rsKataAdult->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+ 
+//Catch anything wrong with query
+try {
+// Count children contestants in Kata in the active competition
+$query_rsKataChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND class_category = 'Barn' AND comp_current = 1";
+$stmt_rsKataChildren = $DBconnection->query($query_rsKataChildren);
+$row_rsKataChildren = $stmt_rsKataChildren->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+     
+//Catch anything wrong with query
+try {
+// Count contestants in Kumite in the active competition
+$query_rsKumite = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND comp_current = 1";
+$stmt_rsKumite = $DBconnection->query($query_rsKumite);
+$row_rsKumite = $stmt_rsKumite->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+
+//Catch anything wrong with query
+try {
+// Count adult contestants in Kumite in the active competition
+$query_rsKumiteAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND class_category <> 'Barn' AND comp_current = 1";
+$stmt_rsKumiteAdult = $DBconnection->query($query_rsKumiteAdult);
+$row_rsKumiteAdult = $stmt_rsKumiteAdult->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+      
+//Catch anything wrong with query
+try {
+// Count children contestants in Kumite in the active competition
+$query_rsKumiteChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND class_category = 'Barn' AND comp_current = 1";
+$stmt_rsKumiteChildren = $DBconnection->query($query_rsKumiteChildren);
+$row_rsKumiteChildren = $stmt_rsKumiteChildren->fetch(PDO::FETCH_ASSOC);
+}   catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+    }
+      
 $pagetitle="Rapport: summering &ouml;ver antal anm&auml;lda klubbar, t&auml;vlingsklasser, anm&auml;lningar och t&auml;vlande";
 // Includes Several code functions
 include_once('includes/functions.php');
@@ -73,26 +136,53 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="content">    
     <div class="feature">
 <h3>Summeringsrapport</h3>
-<p> H&auml;r &auml;r en summering av antal klubbar, t&auml;vlingsklasser, anm&auml;lningar och t&auml;vlande. Nedan finns l&auml;nkar till andra rapporter.</p>
-<table width="200">
+<p> H&auml;r &auml;r en summering av utvalda data. Nedan finns l&auml;nkar till andra rapporter.</p>
+<table width="320">
   <tr>
-    <td>Antal klubbar:</td>
-    <td><?php echo $totalRows_rsAccounts;?></td>
+    <td>Antal klubbar med anm&auml;lda deltagare:</td>
+    <td><?php echo $row_rsAccounts['total'];?></td>
   </tr>
   <tr>
-    <td>Antal t&auml;vlingsklasser:</td>
-    <td><?php echo $totalRows_rsClasses;?></td>
+    <td>Antal t&auml;vlingsklasser med anm&auml;lda deltagare:</td>
+    <td><?php echo $row_rsClasses['total'];?></td>
   </tr>
   <tr>
-    <td>Antal anm&auml;lda startande:</td>
-    <td><?php echo $totalRows_rsRegistrations;?></td>
+    <td>Antal deltagare anm&auml;lda i n&aring;gon klass (starter):</td>
+    <td><?php echo $row_rsRegistrations['total'];?></td>
   </tr>
   <tr>
-      <td>Antal registrerade t&auml;vlande fr&aring;n klubbar (inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
-    <td><?php echo $totalRows_rsContestants;?></td>
+      <td>Antal registrerade medlemmar fr&aring;n klubbar <br>(inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
+    <td><?php echo $row_rsMembers['total'];?></td>
   </tr>
+  <tr>
+    <td>Antal anm&auml;lda deltagare:</td>
+    <td><?php echo $row_rsContestants['total'];?></td>
+  </tr>
+  <tr>
+    <td>Antal starter i kata, totalt:</td>
+    <td><?php echo $row_rsKata['total'];?></td>
+  </tr>  
+  <tr>
+    <td>Antal starter i kata, vuxna (>13 &aring;r)):</td>
+    <td><?php echo $row_rsKataAdult['total'];?></td>
+  </tr>  
+  <tr>
+    <td>Antal starter i kata, barn:</td>
+    <td><?php echo $row_rsKataChildren['total'];?></td>
+  </tr>  
+  <tr>
+    <td>Antal starter i kumite, totalt:</td>
+    <td><?php echo $row_rsKumite['total'];?></td>
+  </tr>  
+  <tr>
+    <td>Antal starter i kumite, vuxna (>13 &aring;r):</td>
+    <td><?php echo $row_rsKumiteAdult['total'];?></td>
+  </tr>  
+  <tr>
+    <td>Antal starter i kumite, barn:</td>
+    <td><?php echo $row_rsKumiteChildren['total'];?></td>
+  </tr>  
 </table>
-<p>&nbsp;</p>
   </div>
   <div class="story">
     <ul>
@@ -103,13 +193,18 @@ include_once("includes/news_sponsors_nav.php");?>
     </ul>
   </div>
 </div>
-<?php include("includes/footer.php");?>
-</body>
-</html><?php
-//Kill statements and DB connection
+<?php 
+//Kill statements
 $stmt_rsAccounts->closeCursor();
 $stmt_rsClasses->closeCursor();
-$stmt_rsContestants->closeCursor();
 $stmt_rsRegistrations->closeCursor();
-$DBconnection = null;
+$stmt_rsMembers->closeCursor();
+$stmt_rsContestants->closeCursor();
+$stmt_rsKata->closeCursor();
+$stmt_rsKataChildren->closeCursor();
+$stmt_rsKumite->closeCursor();
+$stmt_rsKumiteChildren->closeCursor();
+include("includes/footer.php");
 ?>
+</body>
+</html>

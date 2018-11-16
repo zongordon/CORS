@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -22,7 +22,6 @@ if (filter_input(INPUT_GET,'contestant_id') != "") {
     header(sprintf("Location: %s", $deleteGoTo));
 //Kill statements and DB connection
 $stmt_rsDelete->closeCursor();
-$DBconnection = null;    
 }
 $pagetitle="Ta bort deltagare - admin";
 // Includes Several code functions

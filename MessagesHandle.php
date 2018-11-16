@@ -1,6 +1,5 @@
 <?php
-//Minor cosmetic changes
-//Changed from <div id="content"> 
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 //Access level top administrator
@@ -176,7 +175,6 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
             $insertGoTo = "MessagesHandle.php#new_message";
             header(sprintf("Location: %s", $insertGoTo));  	
             $stmt_rsClubEmails->closeCursor();
-            $DBconnection = null;
     }	
 }
 ?>
@@ -263,14 +261,14 @@ if ($totalRows_rsMessages > 0) { // Show if recordset not empty ?>
       </table>
 <?php 
 } // Show if rsMessages recordset not empty
-//Kill statements and DB connection
-$stmt_rsCompActive->closeCursor();
-$stmt_rsMessages->closeCursor();
-$DBconnection = null;
 ?>        
     </div>
 </div>
-<?php include("includes/footer.php");?>    
+<?php 
+//Kill statements
+$stmt_rsCompActive->closeCursor();
+$stmt_rsMessages->closeCursor();
+include("includes/footer.php");?>    
 </body>
 </html>
 <?php ob_end_flush();?>

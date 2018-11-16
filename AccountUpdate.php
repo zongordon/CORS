@@ -1,7 +1,5 @@
 <?php 
-//v3.1.1 Hotfix for "Cannot update accounts" #22 application version v3.1.0
-//Re-introduced encodeToUtf8() to contact_name and club_name
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 ob_start();
 
 //Access level admin
@@ -98,10 +96,8 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
         $output_form = 'yes';		
 	}
 
-         //Kill statement and DB connection
+         //Kill statement
         $stmt_rsContactemail->closeCursor();
-        $DBconnection = null;   
-      
     }
  
     if (empty($contact_phone)) {
@@ -138,7 +134,6 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
 	}
         //Kill statement and DB connection
         $stmt_rsUsername->closeCursor();
-        $DBconnection = null;       
     }	
     
     if (empty($user_password)) {
@@ -290,11 +285,10 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
             }
             header(sprintf("Location: %s", $updateGoTo));
         }
-        
+//Kill statement
+$stmt_rsAccount->closeCursor();        
 include("includes/footer.php");
-//Kill statement and DB connection
-$stmt_rsAccount->closeCursor();
-$DBconnection = null;?>
+?>
 </body>
 </html>
 <?php ob_end_flush();?>

@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 ob_start();
 //Access level top administrator
@@ -55,12 +55,13 @@ include_once("includes/news_sponsors_nav.php");?>
 <p><a href="MessagesHandle.php">Tillbaka till Hantera nyheter</a></p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
 <?php 
 //Kill statement 
 $stmt_rsMessageDelete->closeCursor();
-$DBconnection = null;
+include("includes/footer.php");
+?>
+</body>
+</html>
+<?php 
 ob_end_flush()
 ?>

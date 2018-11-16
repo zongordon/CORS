@@ -1,5 +1,5 @@
 <?php
-//Added $colname_rsClass = filter_input(INPUT_POST,'class_id') to update the class as that only worked locally and not on the testsite
+//Added kill DB connection
 
 ob_start();
 //Access level top administrator
@@ -177,7 +177,7 @@ Kata</label>
 </body>
 </html>
 <?php
-//Kill statements and DB connection
+//Kill statement
 $stmt_rsClass->closeCursor();
         }
  	else if ($output_form == 'no') {        
@@ -217,8 +217,9 @@ $stmt_rsClass->closeCursor();
                 $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
                 }
             header(sprintf("Location: %s", $updateGoTo));
-            //Kill statement 
+            //Kill statement and DB connection
             $stmt->closeCursor();
+            $DBconnection = null;
             }
         }
 ob_end_flush();

@@ -1,5 +1,5 @@
 <?php
-//Changed from $xxx = encodeToUtf8(filter_input(INPUT_POST, trim('xxx')));
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -77,9 +77,8 @@ include_once("includes/news_sponsors_nav.php");
         echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
         $output_form = 'yes';		
 	}
-         //Kill statement and DB connection
+         //Kill statement
         $stmt_rsContactemail->closeCursor();
-        $DBconnection = null;   	
     }
   
     if (empty($contact_phone)) {
@@ -114,9 +113,8 @@ include_once("includes/news_sponsors_nav.php");
             echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
             $output_form = 'yes';		
 	}
-        //Kill statement and DB connection
+        //Kill statement
         $stmt_rsUsername->closeCursor();
-        $DBconnection = null;   
     }	
 	
     if (empty($user_password)) {
@@ -242,9 +240,8 @@ if ($output_form == 'yes') {
       else {
           echo 'Inga konton tillg&auml;ngliga &auml;n!';
       }
-//Kill statement and DB connection
+//Kill statement
 $stmt_rsAccounts->closeCursor();
-$DBconnection = null;      
 } 
         
 	//Send the account information to the users email address and save it
@@ -315,9 +312,8 @@ $DBconnection = null;
             }   
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
-            }
+            } //Kill statement
             $stmt_rsAccount->closeCursor();
-            $DBconnection = null;   
 	} ?>
    </div>
 </div>

@@ -1,5 +1,5 @@
 <?php
-//Added setting timezone
+//Removed kill DB as it's included in footer.php
 
 ob_start();
 session_start();
@@ -129,9 +129,8 @@ if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") |
                 echo "An Error occured with queryX: ".$ex->getMessage();
                 }            
         }
-    //Kill statements and DB connection
+    //Kill statement
     $stmt->closeCursor();
-    $DBconnection = null;
     }
 }
 
@@ -376,13 +375,11 @@ if ($totalRows_rsContestants > 0) {
   	$insertGoTo = "RegInsert_reg.php#registration_delete";
 	header(sprintf("Location: %s", $insertGoTo));
                 
-        //Kill statements and DB connection
+        //Kill statement
         $stmt->closeCursor();
-        $DBconnection = null;
     }
-    //Kill statements and DB connection
+    //Kill statement
     $stmt_rsClassGender->closeCursor();
-    $DBconnection = null;
     }
 
 //Catch anything wrong with query
@@ -607,11 +604,11 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 ?>   
        </div>                     
 </div>                 
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsClasses->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsClasses->closeCursor();
-$DBconnection = null;
-ob_end_flush();?>
+<?php ob_end_flush();?>

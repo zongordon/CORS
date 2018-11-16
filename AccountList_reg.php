@@ -1,6 +1,5 @@
 <?php
-//Removed query for selecting data from current competition
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -74,11 +73,9 @@ include_once("includes/news_sponsors_nav.php");?>
     <h3><a href="AccountUpdate_reg.php">Om du inte &auml;r n&ouml;jd, s&aring; &auml;ndra h&auml;r!</a></h3>
 </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statementn
+$stmt_rsAccount->closeCursor();
+include("includes/footer.php");?>
 </body>
 </html>
-<?php
-//Kill statement and DB connection
-$stmt_rsAccount->closeCursor();
-$DBconnection = null; 
-?>

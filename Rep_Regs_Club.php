@@ -1,5 +1,5 @@
 <?php 
-//Changed to only select accounts with registered contestants, to select in drop list
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -146,14 +146,13 @@ foreach($row_rsAccounts as $row_rsAccount) {
     <p><a href="Rep_Summary.php">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>    
   </div>
 </div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
-<?php
-//Kill statements and DB connection
+<?php 
+//Kill statements
 $stmt_rsAccounts->closeCursor();
 $stmt_rsRegistrations->closeCursor();
 $stmt_rsCost->closeCursor();
 $stmt_rsSelectedClub->closeCursor();
-$DBconnection = null;
+include("includes/footer.php");
 ?>
+</body>
+</html>

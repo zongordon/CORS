@@ -1,5 +1,5 @@
 <?php
-//Removed commented (hidden) code 
+//Removed kill DB as it's included in footer.php
 ob_start();
 session_start();
 
@@ -177,9 +177,8 @@ if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") |
                 echo "An Error occured with queryX: ".$ex->getMessage();
                 }            
         }
-    //Kill statements and DB connection
+    //Kill statement
     $stmt->closeCursor();
-    $DBconnection = null;
  	}
 }
 //Catch anything wrong with query
@@ -425,9 +424,8 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
                         }
   		$insertGoTo = "RegsHandleAll.php#registration_delete";
 		header(sprintf("Location: %s", $insertGoTo));  
-                //Kill statements and DB connection
+                //Kill statement
                 $stmt->closeCursor();
-                $DBconnection = null;        
 		}
 	}	
 //Catch anything wrong with query
@@ -618,13 +616,13 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 ?>    
      </div>
 </div>    
-<?php include("includes/footer.php");?>
-</body>
-</html>
 <?php 
-//Kill statements and DB connection
+//Kill statements 
 $stmt_rsAccounts->closeCursor();
 $stmt_rsClasses->closeCursor();
 $stmt_rsSelectedClub->closeCursor();
-$DBconnection = null;
-ob_end_flush();?>
+include("includes/footer.php");
+?>
+</body>
+</html>
+<?php ob_end_flush();?>

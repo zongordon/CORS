@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 ob_start();
 
@@ -21,9 +21,8 @@ if (filter_input(INPUT_GET,'reg_id') != "") {
         }
     $deleteGoTo = "RegsHandleAll.php#registration_insert";
     header(sprintf("Location: %s", $deleteGoTo));
-//Kill statements and DB connection
+//Kill statement
 $stmt_rsDelete->closeCursor();
-$DBconnection = null;
 }
 $pagetitle="Ta bort anm&auml;lan - admin";
 // Includes Several code functions
