@@ -1,5 +1,5 @@
 <?php 
-//Added code for Recaptcha
+//Added code for captcha functionality
 
  ob_start();
 
@@ -28,78 +28,30 @@ if (!isset($_SESSION)) {
 
 $loginFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 $_SESSION['PrevUrl'] = filter_input(INPUT_SERVER,'accesscheck');
-//if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_password') && !empty(filter_input(INPUT_POST, 'g-recaptcha-response'))) {
+
 if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_password')) {
   $MM_fldUserAuthorization = "access_level";
   $MM_redirectLoginSuccess = "LogedIn.php";
   $MM_redirecttoReferrer = true;
   $loginUsername=filter_input(INPUT_POST,trim('user_name'));
   $password=filter_input(INPUT_POST,trim('user_password'));
-  $captcha=filter_input(INPUT_POST, 'g-recaptcha-response');
+  $captcha=filter_input(INPUT_POST,'captcha');
   $tryLogin = "yes";
   
-  $secretKey = "6LfJIn4UAAAAAHaXGvmlDtX1inWGDJjUFlDSZKOd";
-/*  
-      if(!$captcha){
-      // Recaptcha is not checked      
-        exit;
-      }
- * 
-      $ip = $_SERVER['REMOTE_ADDR'];
-      $response=file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secretKey.'&response='.$captcha.'&remoteip='.$ip);
-      $responseKeys = json_decode($response,true);
-      if(intval($responseKeys["success"]) !=== 1){
- * 
-        $post_data = 'secret='.$secretKey.'&response='.$captcha.'&remoteip='.$_SERVER['REMOTE_ADDR'] ;
-        $ch = curl_init();  
-        curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, 
-        array('Content-Type: application/x-www-form-urlencoded; charset=utf-8', 
-        'Content-Length: ' . strlen($post_data)));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data); 
-        $googresp = curl_exec($ch);       
-        $decgoogresp = json_decode($googresp);
-        curl_close($ch);
-
-    if ($decgoogresp->success == true){
- * 
-       $response=file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secretKey.'&response='.$captcha.'&remoteip='.$_SERVER['REMOTE_ADDR']);
-      $obj = json_decode($response);
-      if($obj->success === true){
- * 
-        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secretKey.'&response='.$captcha);
-        $responseData = json_decode($verifyResponse);
-        if($responseData->success){
- */
-      if(empty($captcha)){
-      // Recaptcha is not checked      
-        echo '<h3>Klicka i att du inte &auml;r en robot!</h3>';
-        $tryLogin = "no";
-      }
-      else {
-      // Verify Recaptcha                
-        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secretKey.'&response='.$captcha);
-        $responseData = json_decode($verifyResponse);
-        if($responseData->success){
-            $tryLogin = "yes";
-        }
-        else {        
-            echo '<h3>Kunde inte verifiera att du inte &auml;r en robot!</h3>';
-            $tryLogin = "no";
-        }
-      }
       if (empty($loginUsername)) {
       // $loginUsername is blank
-        echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
-        $tryLogin = "no";
+      echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
+      $tryLogin = "no";
       }
       if (empty($password)) {
       // $password is blank
-        echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
-        $tryLogin = "no";
+      echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
+      $tryLogin = "no";
       }      
+      if ($captcha <> $_SESSION['captcha']){
+      echo '<h3>Du skrev inte in samma teckan som i bilden. Försök igen!</h3>';
+      $tryLogin = "no";
+      }
       
   if ($tryLogin == "yes") {	    
     //Catch anything wrong with query 
@@ -170,12 +122,13 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
             <td><input name="user_password" type="password" id="user_password" size="25" /></td>
           </tr>
           <tr>
-            <td><input type="submit" name="LoginButton" id="LoginButton" value="Logga in" /></td>
-            <td>&nbsp;</td>            
+            <td>Skriv in samma tecken som i bilden!</td>
+            <td><input name="captcha" type="text" id="captcha" size="25" /></td>
           </tr>
           <tr>
-            <td colspan="2"><div class="g-recaptcha" data-sitekey="6LfJIn4UAAAAAFyZGl2_gdIXjV3QN12j9poMJKgG"></div></td>
-          </tr>           
+            <td><img src="Captcha.php" /></td>
+            <td><input type="submit" name="LoginButton" id="LoginButton" value="Logga in" /></td>
+          </tr>
         </table>
     </form>
 <p><a href="ForgottenPassword.php">Gl&ouml;mt l&ouml;senordet eller anv&auml;ndarnamnet?</a></p>
