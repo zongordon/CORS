@@ -1,7 +1,5 @@
 <?php 
-//Added DB selection to get competition data
-//Added meta description and keywords 
-//Added error diplay code
+//Added link to Recaptcha script on google.com
 
 //Display errors! NOTE! Turn-off for production sites!!
 error_reporting(E_ALL);
@@ -39,4 +37,5 @@ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförs
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
 <script language="JavaScript" type="text/javascript" src="includes/PopUp.js"></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
