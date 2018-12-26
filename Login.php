@@ -1,5 +1,5 @@
 <?php 
-//Added code for captcha functionality
+//Added information about and link to GDPR policy
 
  ob_start();
 
@@ -131,9 +131,12 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
           </tr>
         </table>
     </form>
+På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
+Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
+Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.         
 <p><a href="ForgottenPassword.php">Gl&ouml;mt l&ouml;senordet eller anv&auml;ndarnamnet?</a></p>
       <p>Har du inget anv&auml;ndarkonto &auml;n? <a href="AccountInsert.php">Skapa ett h&auml;r!</a></p>
-  </div>
+    </div>
   <div class="story"></div>
 </div>
 <?php

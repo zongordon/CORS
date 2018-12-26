@@ -1,6 +1,7 @@
 /***********************************************/
-/*  Added DejaVu Serif font and moved right-hand elimination ladder 20-35pt left to fit in A4
- *  Added code for div result_tbl to 100 % font size 
+/* Added apMatchTbl and apContTbl to locate match table and contestants table
+/* Added sponsor images
+/* Added apDivResultatRR for Round Robin results located differently than in ordinary elimination ladders
 
 /* print.css                             */
 
@@ -1026,11 +1027,20 @@ color: #cccccc;
 
 #apDivResultat {
 	position:absolute;
-	width:180px;
-	height:115px;
-	z-index:5;
+	z-index:1;
 	left: 320pt;
 	top: 340pt;
+	width:180px;
+	height:115px;        
+}
+
+#apDivResultatRR {
+	position:absolute;
+	z-index:1;
+	left: 600pt;
+	top: 300pt;        
+	width:220px;
+	height:115px;
 }
 
 #apDivRepechage {
@@ -1043,7 +1053,54 @@ color: #cccccc;
         background-image: url("img/Repechage.png");
         background-repeat: no-repeat;
 }
-
+#apDivPDF {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 500pt; 
+}
+#apMatchTbl {
+	position:absolute;
+	z-index:1;
+	left: 25pt;
+	top: 100pt;        
+}
+#apContTbl {
+	position:absolute;
+	z-index:1;
+        left: 600pt;
+	top: 100pt;
+}	
+#apSponsorPic1 {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 430pt;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-logo.svg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic2 {
+	position:absolute;
+	z-index:1;
+	left: 340pt;
+	top: 20pt;
+	width:150px;
+	height:17px;
+        background-image: url("img/sponsors/lazyposters black red_mini.jpg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic3 {
+	position:absolute;
+	z-index:1;
+	left: 650pt;
+	top: 430pt;
+	width:150px;
+	height:104px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
 /*
 
 */

@@ -1,6 +1,5 @@
 <?php 
-//Changed information regarding elimination ladders
-//Removed kill DB as it's included in footer.php
+//Changed from $comp_raffled === 1
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -37,7 +36,7 @@ include_once("includes/news_sponsors_nav.php");
     <p>Anm&auml;lan kan g&ouml;ras online av klubbledare/coach under rubriken &quot;Anm&auml;lan&quot; ovan, fram till 
         <strong><?php echo $comp_end_reg_date?></strong>. Ni kan INTE g&ouml;ra n&aring;gon efteranm&auml;lan!</p>
     <h2>T&auml;vlingsstegar</h2>
-    <p>N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten<?php if ($comp_raffled === 1) { echo ", via l&auml;nken Lottning ovan direkt fr&aring;n sidan eller som pdf";} ?>! <br><strong>Inga stegar delas ut p&aring; plats!</strong></p>
+    <p>N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten<?php if ($comp_raffled === "1") { echo ", via l&auml;nken Lottning ovan direkt fr&aring;n sidan eller som pdf";} ?>! <br><strong>Inga stegar delas ut p&aring; plats!</strong></p>
     <h2>Startavgift och inbetalning</h2>
     <p>Avgiften &auml;r 200 kr per klass 7-13 &aring;r och 250 kr fr&aring;n 14 &aring;r. Anv&auml;nd bankgironummer 695‐9175 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
     <h2>Registrering, strykningar och inv&auml;gning</h2>

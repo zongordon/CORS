@@ -1,5 +1,5 @@
 <?php
-//Added code for captcha functionality
+//Added information about and link to GDPR policy
 
 if (!isset($_SESSION)) {
   session_start();
@@ -169,7 +169,7 @@ if ($output_form === 'yes') {
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     } ?>
-      </div>
+      </div>       
 <h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
 <p><strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
     <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i!</br></p>
@@ -227,6 +227,9 @@ if ($output_form === 'yes') {
       </table>
       <input type="hidden" name="MM_insert" value="new_account" />
     </form>
+På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
+Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
+Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.
 <!-- Show current accounts -->
 <h3>Registrerade konton</h3>
 <?php if ($totalRows_rsAccounts > 0) { ?>    

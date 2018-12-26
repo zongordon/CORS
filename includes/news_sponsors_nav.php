@@ -1,5 +1,5 @@
 <?php
-//Added link to Draws.php to appear when the competition as raffled
+//Changed from $comp_raffled === 1
 
 require_once('Connections/DBconnection.php');
 
@@ -28,7 +28,7 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
     <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
     <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
 </div>
-<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://karateklubben.com/Support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === "1") { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://karateklubben.com/Support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
 <div id="headlines">
   <div id="latestnews">
