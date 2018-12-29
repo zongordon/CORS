@@ -1,5 +1,8 @@
 <?php 
-//Added link to Recaptcha script on google.com
+//Added $comp_id
+
+//Set timezone
+date_default_timezone_set("Europe/Stockholm");
 
 //Display errors! NOTE! Turn-off for production sites!!
 error_reporting(E_ALL);
@@ -15,6 +18,7 @@ $row_rsCurrentComp = $stmt_rsCurrentComp->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
+$comp_id = $row_rsCurrentComp['comp_id'];
 $comp_name = $row_rsCurrentComp['comp_name'];
 $comp_start_date = $row_rsCurrentComp['comp_start_date'];
 $comp_end_date = $row_rsCurrentComp['comp_end_date'];

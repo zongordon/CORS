@@ -1,6 +1,6 @@
 <?php
-//Added code for entering start time and round robin limit
-//Added browser supported date and time input fields
+//Changed from filter_input(INPUT_POST,'comp_limit_roundrobin') in form
+//Removed browser supported time input field as it's a bug in Chrome
 ob_start();
 
 //Access level top administrator
@@ -171,7 +171,7 @@ global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp
           <tr>
             <td>Starttid</td>
             <td><label>
-                    <input type="time" name="comp_start_time" id="comp_start_time" value="<?php echo $comp_start_time ?>" size="5"/>
+                    <input type="text" name="comp_start_time" id="comp_start_time" value="<?php echo $comp_start_time ?>" size="5"/>
             </label></td>
           </tr>          
           <tr>
@@ -212,9 +212,8 @@ global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp
           </tr>
         <tr>
             <td>Gr&auml;ns f&ouml;r round robin:</td>
-            <td>&nbsp;</td> 
             <td><label>
-              <input name="comp_limit_roundrobin" type="number" id="comp_limit_roundrobin" value="<?php echo $row_rsCompetition['comp_limit_roundrobin']; ?>"/>              
+              <input name="comp_limit_roundrobin" type="number" id="comp_limit_roundrobin" value="<?php echo $comp_limit_roundrobin ?>"/>              
             </label></td>
         </tr>                  
           <tr>

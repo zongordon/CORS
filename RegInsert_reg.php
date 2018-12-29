@@ -1,6 +1,9 @@
 <?php
-//Removed kill DB as it's included in footer.php
-
+//Moved date_default_timezone_set("Europe/Stockholm") to header.php
+//Changed to COUNT(class_id) instead of fetching all rows
+//Reused comp_id and $comp_end_reg_date from header.php instead of searching again for current competition
+//Added calculation of contestant_age and filtering of classes matching contestant_age
+//Removed Class gender validation for selected class
 ob_start();
 session_start();
 
@@ -18,28 +21,16 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 try {
 // Select number of classes including last date for registrations, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsClasses = "SELECT co.comp_end_reg_date, cl.comp_id FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1";
+$query_rsClasses = "SELECT COUNT(class_id) FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1";
 $stmt_rsClasses = $DBconnection->query($query_rsClasses);
 $row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
-$totalRows_rsClasses = $stmt_rsClasses->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
-//Get comp_id for active competetion and account_id for logged-in user
-$Current_Comp_id = $row_rsClasses['comp_id'];
+//Get account_id for logged-in user
 $account_id = $_SESSION['MM_AccountId'];
 
-//Set timezone
-date_default_timezone_set("Europe/Stockholm");
-
-//Setting the date for today (including format), last enrolment date and check if the last enrolment date is passed or not
-$now = date('Y-m-d');
-$endEnrolmentDate = $row_rsClasses['comp_end_reg_date'];
-$passedDate = 0;
-if ($endEnrolmentDate < $now) {
-	$passedDate = 1;
-}
 $pagetitle="Registrera egna t&auml;vlande";
 // Includes Several code functions
 include_once('includes/functions.php');
@@ -56,13 +47,20 @@ include_once("includes/news_sponsors_nav.php");?>
 <div class ="content">    
        <div class="feature">    
 <?php 
+//Setting the date for today (including format), last enrolment date and check if the last enrolment date is passed or not
+$now = date('Y-m-d');
+$endEnrolmentDate = $comp_end_reg_date;
+$passedDate = 0;
+if ($endEnrolmentDate < $now) {
+	$passedDate = 1;
+}
 // Show if recordset (classes) rsClasses empty 
-if ($totalRows_rsClasses === 0) {?>
+if ($row_rsClasses['COUNT(class_id)'] === 0) {?>
     <p>Det finns inga klasser att anm&auml;la till &auml;n!</p>
 <?php
 }
 // If recordset (classes) rsClasses is NOT empty 
-if ($totalRows_rsClasses > 0) {
+if ($row_rsClasses['COUNT(class_id)'] > 0) {
 
     //Show if the last date for registration is passed
     if ($passedDate === 1) { ?>
@@ -107,7 +105,7 @@ if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") |
             $stmt = $DBconnection->prepare($insertSQL);
             $stmt->bindValue(':coach_names', $coach_names, PDO::PARAM_STR);
             $stmt->bindValue(':account_id', $account_id, PDO::PARAM_INT);
-            $stmt->bindValue(':comp_id', $Current_Comp_id, PDO::PARAM_INT);
+            $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
             $stmt->execute();
             }   catch(PDOException $ex) {
                 echo "An Error occured with queryX: ".$ex->getMessage();
@@ -211,7 +209,7 @@ if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
 	}
     if (!empty($insert_contestant_birth) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $insert_contestant_birth)) {
     // $insert_contestant_birth is wrong format
-    echo '<h3>Du anv&auml;nde fel format p&aring; f&ouml;delsedatum!</h3>';
+    echo '<h3>Du anv&auml;nde fel format p&aring; f&ouml;delsedatum (YYYY-MM-DD)!</h3>';
     $output_form = 'yes';
     }	
     if (empty($insert_contestant_gender)) {	
@@ -263,7 +261,7 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
         <tr>
           <td>F&ouml;delsedatum (t.ex. 1996-01-31)</td>
           <td valign="top"><label>
-            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $insert_contestant_birth; ?>" size="8" maxlength="10"/>
+            <input name="contestant_birth" type="date" id="contestant_birth" value="<?php echo $insert_contestant_birth; ?>" size="8" maxlength="10"/>
           </label></td>
         </tr>
         <tr>
@@ -295,21 +293,8 @@ if ($totalRows_rsContestants > 0) {
     $contestant_height = "";
     $class_gender = "";
     $contestant_gender = "";
-    if (filter_input(INPUT_POST,"MM_insert_registration") === "new_registration") {
+  if (filter_input(INPUT_POST,"MM_insert_registration") === "new_registration") {
         $colname_rsClass = filter_input(INPUT_POST,'class_id');
-
-        //Catch anything wrong with query
-        try {
-        //Select Class gender for selected class 
-        require('Connections/DBconnection.php');         
-        $query_rsClassGender = "SELECT class_gender FROM classes WHERE class_id = :class_id";
-        $stmt_rsClassGender = $DBconnection->prepare($query_rsClassGender);
-        $stmt_rsClassGender->execute(array(':class_id'=>$colname_rsClass));
-        $row_rsClassGender = $stmt_rsClassGender->fetch(PDO::FETCH_ASSOC);
-        //$totalRows_rsClassGender = $stmt_rsClassGender->rowCount();
-        }   catch(PDOException $ex) {
-            echo "An Error occured with queryX: ".$ex->getMessage();
-            }
         $contestant_height = filter_input(INPUT_POST,'contestant_height');
         $contestant_gender = filter_input(INPUT_POST,'contestant_gender');    
         $club_reg_id = filter_input(INPUT_POST,'club_reg_id');    
@@ -328,11 +313,6 @@ if ($totalRows_rsContestants > 0) {
       		$output_form = 'yes';
 	    	}
     	}  
-    // Compare $contestant_gender with $class_gender    
-    if ($class_gender <> $contestant_gender ) {	
-      	echo '<h3>T&auml;vlandes k&ouml;n st&auml;mmer inte &ouml;verens med den valda klassen!</h3>';
-      	$output_form = 'yes';
-    } 
     if ($output_form === 'no') {
                 
         // Search for start number already set for the competition and if not, set start number for the contestant
@@ -346,7 +326,6 @@ if ($totalRows_rsContestants > 0) {
         $stmt_rsContestant_Startnumber = $DBconnection->prepare($query_rsContestant_Startnumber);
         $stmt_rsContestant_Startnumber->execute(array(':contestant_id'=>$colname_rsContestant));
         $row_rsContestant_Startnumber = $stmt_rsContestant_Startnumber->fetch(PDO::FETCH_ASSOC);
-        $totalRows_rsContestant_Startnumber = $stmt_rsContestant_Startnumber->rowCount();
         }   catch(PDOException $ex) {
             echo "An Error occured with queryX: ".$ex->getMessage();
             }        
@@ -378,21 +357,7 @@ if ($totalRows_rsContestants > 0) {
         //Kill statement
         $stmt->closeCursor();
     }
-    //Kill statement
-    $stmt_rsClassGender->closeCursor();
-    }
-
-//Catch anything wrong with query
-try {
-// Select all classes for the active competition
-require('Connections/DBconnection.php');           
-$query_rsClassData = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category";
-$stmt_rsClassData = $DBconnection->query($query_rsClassData);
-$row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);
-//$totalRows_rsClassData = $stmt_rsClassData->rowCount();   
-}   catch(PDOException $ex) {
-        echo "An Error occured with queryX: ".$ex->getMessage();
-    }
+  }
 
 //Catch anything wrong with query
 try {
@@ -456,11 +421,45 @@ if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
 } 
 ?>           
 </p>
-      <table width="100%" border="1">
+      <table width="800" border="1">
         <tr>
           <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
         </tr>
-<?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
+<?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { 
+    $contestant_gender = $row_rsContestants['contestant_gender'];
+    //Calculate the age of the contestant at the date of the competition
+    $date1 = new DateTime($comp_start_date);
+    $date2 = new DateTime($row_rsContestants['contestant_birth']);
+    $diff = $date2->diff($date1);
+    $contestant_age = $diff->y;
+    //If age > 18, set to 18 to match with classes
+    if($contestant_age >18){
+      $contestant_age = 18;
+    }
+    //If age < 10, add a "0" to be able to match with classes
+    if($contestant_age <10){
+      $contestant_age = '0'.$contestant_age;
+    }
+
+    //Catch anything wrong with query
+    try {
+// Select classes applicable for the contestant
+    require('Connections/DBconnection.php');               
+    $query_rsClassData = 
+            "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, "
+            . "cl.class_gender_category, cl.class_weight_length, cl.class_age "
+            . "FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id "
+            . "WHERE "
+            . "comp_current = 1 && cl.class_gender = :contestant_gender && SUBSTRING(cl.class_age, 1, 2) = :contestant_age "
+            . "|| comp_current = 1 && cl.class_gender = :contestantgender && SUBSTRING(cl.class_age, 4, 2) = :contestantage "
+            . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
+    $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
+    $stmt_rsClassData->execute(array(':contestant_gender'=>$contestant_gender, ':contestant_age'=>$contestant_age, ':contestantgender'=>$contestant_gender, ':contestantage'=>$contestant_age));
+    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);   
+    } catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+      }        
+?>
           <tr>
             <td><form id="new_registration" name="new_registration" method="POST" action="<?php echo $editFormAction; ?>">
               <table>
@@ -469,7 +468,7 @@ if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
                     <input type="text" name="contestant_name" id="contestant_name" value="<?php echo $row_rsContestants['contestant_name']; ?>" size="20"/>
                   </label></td>
                   <td><label>
-                    <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="6" maxlength="10"/>
+                    <input name="contestant_birth" type="date" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="6" maxlength="10"/>
                   </label></td>
                   <td><label>
                     <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="2" />
@@ -539,7 +538,7 @@ try {
 require('Connections/DBconnection.php');           
 $query_rsRegistrations = "SELECT re.reg_id, re.contestant_height, re.contestant_startnumber, co.contestant_name, co.contestant_birth, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,cl.class_weight_length, cl.class_age FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) WHERE account_id = :account_id AND comp_id = :comp_id ORDER BY co.contestant_name";
 $stmt_rsRegistrations = $DBconnection->prepare($query_rsRegistrations);
-$stmt_rsRegistrations ->execute(array(':account_id'=>$account_id,':comp_id'=>$Current_Comp_id));
+$stmt_rsRegistrations ->execute(array(':account_id'=>$account_id,':comp_id'=>$comp_id));
 $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();   
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
@@ -548,7 +547,7 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
             if ($totalRows_rsRegistrations > 0) { ?>
 	<h3><a name="registration_delete" id="registration_delete"></a>4. Ta bort anm&auml;lningar</h3>
         <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan. <strong>Du f&aring;r ingen bekr&auml;ftelse p&aring; anm&auml;lan, men kan se resultatet bl.a. under l&auml;nken "Startlistor"!</strong></p>
-      <table width="100%" border="1">
+      <table width="800" border="1">
         <tr>
           <td><strong>Startnr.</strong></td>            
           <td><strong>T&auml;vlande</strong></td>

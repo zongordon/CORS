@@ -1,6 +1,5 @@
 <?php
-//Added code for updating start time and round robin limit
-//Added browser supported date and time input fields
+//Removed browser supported time input field as it's a bug in Chrome
 ob_start();
 
 //Access level top administrator
@@ -177,7 +176,7 @@ if ($output_form == 'yes') {
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap">Starttid:</td>
           <td>&nbsp;</td>
-            <td><input name="comp_start_time" type="time" value="<?php echo $row_rsCompetition['comp_start_time']; ?>" size="5" /></td>
+          <td><input name="comp_start_time" type="text" value="<?php echo $row_rsCompetition['comp_start_time']; ?>" size="5" /></td>
         </tr>
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap">Startdatum:</td>

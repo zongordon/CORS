@@ -1,5 +1,5 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Added class_match_time
 
 ob_start();
 //Access level top administrator
@@ -18,7 +18,7 @@ if ($colname_rsCompetition <> NULL) {
     try {
         //Select all classes for selected competition and the competition's name
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT com.comp_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
+        $query1 = "SELECT com.comp_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category, cl.class_match_time FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
         $stmt_rsClasses = $DBconnection->prepare($query1);
         $stmt_rsClasses->execute(array(':comp_id' => $colname_rsCompetition));
         $row_rsClasses = $stmt_rsClasses->fetchAll(PDO::FETCH_ASSOC);        
@@ -98,6 +98,7 @@ if ($output_form === 'yes') {
         <td><strong>Kategori</strong></td>
         <td><strong>&Aring;lder</strong></td>
         <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
+        <td><strong>Matchtid</strong></td>
         <td><strong>Kopiera</strong></td>
       </tr>
 <?php //reset ($row_rsClasses);
@@ -108,6 +109,7 @@ if ($output_form === 'yes') {
           <td><?php echo $row_rsClass['class_category']; ?></td>
           <td><?php echo $row_rsClass['class_age']; ?></td>
           <td><?php echo $row_rsClass['class_weight_length']; ?></td>
+          <td><?php echo $row_rsClass['class_match_time']; ?></td>
           <td><label>
         <input name="copy_class[]" type="checkbox" id="copy_class[]" value="<?php echo $row_rsClass['class_id'];?>" checked />
               </label>
@@ -146,8 +148,8 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
             try {
             //INSERT new class in the database    
             require('Connections/DBconnection.php');
-            $insertSQL = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee)
-            SELECT :comp_id AS comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee  
+            $insertSQL = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee, class_match_time)
+            SELECT :comp_id AS comp_id, class_category, class_discipline, class_gender_category, class_gender, class_weight_length, class_age, class_fee, class_match_time  
             FROM classes WHERE class_id = :class_id";
             $stmt = $DBconnection->prepare($insertSQL);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
