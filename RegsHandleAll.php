@@ -1,8 +1,7 @@
 <?php
-//Changed to COUNT(class_id) instead of fetching all rows
-//Reused comp_id from header.php instead of searching again for current competition
-//Added calculation of contestant_age and filtering of classes matching contestant_age
-//Removed Class gender validation for selected class
+//Added link to ContestantUpdate.php to update contestants
+//Corrected input fileds for contestant_gender in form
+//Replaced date input to text for contestant_birth due to expected need to copy dates when adding contestants
 ob_start();
 session_start();
 
@@ -43,8 +42,12 @@ $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC);
     }    
   
 //Define $colname_rsSelectedClub before the $_SESSION['MM_Account'] has been created
-$colname_rsSelectedClub = "";
-    
+if ($_SESSION['MM_Account'] === "") {
+    $colname_rsSelectedClub = "";
+}
+else {
+    $colname_rsSelectedClub = $_SESSION['MM_Account']; 
+}
 //When a club is selected and "Välj klubb" clicked, initiate variable to select data from DB, to enable changing clubs
 if (filter_input(INPUT_POST,'account_id')) {
     $colname_rsSelectedClub = filter_input(INPUT_POST,'account_id');    
@@ -227,7 +230,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
         </label></td>
       </tr>
     </table>      
-</form>
+    </form>
  <?php   
  }
  ?>
@@ -293,7 +296,7 @@ try {
 // Select all registered contestants for the club
 $colname_rsContestants = $_SESSION['MM_Account'];
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT co.contestant_id, co.contestant_name, co.contestant_birth, co.contestant_gender FROM contestants AS co JOIN account AS a ON co.account_id = a.account_id AND co.account_id = :account_id ORDER BY co.contestant_name";
+$query_rsContestants = "SELECT co.contestant_id, co.account_id, co.contestant_name, co.contestant_birth, co.contestant_gender FROM contestants AS co JOIN account AS a ON co.account_id = a.account_id AND co.account_id = :account_id ORDER BY co.contestant_name";
 $stmt_rsContestants = $DBconnection->prepare($query_rsContestants);
 $stmt_rsContestants ->execute(array(':account_id'=>$colname_rsContestants));
 $totalRows_rsContestants = $stmt_rsContestants->rowCount();   
@@ -313,17 +316,17 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
         <tr>
           <td>F&ouml;delsedatum (t.ex. 1996-01-31)</td>
           <td valign="top"><label>
-            <input name="contestant_birth" type="date" id="contestant_birth" value="<?php echo $insert_contestant_birth; ?>" size="8" maxlength="10"/>
+            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $insert_contestant_birth; ?>" size="8" maxlength="10"/>
           </label></td>
         </tr>
         <tr>
           <td>K&ouml;n</td>
           <td valign="top">
             <label>
-              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($insert_contestant_gender == "Man") echo "checked='checked'"; ?>//>
+              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($insert_contestant_gender === "Man"){ echo "checked='checked'";} ?>/>
               Man</label>
             <label>
-              <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($insert_contestant_gender == "Kvinna") echo "checked='checked'"; ?>/>
+    <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($insert_contestant_gender === "Kvinna"){ echo "checked='checked'";} ?>/>
               Kvinna</label>
           </td>
         </tr>
@@ -442,7 +445,10 @@ else {
 ?>
         </div>    
 <h3><a name="registration_insert" id="registration_insert"></a>4. Anm&auml;l till t&auml;vlingklasser</h3>
-<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 7-13 &aring;r: skriv i l&auml;ngduppgift!</strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". Ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; l&auml;nken.
+<p>V&auml;lj bland klubbens t&auml;vlande och anm&auml;l till den eller de t&auml;vlingsklasser som han/hon ska t&auml;vla i 
+    (en klass i taget).<strong> F&ouml;r kumite och &aring;ldrarna 7-13 &aring;r: skriv i l&auml;ngduppgift!
+    </strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". 
+    G&ouml;r &auml;ndringar eller ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; n&aring;gon av l&auml;nkarna.
 <?php //Show if the maximum number of registrations is reached
       if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
         <div class="error">
@@ -470,7 +476,8 @@ else {
     if($contestant_age <10){
       $contestant_age = '0'.$contestant_age;
     }
-
+    //Setting gender for mixed classes (not used for anything yet)
+    $mixed_gender = "Mix";
     //Catch anything wrong with query
     try {
 // Select classes applicable for the contestant
@@ -498,17 +505,16 @@ else {
                     <input type="text" name="contestant_name" id="contestant_name" value="<?php echo $row_rsContestants['contestant_name']; ?>" size="20"/>
                   </label></td>
                   <td><label>
-                    <input name="contestant_birth" type="date" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="6" maxlength="10"/>
+                    <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="6" maxlength="10"/>
                   </label></td>
                   <td><label>
-                    <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="2" />
+                    <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="2"/>
                   </label></td>
                   <td><label>
                     <input name="contestant_height" type="text" id="contestant_height" size="1" maxlength="3" />
                   </label></td>
                   <td nowrap="nowrap">
-                  <label>
-                    <select name="class_id" id="class_id">
+                  <label><select name="class_id" id="class_id">
 <?php
     foreach($row_rsClassData as $row_rsClasses) {
 ?>
@@ -532,15 +538,17 @@ else {
     $stmt_rsClassData->closeCursor();
     $stmt_rsCurrRegs->closeCursor();
     } ?>
-                   </select>
-                </label></td>
-                <td><label>
-                <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
+                  </select></label></td>
+                  <td><label>
+                    <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
                   </label></td>
-                <td nowrap="nowrap">
-          <a href="ContestantDelete.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>                    
-		</td>
-                </tr>
+                  <td nowrap="nowrap">
+                    <a href="ContestantUpdate.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a> |                    
+                  </td>  
+                  <td nowrap="nowrap">
+                    <a href="ContestantDelete.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>                    
+                  </td>
+                  </tr>
               </table>
               <input name="contestant_id" type="hidden" id="contestant_id" value="<?php echo $row_rsContestants['contestant_id']; ?>" />
               <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />
