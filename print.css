@@ -1,8 +1,6 @@
 /***********************************************/
-/* Added apMatchTbl and apContTbl to locate match table and contestants table
-/* Added sponsor images
-/* Added apDivResultatRR for Round Robin results located differently than in ordinary elimination ladders
-
+/* Replaced Lazy Posters as sponsor with http://www.sparbanksstiftelsenrekarne.se/
+/* 
 /* print.css                             */
 
 /* Used for printing          */
@@ -1084,11 +1082,11 @@ color: #cccccc;
 #apSponsorPic2 {
 	position:absolute;
 	z-index:1;
-	left: 340pt;
-	top: 20pt;
-	width:150px;
-	height:17px;
-        background-image: url("img/sponsors/lazyposters black red_mini.jpg");
+	left: 640pt;
+	top: 18pt;
+	width:244px;
+	height:65px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic3 {

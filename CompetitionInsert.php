@@ -1,6 +1,6 @@
 <?php
-//Changed from filter_input(INPUT_POST,'comp_limit_roundrobin') in form
-//Removed browser supported time input field as it's a bug in Chrome
+//Added :comp_limit_roundrobin to $insertSQL
+
 ob_start();
 
 //Access level top administrator
@@ -259,11 +259,11 @@ else if ($output_form == 'no') {
     // Insert all competition data  
     require('Connections/DBconnection.php');         
     $insertSQL = "INSERT INTO competition  (comp_name, comp_start_time, comp_start_date, comp_end_reg_date, comp_arranger, comp_email, "
-            . "comp_url, comp_max_regs, comp_current) VALUES (:comp_name, :comp_start_time, :comp_start_date, :comp_end_reg_date, :comp_arranger, :comp_email, "
-            . ":comp_url, :comp_max_regs, :comp_current, :comp_limit_roundrobin)";
+            . "comp_url, comp_max_regs, comp_limit_roundrobin, comp_current) VALUES (:comp_name, :comp_start_time, :comp_start_date, "
+            . ":comp_end_reg_date, :comp_arranger, :comp_email, :comp_url, :comp_max_regs, :comp_limit_roundrobin, :comp_current)";
     $stmt = $DBconnection->prepare($insertSQL);
     $stmt->bindValue(':comp_name', $comp_name, PDO::PARAM_STR);
-    $stmt->bindValue(':comp_start_time', $comp_start_date, PDO::PARAM_STR);
+    $stmt->bindValue(':comp_start_time', $comp_start_time, PDO::PARAM_STR);
     $stmt->bindValue(':comp_start_date', $comp_start_date, PDO::PARAM_STR);
     $stmt->bindValue(':comp_end_reg_date', $comp_end_reg_date, PDO::PARAM_STR);
     $stmt->bindValue(':comp_arranger', $comp_arranger, PDO::PARAM_STR);

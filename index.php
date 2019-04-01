@@ -1,5 +1,5 @@
 <?php 
-//Changed from $comp_raffled === 1
+//Added information about coach licenses
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -25,8 +25,9 @@ include_once("includes/news_sponsors_nav.php");
   </div>
   <div class="story">
     <h2>Tid och plats</h2>
-    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. 10.00 i Munktellarenan i Eskilstuna, Verkstadsgatan 5. <!-- --> L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br />
-    Eniro-l&auml;nk till Munktellarenan i Eskilstuna:&nbsp;<a href="https://kartor.eniro.se/?c=59.378028,16.508754&z=14&q=%22verkstadsgatan,%205,%20eskilstuna%22;209077897;geo" target="_blank">h&auml;r</a></p>
+    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. 10.00 i <a href="http://www.facebook.com/stigasportsarena/" title="Stiga Sports Arena" target="_blank">
+    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!-- L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br />--> 
+    Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
     <h2>Anm&auml;lning av t&auml;vlande</h2>
     <p>Anm&auml;lan g&ouml;rs h&auml;r <strong>online</strong> av klubbledare/coach genom att f&ouml;rst skapa ett klubbkonto 
         via l&auml;nken &quot;Nytt konto&quot;, logga in och d&auml;refter g&ouml;ra anm&auml;lningar via l&auml;nken 
@@ -45,7 +46,8 @@ include_once("includes/news_sponsors_nav.php");
     <p>F&ouml;r &aring;sk&aring;dare (icke t&auml;vlande eller deras coacher) kostar det 40 kr i entr&eacute;. F&ouml;rskolebarn kommer in gratis!</p>
     <h2>Regler mm.</h2>
     <ul>
-        <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
+      <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
+      <li>Obligatorisk coachlicens g&auml;ller f&ouml;r samtliga som ska coacha under t&auml;vlingen - <a href="http://skfcoach.se/" target=_blank>Coachlicensverktyget</a></li>
       <li>Kadetter och juniorer har inga krav p&aring; shitei kata, men ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
       <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
       <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter, juniorer och vuxna (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>

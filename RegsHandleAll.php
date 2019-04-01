@@ -1,7 +1,6 @@
 <?php
-//Added link to ContestantUpdate.php to update contestants
-//Corrected input fileds for contestant_gender in form
-//Replaced date input to text for contestant_birth due to expected need to copy dates when adding contestants
+//Changed width of birthdate and gender fields to review the complete data
+
 ob_start();
 session_start();
 
@@ -505,10 +504,10 @@ else {
                     <input type="text" name="contestant_name" id="contestant_name" value="<?php echo $row_rsContestants['contestant_name']; ?>" size="20"/>
                   </label></td>
                   <td><label>
-                    <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="6" maxlength="10"/>
+                    <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $row_rsContestants['contestant_birth']; ?>" size="8" maxlength="10"/>
                   </label></td>
                   <td><label>
-                    <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="2"/>
+                    <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="4"/>
                   </label></td>
                   <td><label>
                     <input name="contestant_height" type="text" id="contestant_height" size="1" maxlength="3" />

@@ -1,6 +1,4 @@
-/* Added apMatchTbl and apContTbl to locate match table and contestants table
-/* Added sponsor images
-/* Added apDivResultatRR for Round Robin results located differently than in ordinary elimination ladders
+/* Replaced Lazy Posters as sponsor with http://www.sparbanksstiftelsenrekarne.se/
 /***********************************************/
 /* 3col_leftNav.css                             */
 
@@ -619,14 +617,15 @@ label{
         background-image: url("img/sponsors/EKA-Logo.png");
         background-repeat: no-repeat;
 }
+
 #apSponsorPic2 {
 	position:absolute;
 	z-index:1;
-	left: 465px;
-	top: 40px;
-	width:150px;
-	height:17px;
-        background-image: url("img/sponsors/lazyposters black red_mini.jpg");
+	left: 665px;
+	top: 33px;
+	width:244px;
+	height:65px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic3 {
@@ -639,6 +638,3 @@ label{
         background-image: url("img/sponsors/Dental_Estetik_small.png");
         background-repeat: no-repeat;
 }
-/*
-
-*/
