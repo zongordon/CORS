@@ -1,8 +1,4 @@
-/*  Re-added apDivRepechage
-    Added link to DOMPDF through #apDivPDF, 0 px margin through @page and DejaVu Sans font
-    Reduced size och "Final om 1:a pris" picture from 150px 50px and moved right-hand elimination ladder 20px left to fit in A4 
-    Changed code for div result_tbl to 12px font size
-*/
+/* Replaced Lazy Posters as sponsor with http://www.sparbanksstiftelsenrekarne.se/
 /***********************************************/
 /* 3col_leftNav.css                             */
 
@@ -569,9 +565,17 @@ label{
 	position:absolute;
 	width:220px;
 	height:115px;
-	z-index:5;
+	z-index:1;
 	left: 445px;
 	top: 480px;
+}
+#apDivResultatRR {
+	position:absolute;
+	width:220px;
+	height:115px;
+	z-index:1;
+	left: 650px;
+	top: 300px;
 }
 
 #apDivRepechage {
@@ -589,8 +593,48 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 10px;
-	top: 600px;        
+	top: 650px;        
 }
-/*
+#apMatchTbl {
+	position:absolute;
+	z-index:1;
+	left: 25px;
+	top: 110px;        
+}
+#apContTbl {
+	position:absolute;
+	z-index:1;
+        left: 650px;
+	top: 110px;
+}	
+#apSponsorPic1 {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 560px;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-Logo.png");
+        background-repeat: no-repeat;
+}
 
-*/
+#apSponsorPic2 {
+	position:absolute;
+	z-index:1;
+	left: 665px;
+	top: 33px;
+	width:244px;
+	height:65px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic3 {
+	position:absolute;
+	z-index:1;
+	left: 950px;
+	top: 560px;
+	width:150px;
+	height:104px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}

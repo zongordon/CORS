@@ -1,6 +1,5 @@
 <?php 
-//Changed information regarding elimination ladders
-//Removed kill DB as it's included in footer.php
+//Added information about coach licenses
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -26,8 +25,9 @@ include_once("includes/news_sponsors_nav.php");
   </div>
   <div class="story">
     <h2>Tid och plats</h2>
-    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. 10.00 i Munktellarenan i Eskilstuna, Verkstadsgatan 5. <!-- --> L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br />
-    Eniro-l&auml;nk till Munktellarenan i Eskilstuna:&nbsp;<a href="https://kartor.eniro.se/?c=59.378028,16.508754&z=14&q=%22verkstadsgatan,%205,%20eskilstuna%22;209077897;geo" target="_blank">h&auml;r</a></p>
+    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. 10.00 i <a href="http://www.facebook.com/stigasportsarena/" title="Stiga Sports Arena" target="_blank">
+    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!-- L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br />--> 
+    Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
     <h2>Anm&auml;lning av t&auml;vlande</h2>
     <p>Anm&auml;lan g&ouml;rs h&auml;r <strong>online</strong> av klubbledare/coach genom att f&ouml;rst skapa ett klubbkonto 
         via l&auml;nken &quot;Nytt konto&quot;, logga in och d&auml;refter g&ouml;ra anm&auml;lningar via l&auml;nken 
@@ -37,7 +37,7 @@ include_once("includes/news_sponsors_nav.php");
     <p>Anm&auml;lan kan g&ouml;ras online av klubbledare/coach under rubriken &quot;Anm&auml;lan&quot; ovan, fram till 
         <strong><?php echo $comp_end_reg_date?></strong>. Ni kan INTE g&ouml;ra n&aring;gon efteranm&auml;lan!</p>
     <h2>T&auml;vlingsstegar</h2>
-    <p>N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten<?php if ($comp_raffled === 1) { echo ", via l&auml;nken Lottning ovan direkt fr&aring;n sidan eller som pdf";} ?>! <br><strong>Inga stegar delas ut p&aring; plats!</strong></p>
+    <p>N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten<?php if ($comp_raffled === "1") { echo ", via l&auml;nken Lottning ovan direkt fr&aring;n sidan eller som pdf";} ?>! <br><strong>Inga stegar delas ut p&aring; plats!</strong></p>
     <h2>Startavgift och inbetalning</h2>
     <p>Avgiften &auml;r 200 kr per klass 7-13 &aring;r och 250 kr fr&aring;n 14 &aring;r. Anv&auml;nd bankgironummer 695‐9175 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
     <h2>Registrering, strykningar och inv&auml;gning</h2>
@@ -46,7 +46,8 @@ include_once("includes/news_sponsors_nav.php");
     <p>F&ouml;r &aring;sk&aring;dare (icke t&auml;vlande eller deras coacher) kostar det 40 kr i entr&eacute;. F&ouml;rskolebarn kommer in gratis!</p>
     <h2>Regler mm.</h2>
     <ul>
-        <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
+      <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
+      <li>Obligatorisk coachlicens g&auml;ller f&ouml;r samtliga som ska coacha under t&auml;vlingen - <a href="http://skfcoach.se/" target=_blank>Coachlicensverktyget</a></li>
       <li>Kadetter och juniorer har inga krav p&aring; shitei kata, men ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
       <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
       <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter, juniorer och vuxna (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>

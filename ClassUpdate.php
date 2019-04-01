@@ -1,5 +1,5 @@
 <?php
-//Added kill DB connection
+//Added class_match_time and changed validation of class_age
 
 ob_start();
 //Access level top administrator
@@ -47,17 +47,47 @@ include_once("includes/news_sponsors_nav.php");?>
     }
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
+    $class_match_time = filter_input(INPUT_POST, trim('class_match_time'));
     $output_form = 'no';
         
+    if (empty($class_age)) {
+      // $class_age is blank
+      echo '<h3>Du gl&ouml;mde att fylla i &aring;lder f&ouml;r klassen!</h3>';
+      $output_form = 'yes';
+    }
+    else {
+        if (!ctype_digit($class_age) && !preg_match('/(\d{2})-(\d{2})/', $class_age)) {	
+        // $class_age input is not numeric and doesn't match "nn-nn"
+        echo '<h3>Det ska antingen vara bara siffror eller "nn-nn" f&ouml;r &aring;lder f&ouml;r klassen!</h3>';
+        $output_form = 'yes';
+        }     
+    }
+    //If age < 10 remove and then add a "0" for better sorting
+    if ($class_age < 10) {
+        $class_age = ltrim($class_age, 0);
+        $class_age = '0'.$class_age;
+    }       
     if (empty($class_fee)) {
       // $class_fee is blank
-      echo '<h1>Du gl&ouml;mde att fylla i avgift f&ouml;r klassen!</h1>';
+      echo '<h3>Du gl&ouml;mde att fylla i avgift f&ouml;r klassen!</h3>';
       $output_form = 'yes';
     }
     else {
         if (!ctype_digit($class_fee)) {	
         // $class_fee input is not numeric
-        echo '<h1>Bara siffror &auml;r till&aring;tet i f&auml;ltet f&ouml;r avgift!</h1>';
+        echo '<h3>Bara siffror &auml;r till&aring;tet i f&auml;ltet f&ouml;r avgift!</h3>';
+        $output_form = 'yes';
+        }     
+    }
+    if (empty($class_match_time)) {
+      // $class_match_time is blank
+      echo '<h3>Du gl&ouml;mde att fylla i ber&auml;knad matchtid f&ouml;r klassen!</h3>';
+      $output_form = 'yes';
+    }
+    else {
+        if (!is_numeric($class_match_time)) {	
+        // $class_match_time is not numeric
+        echo '<h3>Bara tal eller decimaltal (t.ex. 3.8) &auml;r till&aring;tet i f&auml;ltet f&ouml;r ber&auml;knad matchtid!</h3>';
         $output_form = 'yes';
         }     
     }
@@ -70,7 +100,7 @@ include_once("includes/news_sponsors_nav.php");?>
     try {
         //Select Class data for selected class
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
+        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
         $stmt_rsClass = $DBconnection->prepare($query1);
         $stmt_rsClass->execute(array(':class_id' => $colname_rsClass));
         $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -153,11 +183,15 @@ Kata</label>
           </tr>
           <tr>
             <td>&Aring;lder eller namn p&aring; klass</td>
-            <td><input name="class_age" type="text" id="class_age" value="<?php echo ltrim($row_rsClass['class_age']); ?>" size="15" /></td>
+            <td><input name="class_age" type="text" id="class_age" value="<?php echo $row_rsClass['class_age']; ?>" size="15" /></td>
           </tr>
           <tr>
             <td>Avgift</td>
-            <td><input name="class_fee" type="int" id="class_fee" value="<?php echo ltrim($row_rsClass['class_fee']); ?>" size="15" /></td>
+            <td><input name="class_fee" type="number" id="class_fee" value="<?php echo $row_rsClass['class_fee']; ?>" size="15" /></td>
+          </tr>
+          <tr>
+            <td>Ber&auml;knad matchtid</td>
+            <td><input name="class_match_time" type="text" id="class_match_time" value="<?php echo $row_rsClass['class_match_time']; ?>" size="15" /></td>
           </tr>
           <tr>
             <td>&nbsp;</td>
@@ -180,7 +214,7 @@ Kata</label>
 //Kill statement
 $stmt_rsClass->closeCursor();
         }
- 	else if ($output_form == 'no') {        
+ 	else if ($output_form === 'no') {        
             if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
                 //Catch anything wrong with query
                 try {
@@ -193,7 +227,8 @@ $stmt_rsClass->closeCursor();
                 class_gender_category = :class_gender_category, 
                 class_weight_length = :class_weight_length, 
                 class_age = :class_age, 
-                class_fee = :class_fee
+                class_fee = :class_fee,
+                class_match_time = :class_match_time
                 WHERE class_id = :class_id"; 
                 $stmt = $DBconnection->prepare($updateSQL);                                 
                 $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
@@ -204,6 +239,7 @@ $stmt_rsClass->closeCursor();
                 $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
                 $stmt->bindValue(':class_age', $class_age, PDO::PARAM_STR);            
                 $stmt->bindValue(':class_fee', $class_fee, PDO::PARAM_INT);                        
+                $stmt->bindValue(':class_match_time', $class_match_time, PDO::PARAM_STR);                        
                 $stmt->bindValue(':class_id', $colname_rsClass, PDO::PARAM_INT);
                 $stmt->execute();
                 }   

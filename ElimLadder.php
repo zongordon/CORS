@@ -1,6 +1,5 @@
 <?php 
-//Added DomPDF.php to render PDF file
-//Added div result_tbl contestant tables to be able to make font size smaller in PDF
+//Added code to show Round Robin protocol when limit is met
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -9,7 +8,7 @@ $colname_rsClassData = filter_input(INPUT_GET,'class_id');
 try {
 //SELECT data för the competition class
 require('Connections/DBconnection.php');         
-$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1";
+$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, com.comp_limit_roundrobin, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1";
 $stmt_rsClass = $DBconnection->prepare($queryClass);
 $stmt_rsClass->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -19,11 +18,12 @@ catch(PDOException $ex) {
 }   
 //Catch anything wrong with query
 try {
-//SELECT competitor data för the competition class
+//SELECT contestant data för the competition class
 require('Connections/DBconnection.php');         
 $query = "SELECT a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1 ORDER BY club_startorder, reg_id";
 $stmt_rsClassContestants = $DBconnection->prepare($query);
 $stmt_rsClassContestants->execute(array(':class_id'=>$colname_rsClassData));
+$totalRows_rsClassContestants = $stmt_rsClassContestants->rowCount();
 }   
 catch(PDOException $ex) {
     echo "An Error occured with queryX: ".$ex->getMessage();
@@ -40,15 +40,29 @@ $totalRows_rsResult = $stmt_rsResult->rowCount();
 catch(PDOException $ex) {
     echo "An Error occured with queryX: ".$ex->getMessage();
 }   
+//Creating arrays for contestants and start numbers
+$contestantsArray = array(); 
+$startnumbersArray = array();
+while($row_rsClassContestants = $stmt_rsClassContestants->fetch(PDO::FETCH_ASSOC)) {  
+$startnumber = $row_rsClassContestants['contestant_startnumber']; 
+$name = $row_rsClassContestants['contestant_name']; 
+$club = $row_rsClassContestants['club_name']; 
+$str = $name.', '.$club;
+        //Limit the string to 34 characters
+        if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
+$contestantsArray[] = $str; 
+$startnumbersArray[] = $startnumber;
+} 
 
 $comp_name = $row_rsClass['comp_name'];
 $comp_arranger = $row_rsClass['comp_arranger'];
+$comp_start_date = $row_rsClass['comp_start_date']; 
+$comp_limit_roundrobin = $row_rsClass['comp_limit_roundrobin'];
 $class_discipline = $row_rsClass['class_discipline']; 
 $class_gender_category = $row_rsClass['class_gender_category']; 
 $class_category = $row_rsClass['class_category']; 
 $class_age = $row_rsClass['class_age']; 
-$class_weight_length = $row_rsClass['class_weight_length']; 
-$comp_start_date = $row_rsClass['comp_start_date']; 
+$class_weight_length = $row_rsClass['class_weight_length'];  
 $pagetitle="T&auml;vlingsstege";
 $pagedescription="$comp_name som arrangeras av $comp_arranger.";
 $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
@@ -80,40 +94,33 @@ echo ' | '.$class_weight_length;
 }
 ?>
 </h1>
-    <table class = masthead_table>
+  <table class = masthead_table>
     <tr>
       <td>&nbsp;</td>  
     </tr>        
     <tr>
       <td class = zero_left>&nbsp;</td>    
-      <td class = first_left>Pool A</td>
+      <td class = first_left><?php if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { 
+          echo 'Pool A'; } else { echo 'Round Robin'; };?></td>
       <td class = second_left>&nbsp;</td>
       <td class = third_left>&nbsp;</td>
       <td class = fourth_left><?php echo 'Datum: '.$comp_start_date;?></td>
       <td class = fourth_right>&nbsp;</td>
       <td class = third_right>&nbsp;</td>
       <td class = second_right>&nbsp;</td>
-      <td class = first_right>Pool B</td>
+      <td class = first_right><?php if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { 
+          echo 'Pool B'; } else { echo 'Round Robin'; };?></td>
       <td class = zero_right>&nbsp;</td>      
     </tr>
   </table> 
 </div>
   <div id="content">
       <div class="story">
-<?php    
-$contestantsArray = array(); 
-$startnumbersArray = array();
-while($row_rsClassContestants = $stmt_rsClassContestants->fetch(PDO::FETCH_ASSOC)) {  
-$startnumber = $row_rsClassContestants['contestant_startnumber']; 
-$name = $row_rsClassContestants['contestant_name']; 
-$club = $row_rsClassContestants['club_name']; 
-$str = $name.', '.$club;
-        if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
-$contestantsArray[] = $str; 
-$startnumbersArray[] = $startnumber;
-} 
-?>
 <div class ="result_tbl">
+<?php 
+//When limit for Round Robin is not met - show elimination ladder
+//If startnumber and contestant exist - show them with the proper colours
+if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { ?>
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
@@ -290,7 +297,236 @@ $startnumbersArray[] = $startnumber;
   </table>
 </div>
 </div>
+<div id="apDivRepechage"></div>          
+<?php 
+}
+//When limit for Round Robin is met - show round robin protocol
+//If startnumber and contestant exist - show them with the proper colours
+else { 
+//Set start of match numbers
+$matchNo = 1; ?>    
+<div id="apMatchTbl">
+  <table width="450" border="1">
+    <tr>
+        <td><h3>Match</h3></td>      
+        <td><h3>Nr.</h3></td>             
+        <td><h3>Namn</h3></td>      
+        <td><h3>Po&auml;ng</h3></td>                     
+        <td><h3>Vinst</h3></td>                     
+    </tr>        
+    <tr>
+        <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[0])) { echo $startnumbersArray[0]; }?><!--1--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>        
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[1])) { echo $startnumbersArray[1]; }?><!--2--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>        
+    </tr>
+<?php if (array_key_exists(3, $contestantsArray)) { 
+        //Set correct order of match numbers
+        $matchNo = $matchNo + 1;?>        
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[2])) { echo $startnumbersArray[2]; }?><!--3--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[3])) { echo $startnumbersArray[3]; }?><!--4--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>      
+<?php }
+      if (array_key_exists(4, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>             
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[0])) { echo $startnumbersArray[0]; }?><!--1--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>        
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[4])) { echo $startnumbersArray[4]; }?><!--5--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>        
+    </tr>            
+<?php }
+        $matchNo = $matchNo + 1;?>
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[1])) { echo $startnumbersArray[1]; }?><!--2--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[2])) { echo $startnumbersArray[2]; }?><!--3--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>                  
+<?php if (array_key_exists(3, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>                   
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[0])) { echo $startnumbersArray[0]; }?><!--1--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[3])) { echo $startnumbersArray[3]; }?><!--4--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>                   
+<?php } 
+      if (array_key_exists(4, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>      
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[2])) { echo $startnumbersArray[2]; }?><!--3--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[4])) { echo $startnumbersArray[4]; }?><!--5--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>                   
+<?php }
+      if (array_key_exists(3, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>      
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[1])) { echo $startnumbersArray[1]; }?><!--2--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[3])) { echo $startnumbersArray[3]; }?><!--4--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>                                    
+<?php } 
+        $matchNo = $matchNo + 1;?>      
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[0])) { echo $startnumbersArray[0]; }?><!--1--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>                
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[2])) { echo $startnumbersArray[2]; }?><!--3--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>
+<?php if (array_key_exists(4, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>      
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[1])) { echo $startnumbersArray[1]; }?><!--2--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[4])) { echo $startnumbersArray[4]; }?><!--5--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>                   
+<?php } 
+      if (array_key_exists(3, $contestantsArray) && array_key_exists(4, $contestantsArray)) { 
+        $matchNo = $matchNo + 1;?>
+    <tr>
+       <td rowspan="2"><h3><?php echo $matchNo ?></h3></td>
+       <td class="AKA_red"><?php if (isset($startnumbersArray[3])) { echo $startnumbersArray[3]; }?><!--4--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>               
+    </tr>
+    <tr>    
+       <td class="AO_blue"><?php if (isset($startnumbersArray[4])) { echo $startnumbersArray[4]; }?><!--5--></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; }?></td>
+       <td width="200">&nbsp;</td>
+       <td width="25">&nbsp;</td>              
+    </tr>                   
+<?php } ?>
+  </table>
+</div>
+<div id="apContTbl">
+  <table width="350" border="1">
+    <tr>
+        <td><h3>Startnr.</h3></td>      
+        <td><h3>Namn</h3></td>             
+        <td><h3>Vinster</h3></td>      
+        <td><h3>Po&auml;ng</h3></td>             
+    </tr>  
+    <tr>    
+       <td><?php if (isset($startnumbersArray[0])) { echo $startnumbersArray[0]; }?></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(0, $contestantsArray)) { echo $contestantsArray[0]; }?></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>               
+    </tr>                        
+    <tr>    
+       <td><?php if (isset($startnumbersArray[1])) { echo $startnumbersArray[1]; }?></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(1, $contestantsArray)) { echo $contestantsArray[1]; }?></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>               
+    </tr>                         
+    <tr>    
+       <td><?php if (isset($startnumbersArray[2])) { echo $startnumbersArray[2]; }?></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(2, $contestantsArray)) { echo $contestantsArray[2]; }?></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>               
+    </tr>                        
+    <tr>    
+       <td><?php if (isset($startnumbersArray[3])) { echo $startnumbersArray[3]; }?></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(3, $contestantsArray)) { echo $contestantsArray[3]; }?></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>                      
+    </tr>   
+    <tr>    
+       <td><?php if (isset($startnumbersArray[4])) { echo $startnumbersArray[4]; }?></td>
+       <td nowrap="nowrap"><?php if (array_key_exists(4, $contestantsArray)) { echo $contestantsArray[4]; }?></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>                      
+    </tr>  
+  </table>    
+</div>
+<?php 
+} ?>
+<div id="apDivPDF">
+<?php echo '<a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a>';?>    
+</div>
+<div id="apSponsorPic1"></div>
+<div id="apSponsorPic2"></div>
+<div id="apSponsorPic3"></div>
+<?php 
+if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { ?>
 <div id="apDivResultat">
+<?php     
+}
+else { ?>
+<div id="apDivResultatRR">
+<?php     
+} ?>
   <table width="100%">
       <tr><td><h2 align="center">Resultat</h2></td></tr>
 <?php
@@ -325,14 +561,11 @@ else {
 }       
 //Kill statements and DB connection
 $stmt_rsClassContestants->closeCursor();
+$stmt_rsClass->closeCursor();
 $stmt_rsResult->closeCursor();
 $DBconnection = null;
 ?>
-  </table>      
-</div>
-<div id="apDivRepechage"></div>
-<div id="apDivPDF">
-<?php echo '<a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a>';?>    
+  </table>
 </div>
     </div> 
 </div>

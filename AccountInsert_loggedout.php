@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Added information about and link to GDPR policy
 
 if (!isset($_SESSION)) {
   session_start();
@@ -27,7 +27,7 @@ include_once("includes/news_sponsors_nav.php");
       <div class="error">
 <?php
 //Declare and initialise variables
-  $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+  $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';$confirm_user_password='';
 // Validate insert account data if button is clicked
  if (filter_input(INPUT_POST,'MM_insert') == 'new_account') {
     if (filter_input(INPUT_POST,'user_name')) { $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));}
@@ -40,6 +40,7 @@ include_once("includes/news_sponsors_nav.php");
     if (filter_input(INPUT_POST,'club_name')) { $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));}
     if (filter_input(INPUT_POST,'active')) { $active = filter_input(INPUT_POST,'active');}
     if (filter_input(INPUT_POST,'access_level')) { $access_level = filter_input(INPUT_POST,'access_level');}    
+      $captcha=filter_input(INPUT_POST,'captcha');
     $output_form = 'no';
 	    
     if (empty($email)) {
@@ -145,13 +146,18 @@ include_once("includes/news_sponsors_nav.php");
       // $contact_name is blank
       echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn!</h3>';
       $output_form = 'yes';
+    }
+    
+    if ($captcha <> $_SESSION['captcha']){
+      echo '<h3>Du skrev inte in samma teckan som i bilden. Försök igen!</h3>';
+      $output_form = 'yes';
     }    
  } 
  else {
     $output_form = 'yes';
  }
 
-if ($output_form == 'yes') {
+if ($output_form === 'yes') {
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');                   
@@ -163,13 +169,13 @@ if ($output_form == 'yes') {
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     } ?>
-      </div>
+      </div>       
 <h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
 <p><strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
     <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i!</br></p>
 
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
-      <table width="100%" border="0">
+      <table width="450" border="0">
         <tr>
           <td>Klubbens namn</td>
           <td><label>
@@ -207,7 +213,11 @@ if ($output_form == 'yes') {
           <td><input name="confirm_user_password" type="password" id="confirm_user_password" size="25" /></td>
         </tr>
         <tr>
-          <td><input name="active" type="hidden" id="active" value="1" />
+          <td>Skriv in samma tecken som i bilden!</td>
+          <td><input name="captcha" type="text" id="captcha" size="25" /></td>
+        </tr>
+        <tr>
+          <td><img src="Captcha.php" /><input name="active" type="hidden" id="active" value="1" />
             <input name="access_level" type="hidden" id="access_level" value="0" />
             <input name="confirmed" type="hidden" id="confirmed" value="0" /></td>
           <td><label>
@@ -217,6 +227,9 @@ if ($output_form == 'yes') {
       </table>
       <input type="hidden" name="MM_insert" value="new_account" />
     </form>
+På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
+Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
+Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.
 <!-- Show current accounts -->
 <h3>Registrerade konton</h3>
 <?php if ($totalRows_rsAccounts > 0) { ?>    
