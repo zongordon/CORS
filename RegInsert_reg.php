@@ -1,5 +1,5 @@
-<?php
-//Changed width of birthdate and gender fields to review the complete data
+    <?php
+//Changed from $row_rsCompActive['comp_id'] in hidden field in form
 
 ob_start();
 session_start();
@@ -161,7 +161,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
       </tr>
       <tr>
         <td>
-          <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $row_rsClasses['comp_id']; ?>" />
+          <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>" />
           <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />        </td>
         <td><label>
 	<?php if ($totalRows_rsClubReg === 0) { // Show if recordset empty ?>   

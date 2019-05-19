@@ -1,5 +1,12 @@
 <?php
-//Added sponsor http://www.sparbanksstiftelsenrekarne.se/
+//Added klara_fastigheter.png and link to klarafastigheter.se
+//Changed from $comp_raffled === "1" as text didn't show a supposed
+//Changed from Helpdesk link (https://karateklubben.com/Support/)
+require_once('Connections/DBconnection.php');
+
+if (!isset($_SESSION)) {
+  session_start();
+}
 
 $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
@@ -18,11 +25,11 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
 ?>
 <body>
 <div id="masthead">
-    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
-    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
-    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="90" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="503" height="90"></a>
+    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="90" height="90" hspace="10"></a>
 </div>
-<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === "1") { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://karateklubben.com/Support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://github.com/zongordon/CORS/issues" target="_blank">GitHub Issues</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
 <div id="headlines">
   <div id="latestnews">
@@ -48,6 +55,7 @@ $DBconnection = null;
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
       <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="244" height="65" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
       <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
+      <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
 <!--Hide code       
       <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      
@@ -58,3 +66,5 @@ $DBconnection = null;
 -->
   </div>
 </div>
+
+

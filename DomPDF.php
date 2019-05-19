@@ -4,23 +4,21 @@
  * https://github.com/dompdf/dompdf
  * *
  */
+
 ob_start();
 
 ini_set('display_errors',1); // enable php error display for easy trouble shooting
 error_reporting(E_ALL); // set error display to all
-
 //Set timezone
 date_default_timezone_set("Europe/Stockholm");
 
 // include autoloader
 require_once '../dompdf/autoload.inc.php';
-
 // reference the Dompdf namespace
 use Dompdf\Dompdf;
 
 //Fetch the class id from previous page
 $class_id = filter_input(INPUT_GET,'class_id');
-
 // instantiate and use the dompdf class
 $dompdf = new DOMPDF();
 $dompdf->set_option('enable_css_float', true);
@@ -34,6 +32,7 @@ $my_path = HTTP_PATH_ROOT;
 
 //Load file and get content from file
 $file = 'http://'.$my_path.'/ElimLadder.php?class_id='.$class_id;
+
 $html = file_get_contents($file);
 
 //Load html and render PDF

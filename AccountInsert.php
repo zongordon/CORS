@@ -1,5 +1,6 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Added $confirm_user_password = ''; in declation and initialising of variables 
+//Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -30,19 +31,19 @@ include_once("includes/news_sponsors_nav.php");?>
        <div class="error">    
 <?php
 //Declare and initialise variables
-  $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+  $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
 // Validate insert account data if button is clicked
- if (filter_input(INPUT_POST,'MM_insert') == 'new_account') {
-    if (filter_input(INPUT_POST,'user_name')) { $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));}
-    if (filter_input(INPUT_POST,'user_password')) { $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));}
-    if (filter_input(INPUT_POST,'confirm_user_password')) { $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');}
-    if (filter_input(INPUT_POST,'confirmed')) { $confirmed = filter_input(INPUT_POST,'confirmed');}     
-    if (filter_input(INPUT_POST,'contact_name')) { $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));}
-    if (filter_input(INPUT_POST,'contact_email')) { $email = filter_input(INPUT_POST,'contact_email');}
-    if (filter_input(INPUT_POST,'contact_phone')) { $contact_phone = filter_input(INPUT_POST,'contact_phone');}
-    if (filter_input(INPUT_POST,'club_name')) { $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));}
-    if (filter_input(INPUT_POST,'active')) { $active = filter_input(INPUT_POST,'active');}
-    if (filter_input(INPUT_POST,'access_level')) { $access_level = filter_input(INPUT_POST,'access_level');}
+ if (filter_input(INPUT_POST,'MM_insert') === 'new_account') {
+    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
+    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
+    $email = filter_input(INPUT_POST,'contact_email');
+    $contact_phone = filter_input(INPUT_POST,'contact_phone');
+    $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));
+    $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));
+    $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');  
+    $access_level = filter_input(INPUT_POST,'access_level');
+    $confirmed = filter_input(INPUT_POST,'confirmed');       
+    $active = filter_input(INPUT_POST,'active');    
     $output_form = 'no';
 
     if (empty($email)) {
@@ -199,22 +200,28 @@ if ($output_form == 'yes') { ?>
           <td><input name="confirm_user_password" type="password" id="confirm_user_password" size="25" /></td>
         </tr>
         <tr>
-          <td>Administrat&ouml;rskonto</td>
+           <td>Kontotyp</td>
           <td><label>
-            <input name="access_level" type="checkbox" id="access_level" value="1" <?php if ($access_level == 1){ echo 'checked';} elseif ($access_level == 0) { echo 'unchecked';}?> />
-          </label></td>
+            <input <?php if (!(strcmp($access_level,1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_1" />
+Admin</label><label>      
+    <input <?php if (!(strcmp($access_level,0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_0" checked=""/>
+Coach</label></td>
         </tr>
         <tr>
           <td>Aktivt konto</td>
           <td><label>
-            <input name="active" type="checkbox" id="active" value="1" <?php if ($active == 1){ echo 'checked';} elseif ($active == 0) { echo 'unchecked';}?> />
-          </label></td>
+                  <input <?php if (!(strcmp($active,1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_1" checked=""/>
+Ja</label><label>      
+            <input <?php if (!(strcmp($active,0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_0" />
+Nej</label></td>                  
         </tr>
         <tr>
           <td>Bekr&auml;ftat konto</td>
           <td><label>
-            <input name="confirmed" type="checkbox" id="confirmed" value="1" <?php if ($confirmed == 1){ echo 'checked';} elseif ($confirmed == 0) { echo 'unchecked';}?> />
-          </label></td>
+                  <input <?php if (!(strcmp($confirmed,1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_1" checked=""/>
+Ja</label><label>      
+            <input <?php if (!(strcmp($confirmed,0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_0" />
+Nej</label></td>                                    
         </tr>
         <tr>
           <td>&nbsp;</td>
@@ -255,7 +262,7 @@ if ($output_form == 'yes') { ?>
         echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';
        //Catch anything wrong with query
             try {
-            require('Connections/DBconnection.php');           
+            require('Connections/DBconnection.php'); 
             //INSERT account data in DB
             $query = "INSERT INTO 
                 account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level)
@@ -282,3 +289,29 @@ if ($output_form == 'yes') { ?>
 </body>
 </html>
 <?php ob_end_flush();?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
