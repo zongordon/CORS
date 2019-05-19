@@ -1,5 +1,5 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Changed to select class match time from DB
 
 if (!isset($_SESSION)) {
   session_start();
@@ -12,7 +12,7 @@ $MM_donotCheckaccess = "false";
 try {
 // Select number of registrations for each class, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsRegistrations = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, cl.class_match_time, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations); 
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
@@ -40,22 +40,12 @@ include_once("includes/news_sponsors_nav.php");?>
           <td><strong>Antal t&auml;vlande</strong></td>
           <td><strong>Totalt ber&auml;knad tid (min)</strong></td>
       </tr>
-      <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { ?>
+      <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
+          $time_class = $row_rsRegistrations['class_match_time'];?>
         <tr>
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
-          <td nowrap="nowrap">
-<?php 
-if ($row_rsRegistrations['class_discipline'] == "Kata") {
-$time_class = 3;
-}
-if (($row_rsRegistrations['class_discipline'] == "Kumite") && ($row_rsRegistrations['class_category'] == "Barn")) {
-$time_class = 4;
-}
-if (($row_rsRegistrations['class_discipline'] == "Kumite") && ($row_rsRegistrations['class_category'] <> "Barn")) {
-$time_class = 5;
-}
-echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
+          <td nowrap="nowrap"><?php echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
         </tr>
       <?php }  ?>        
     </table>
@@ -72,3 +62,4 @@ include("includes/footer.php");
 ?>
 </body>
 </html>
+

@@ -1,5 +1,6 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Added $confirm_user_password = ''; in declation and initialising of variables 
+//Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation
 ob_start();
 
 //Access level admin
@@ -216,22 +217,28 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
           <td><input name="confirm_user_password" type="password" id="confirm_user_password" value="<?php echo $row_rsAccount['user_password']; ?>" size="25" /></td>
         </tr>
         <tr>
-          <td>Administrat&ouml;rskonto</td>
+          <td>Kontotyp</td>
           <td><label>
-            <input name="access_level" type="checkbox" id="access_level" value="1" <?php if (!(strcmp($row_rsAccount['access_level'],1))) {echo "checked=\"checked\"";} ?> />
-          </label></td>
+            <input <?php if (!(strcmp($row_rsAccount['access_level'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_0" />
+Admin</label><label>      
+            <input <?php if (!(strcmp($row_rsAccount['access_level'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_1" />
+Coach</label></td>
         </tr>
         <tr>
           <td>Aktivt konto</td>
           <td><label>
-<input name="active" type="checkbox" id="active" value="1" <?php if (!(strcmp($row_rsAccount['active'],1))) {echo "checked=\"checked\"";} ?> />
-          </label></td>
+            <input <?php if (!(strcmp($row_rsAccount['active'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_0" />
+Ja</label><label>      
+            <input <?php if (!(strcmp($row_rsAccount['active'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_1" />
+Nej</label></td>                  
         </tr>
         <tr>
           <td>Bekr&auml;ftat konto</td>
           <td><label>
-<input name="confirmed" type="checkbox" id="confirmed" value="1" <?php if (!(strcmp($row_rsAccount['confirmed'],1))) {echo "checked=\"checked\"";} ?> />
-          </label></td>
+            <input <?php if (!(strcmp($row_rsAccount['confirmed'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_0" />
+Ja</label><label>      
+            <input <?php if (!(strcmp($row_rsAccount['confirmed'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_1" />
+Nej</label></td>                                    
         </tr>
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap"><input type="hidden" name="MM_update" value="AccountForm" /><input name="account_id" type="hidden" id="account_id" value="<?php echo $row_rsAccount['account_id']; ?>" /></td>
@@ -292,3 +299,12 @@ include("includes/footer.php");
 </body>
 </html>
 <?php ob_end_flush();?>
+
+
+
+
+
+
+
+
+

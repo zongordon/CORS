@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Removed $insert_message_id hidden in form due to not needed. 
 ob_start();
 
 //Access level top administrator
@@ -222,7 +222,6 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
         <tr>
           <td><input type="hidden" name="MM_insert_message" value="new_message" />
               <input type="hidden" name="comp_id" value="<?php echo $row_rsCompActive['comp_id']; ?>" />
-          <input name="message_id" type="hidden" id="message_id" value="<?php echo $insert_message_id; ?>" /></td>
           <td><label>
               <input type="submit" name="new_message" id="new_message" value="Nytt meddelande" />
           </label></td>

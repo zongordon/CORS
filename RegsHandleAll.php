@@ -1,5 +1,6 @@
 <?php
-//Changed width of birthdate and gender fields to review the complete data
+//Changed from $row_rsCompActive['comp_id'] in hidden field in form
+//Changed from if ($_SESSION['MM_Account'] === "") { due to error message about undefined index
 
 ob_start();
 session_start();
@@ -41,7 +42,7 @@ $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC);
     }    
   
 //Define $colname_rsSelectedClub before the $_SESSION['MM_Account'] has been created
-if ($_SESSION['MM_Account'] === "") {
+  if (empty($_SESSION['MM_Account'])) {  
     $colname_rsSelectedClub = "";
 }
 else {
@@ -215,7 +216,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
       <tr>
         <td>
           <input name="account_id" type="hidden" id="account_id" value="<?php echo $_SESSION['MM_Account']; ?>" />
-          <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $row_rsCompActive['comp_id']; ?>" />
+          <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>" />
           <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />        </td>
         <td><label>
 	<?php if ($totalRows_rsClubReg == 0) { // Show if recordset empty ?>   
@@ -636,3 +637,5 @@ include("includes/footer.php");
 </body>
 </html>
 <?php ob_end_flush();?>
+
+

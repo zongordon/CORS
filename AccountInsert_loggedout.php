@@ -1,6 +1,6 @@
 <?php
-//Added information about and link to GDPR policy
-
+//Added $confirm_user_password = ''; in declation and initialising of variables
+//Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -27,20 +27,20 @@ include_once("includes/news_sponsors_nav.php");
       <div class="error">
 <?php
 //Declare and initialise variables
-  $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';$confirm_user_password='';
+  $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';$confirm_user_password='';
 // Validate insert account data if button is clicked
  if (filter_input(INPUT_POST,'MM_insert') == 'new_account') {
-    if (filter_input(INPUT_POST,'user_name')) { $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));}
-    if (filter_input(INPUT_POST,'user_password')) { $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));}
-    if (filter_input(INPUT_POST,'confirm_user_password')) { $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');}
-    if (filter_input(INPUT_POST,'confirmed')) { $confirmed = filter_input(INPUT_POST,'confirmed');}     
-    if (filter_input(INPUT_POST,'contact_name')) { $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));}
-    if (filter_input(INPUT_POST,'contact_email')) { $email = filter_input(INPUT_POST,'contact_email');}
-    if (filter_input(INPUT_POST,'contact_phone')) { $contact_phone = filter_input(INPUT_POST,'contact_phone');}
-    if (filter_input(INPUT_POST,'club_name')) { $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));}
-    if (filter_input(INPUT_POST,'active')) { $active = filter_input(INPUT_POST,'active');}
-    if (filter_input(INPUT_POST,'access_level')) { $access_level = filter_input(INPUT_POST,'access_level');}    
-      $captcha=filter_input(INPUT_POST,'captcha');
+    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
+    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
+    $email = filter_input(INPUT_POST,'contact_email');
+    $contact_phone = filter_input(INPUT_POST,'contact_phone');
+    $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));
+    $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));
+    $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');  
+    $access_level = filter_input(INPUT_POST,'access_level');
+    $confirmed = filter_input(INPUT_POST,'confirmed');       
+    $active = filter_input(INPUT_POST,'active');       
+    $captcha=filter_input(INPUT_POST,'captcha');
     $output_form = 'no';
 	    
     if (empty($email)) {
@@ -333,3 +333,5 @@ $stmt_rsAccounts->closeCursor();
 <?php include("includes/footer.php");?>
 </body>
 </html>
+
+

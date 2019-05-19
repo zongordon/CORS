@@ -1,0 +1,32 @@
+﻿v3.2.8
+Number of bug fixes on admin functions and report including minor enhancements
+Enhancements:
+- New pics for new banner: Banner_M_PROD_new.png, Banner_L_Wado.svg
+- Changed size for Banner_M.png to correspond with the new banner pics: news_sponsors_nav.php
+- Changed to select class match time from DB instead of fixed values: Rep_Regs_Time_Class.php
+- Changed from Helpdesk link (https://karateklubben.com/Support/)
+Bug fixes:
+- Removed $insert_message_id hidden in form due to not needed: MessageHandle.php
+- Changed from $row_rsCompActive['comp_id'] in hidden field in form due to error message: RegInsert_reg-php, RegsHandleAll.php
+- Changed from "if ($_SESSION['MM_Account'] === "") {" due to error message about undefined index: RegsHandleAll.php
+- Added $confirm_user_password = ''; in declation and initialising of variables: AccountUpdate.php,AccountInsert.php,
+AccountInsert_loggedout.php,
+- Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation:AccountUpdate.php,
+- Removed "" in session IF statements: news_sponsors_nav.php
+- Changed SQL from number of registrations to contestants in current competition: Rep_Contestants_Club
+AccountInsert.php,AccountInsert_loggedout.php
+Information changes:
+- Added klara_fastigheter.png and link to klarafastigheter.se: news_sponsors_nav.php
+- Added information about consequences for improper coaching of children: index.php; index_during.php
+- Changed from $comp_raffled === "1" as text didn't show a supposed: index.php; index_during.php, news_sponsors_nav.php
+- Changed from "bankgironummer 695‐9175": index.php; index_during.php
+- Changed competition and entering fees
+- Removed information about adults and changed information about repechage
+SQL:
+- ALTER TABLE `classes` ADD `class_team` BOOLEAN NOT NULL DEFAULT FALSE AFTER `tatami_id`;
+- ALTER TABLE `competition` CHANGE `comp_end_date` `comp_end_date` DATE NULL DEFAULT NULL;
+
+Web Server (production/development): Percona Server 5.6.40/Apache 2.4.37
+Database: MySQL 5.6.40/5.7.24
+PHP version: 7.1.27/7.2.14
+
