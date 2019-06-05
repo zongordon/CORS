@@ -1,6 +1,6 @@
 <?php
-//Added class_match_time and changed validation of class_age
-
+//Added class_discipline_variant to be able to select flag or point system for kata
+//Removed $DBconnection = null; as it's included in footer.php
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -32,11 +32,12 @@ include_once("includes/news_sponsors_nav.php");?>
         <div class="error">
 <?php 
 // Update class data if button is clicked and all fields are validated to be correct
- if (filter_input(INPUT_POST,'MM_insert') == 'update_class') {
+ if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
     $colname_rsClass = filter_input(INPUT_POST,'class_id');
     $comp_id = filter_input(INPUT_POST,'comp_id');         
     $class_category = filter_input(INPUT_POST,'class_category');             
     $class_discipline = filter_input(INPUT_POST,'class_discipline');         
+    $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
     $class_gender = filter_input(INPUT_POST,'class_gender');         
     $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
     if (filter_input(INPUT_POST, trim('class_weight_length')) == '') { 
@@ -100,7 +101,7 @@ include_once("includes/news_sponsors_nav.php");?>
     try {
         //Select Class data for selected class
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
+        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
         $stmt_rsClass = $DBconnection->prepare($query1);
         $stmt_rsClass->execute(array(':class_id' => $colname_rsClass));
         $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -139,14 +140,26 @@ include_once("includes/news_sponsors_nav.php");?>
             <td>Disciplin</td>
             <td valign="top"><p>
               <label>
-<input <?php if (!(strcmp($row_rsClass['class_discipline'],"Kata"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kata" id="class_discipline_0" />
-Kata</label>
+                <input <?php if (!(strcmp($row_rsClass['class_discipline'],"Kata"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kata" id="class_discipline_0" />
+              Kata</label>
               <label>
                 <input <?php if (!(strcmp($row_rsClass['class_discipline'],"Kumite"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kumite" id="class_discipline_1" />
                 Kumite</label>
               <br />
             </p></td>
           </tr>
+          <tr>
+            <td>Katasystem</td>
+            <td valign="top"><p>
+              <label>
+                <input <?php if (!(strcmp($row_rsClass['class_discipline_variant'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" />
+              Flaggor</label>
+              <label>
+                <input <?php if (!(strcmp($row_rsClass['class_discipline_variant'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1" />
+              Po&auml;ng</label>
+              <br />
+            </p></td>
+          </tr>          
           <tr>
             <td>T&auml;vlingsklass f&ouml;r (k&ouml;n)</td>
             <td valign="top"><p>
@@ -200,29 +213,20 @@ Kata</label>
             </label></td>
           </tr>
         </table>
-        <input type="hidden" name="MM_insert" value="update_class" />
-        <input name="class_id" type="hidden" id="class_id" value="<?php echo $row_rsClass['class_id']; ?>" />
-        <input type="hidden" name="MM_update" value="update_class" />
+         <input name="class_id" type="hidden" id="class_id" value="<?php echo $row_rsClass['class_id']; ?>" />
         <input type="hidden" name="MM_update" value="update_class" />
     </form>
-  </div>
-</div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
 <?php
-//Kill statement
-$stmt_rsClass->closeCursor();
         }
  	else if ($output_form === 'no') {        
-            if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
-                //Catch anything wrong with query
+                 //Catch anything wrong with query
                 try {
                 require('Connections/DBconnection.php');
                 //UPDATE selected Class
                 $updateSQL = "UPDATE classes SET comp_id = :comp_id, 
                 class_category = :class_category, 
                 class_discipline = :class_discipline, 
+                class_discipline_variant = :class_discipline_variant, 
                 class_gender = :class_gender, 
                 class_gender_category = :class_gender_category, 
                 class_weight_length = :class_weight_length, 
@@ -234,6 +238,7 @@ $stmt_rsClass->closeCursor();
                 $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
                 $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
                 $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
+                $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);
                 $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
                 $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
                 $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
@@ -243,20 +248,29 @@ $stmt_rsClass->closeCursor();
                 $stmt->bindValue(':class_id', $colname_rsClass, PDO::PARAM_INT);
                 $stmt->execute();
                 }   
+                //Catch eny error
                 catch(PDOException $ex) {
-                    echo "An Error occured: ".$ex->getMessage();
-                }   
-
-            $updateGoTo = "ClassesList.php";
-                if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
-                $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
-                $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+                    echo "An Error occured: ".$ex->getMessage();                    
                 }
-            header(sprintf("Location: %s", $updateGoTo));
-            //Kill statement and DB connection
-            $stmt->closeCursor();
-            $DBconnection = null;
-            }
+                    $updateGoTo = "ClassesList.php";
+                    if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+                    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+                    $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+                    }   
+                    header(sprintf("Location: %s", $updateGoTo));
+          
+        //Kill statement
+        $stmt->closeCursor();
         }
-ob_end_flush();
-?>
+//Kill statement
+$stmt_rsClass->closeCursor();?>
+    </div>
+</div>
+<?php include("includes/footer.php");?>
+</body>
+</html>
+<?php ob_end_flush();?>
+
+
+
+

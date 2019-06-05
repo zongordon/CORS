@@ -1,5 +1,5 @@
 <?php
-//Reinstalled function and links to elimination ladders to have access as admin
+//Added class_discipline_variant in table displaying flag or point system for kata
 
 ob_start();
 
@@ -19,7 +19,7 @@ $sorting = filter_input(INPUT_GET, 'sorting');
 try {
     //Select all classes for respective competition
     require('Connections/DBconnection.php');           
-    $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, com.comp_name FROM classes AS c INNER JOIN competition AS com USING (comp_id) WHERE comp_current = 1 ORDER BY $sorting";
+    $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, com.comp_name FROM classes AS c INNER JOIN competition AS com USING (comp_id) WHERE comp_current = 1 ORDER BY $sorting";
     $stmt_rsClasses = $DBconnection->query($query1);
     $totalRows_rsClasses = $stmt_rsClasses->rowCount();
     }   
@@ -67,7 +67,8 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
       <tr>
         <td><strong>T&auml;vling</strong></td>                  
         <td><strong>Disciplin</strong></td>
-        <td><strong>K&ouml;nskategori</strong></td>
+        <td><strong>System</strong></td>
+        <td><strong>K&ouml;ns-kategori</strong></td>
         <td><strong>Kategori</strong></td>
         <td><strong>&Aring;lder</strong></td>
         <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
@@ -81,6 +82,14 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
   <tr>
     <td><?php echo $row_rsClasses['comp_name']; ?></td>      
           <td><?php echo $row_rsClasses['class_discipline']; ?></td>
+          <td><?php if ($row_rsClasses['class_discipline'] === "Kata"){
+                        if ($row_rsClasses['class_discipline_variant'] === 0){ 
+                        echo 'Flaggor';
+                        }
+                        else {
+                        echo 'Po&auml;ng';
+                        }
+                    }; ?></td>
           <td><?php echo $row_rsClasses['class_gender_category']; ?></td>
           <td><?php echo $row_rsClasses['class_category']; ?></td>
           <td><?php echo $row_rsClasses['class_age']; ?></td>
@@ -105,3 +114,9 @@ include("includes/footer.php");
 ?>
 </body>
 </html>
+
+
+
+
+
+

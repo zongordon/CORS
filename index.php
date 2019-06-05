@@ -1,9 +1,6 @@
 ﻿<?php 
-//Added information about consequences for improper coaching of children
-//Changed from $comp_raffled === "1" as text didn't show a supposed
-//Changed from "bankgironummer 695‐9175"
-//Changed competition and entering fees
-//Removed information about adults and changed information about repechage
+//Changed information regarding Mellersta KF
+
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -23,7 +20,7 @@ include_once("includes/news_sponsors_nav.php");
   <div class="feature">
     <img height="199" width="300" alt="" src="img/rotating/rotate.php" />
     <h1>V&auml;lkomna till <?php echo $comp_name;?>!</h1>
-    <p>En barn-, ungdoms- &amp; vuxent&auml;vling f&ouml;r samtliga karatestilar, &ouml;ppen f&ouml;r deltagare som tillh&ouml;r Mellersta Karatef&ouml;rbundet och anordnas av <?php echo $comp_arranger;?>.    </p>
+    <p>En barn- och ungdomst&auml;vling f&ouml;r samtliga karatestilar och som anordnas av <?php echo $comp_arranger;?>.    </p>
     <p>Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></p>
     <p>L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
@@ -72,13 +69,3 @@ include_once("includes/footer.php");
 </body>
 </html>
 <?php ob_end_flush();?>
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 /***********************************************/
-/* Replaced Lazy Posters as sponsor with http://www.sparbanksstiftelsenrekarne.se/
-/* 
+/* Added #apCompBanner, #apDivResultatKataPoint, #apSponsorPic2KataPoint and #apSponsorPic3KataPoint to fit Kata Point System page
+/* Changed height and width on 1spbsrekarne_mynt.png
 /* print.css                             */
 
 /* Used for printing          */
@@ -1040,6 +1040,14 @@ color: #cccccc;
 	width:220px;
 	height:115px;
 }
+#apDivResultatKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 720pt;
+	top: 0pt;        
+	width:220px;
+	height:115px;
+}
 
 #apDivRepechage {
 	position:absolute;
@@ -1057,19 +1065,55 @@ color: #cccccc;
 	left: 10pt;
 	top: 500pt; 
 }
+#apDivPDFKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 350pt;
+	top: 450pt; 
+}
 #apMatchTbl {
 	position:absolute;
 	z-index:1;
 	left: 25pt;
-	top: 100pt;        
+	top: 70pt;        
 }
 #apContTbl {
 	position:absolute;
 	z-index:1;
-        left: 600pt;
-	top: 100pt;
-}	
+        left: 520pt;
+	top: 70pt;
+}
+#apCompBannerKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 150pt;
+	top: -40pt;
+	width:150px;
+	height:27px;
+        background-image: url("img/Comp_Banner.jpg");
+        background-repeat: no-repeat;
+}
+#apCompBanner {
+	position:absolute;
+	z-index:1;
+	left: 150pt;
+	top: 35pt;
+	width:150px;
+	height:27px;
+        background-image: url("img/Comp_Banner.jpg");
+        background-repeat: no-repeat;
+}
 #apSponsorPic1 {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 430pt;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-logo.svg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic1KataPoint {
 	position:absolute;
 	z-index:1;
 	left: 10pt;
@@ -1082,10 +1126,20 @@ color: #cccccc;
 #apSponsorPic2 {
 	position:absolute;
 	z-index:1;
-	left: 640pt;
-	top: 18pt;
-	width:244px;
-	height:65px;
+	left: 600pt;
+	top: 15pt;
+	width:241px;
+	height:55px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic2KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 500pt;
+	top: -50pt;
+	width:241px;
+	height:55px;
         background-image: url("img/sponsors/1spbsrekarne_mynt.png");
         background-repeat: no-repeat;
 }
@@ -1099,6 +1153,68 @@ color: #cccccc;
         background-image: url("img/sponsors/Dental_Estetik_small.png");
         background-repeat: no-repeat;
 }
+#apSponsorPic3KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 650pt;
+	top: 430pt;
+	width:150px;
+	height:104px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
 /*
 
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

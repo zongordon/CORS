@@ -281,6 +281,7 @@ Nej</label></td>
             $stmt_rsAccount->bindValue(':account_id', $account_id, PDO::PARAM_INT);
             $stmt_rsAccount->execute();
             }   
+            //Catch eny error
             catch(PDOException $ex) {
                 echo "An Error occured: ".$ex->getMessage();
             }
@@ -299,6 +300,7 @@ include("includes/footer.php");
 </body>
 </html>
 <?php ob_end_flush();?>
+
 
 
 

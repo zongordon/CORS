@@ -1,6 +1,6 @@
 <?php
-//Added class_match_time and changed validation of class_age
-
+//Added class_discipline_variant to be able to select flag or point system for kata
+//Removed $DBconnection = null; as it's included in footer.php
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -33,6 +33,7 @@ include_once("includes/news_sponsors_nav.php");?>
     $comp_id = filter_input(INPUT_POST,'comp_id');         
     $class_category = filter_input(INPUT_POST,'class_category');             
     $class_discipline = filter_input(INPUT_POST,'class_discipline');         
+    $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
     $class_gender = filter_input(INPUT_POST,'class_gender');         
     $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
     if (filter_input(INPUT_POST, trim('class_weight_length')) === '') { 
@@ -120,12 +121,6 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
 <option value="<?php echo $row_rsCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsCompetitions['comp_id'], $row_rsCompetitions['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsCompetitions['comp_name']?></option>
 <?php
 }
-/*
-    $class_category;             
-    $class_discipline;         
-    $class_gender;         
-    $class_gender_category;
- */
 ?>
 </select>
             </label></td>
@@ -154,6 +149,18 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
                 <br />
             </p></td>
           </tr>
+          <tr>
+            <td>Katasystem</td>
+            <td valign="top"><p>
+              <label>
+                <input type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" checked="checked" />
+              Flaggor</label>
+              <label>
+                <input type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1"/>
+              Po&auml;ng</label>
+              <br />
+            </p></td>
+          </tr>                    
           <tr>
             <td>T&auml;vlingsklass f&ouml;r (k&ouml;n) </td>
             <td valign="top"><p>
@@ -207,25 +214,19 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
         </table>
         <input type="hidden" name="MM_insert" value="new_class" />
     </form>
-  </div>
-</div>
-<?php include("includes/footer.php");?>
-</body>
-</html>
 <?php
   	} 
   	else if ($output_form == 'no') {
-            
-            if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "new_class")) {
             //Catch anything wrong with query
             try {
             //INSERT new class in the database    
             require('Connections/DBconnection.php');             
-            $query1 = "INSERT INTO classes (comp_id, class_category, class_discipline, class_gender, class_gender_category, class_weight_length, class_age, class_fee) VALUES (:comp_id, :class_category, :class_discipline, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee)";
+            $query1 = "INSERT INTO classes (comp_id, class_category, class_discipline, class_discipline_variant, class_gender, class_gender_category, class_weight_length, class_age, class_fee, class_match_time) VALUES (:comp_id, :class_category, :class_discipline, :class_discipline_variant, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee, :class_match_time)";
             $stmt = $DBconnection->prepare($query1);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
             $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
             $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
+            $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);
             $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
             $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
             $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
@@ -234,22 +235,23 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             $stmt->bindValue(':class_match_time', $class_match_time, PDO::PARAM_INT);
             $stmt->execute();
             }   
-            catch(PDOException $ex) {
+            //Catch eny error
+            catch(PDOException $ex) {  
                 echo "An Error occured: ".$ex->getMessage();
-            }   
-  
-            $insertGoTo = "ClassesList.php";
+            }
+                $insertGoTo = "ClassesList.php";
                 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
                 $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
                 $insertGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
                 }
-            header(sprintf("Location: %s", $insertGoTo));
-            //Kill statement 
+                header(sprintf("Location: %s", $insertGoTo));
+
+            //Kill statement
             $stmt->closeCursor();
-            }
-        }
-//Kill statement and DB connection
-$stmt_rsCompetitions->closeCursor();
-$DBconnection = null;
-ob_end_flush();
-?>
+        } ?>
+  </div>
+</div>
+<?php include("includes/footer.php");?>
+</body>
+</html>
+<?php ob_end_flush();?>
