@@ -1,6 +1,5 @@
 <?php 
-//Added $confirm_user_password = ''; in declation and initialising of variables 
-//Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation
+//Added validation class with multiple validation features and removed most of existing validation code
 ob_start();
 
 //Access level admin
@@ -28,14 +27,16 @@ catch(PDOException $ex) {
 }
 
 $pagetitle="&Auml;ndra anv&auml;ndarkonto - admin";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?> 
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -59,24 +60,27 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
     $active = filter_input(INPUT_POST, 'active');
     $access_level = filter_input(INPUT_POST, 'access_level');
     $account_id = filter_input(INPUT_POST, 'account_id');			
-    $output_form = 'no';
-	    
-    if (empty($email)) {
-    // contact_email is blank
-      echo '<h3>Du gl&ouml;mde att fylla i e-post!</h3>';
-      $output_form = 'yes';
-    }  
-    //If contact_email is not blank validate the input and check if it's already registered 
-    else {
-      // Validate contact_email
-      if(valid_email($email)){
-            $output_form = 'no';
-      } 
-      else {
-        // contact_email is invalid because LocalName is bad  
-        echo '<h3>Den ifyllda e-postadressen inneh&aring;ller felaktiga tecken.</h3>';
+    
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+    $val->name('e-post')->value($email)->emailPattern()->required();
+    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);
+    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
         $output_form = 'yes';
-      }
+    }
+    //Validate that email isn't already used
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');               
@@ -90,30 +94,15 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     }   
-
 	if ($totalRows_rsContactemail > 0) {
         // $contact_email is already in use
         echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
         $output_form = 'yes';		
 	}
-
          //Kill statement
         $stmt_rsContactemail->closeCursor();
-    }
  
-    if (empty($contact_phone)) {
-      // $contact_phone is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens telefonnummer.</h3>';
-      $output_form = 'yes';
-    }
-
-    if (empty($user_name)) {
-      // $user_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn.</h3>';
-      $output_form = 'yes';
-    }
-    //If user_name is not blank validate the input and check if it's already registered    
-    else {        
+    //Check if it's already registered    
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');                   
@@ -127,54 +116,20 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     }       
-
 	if ($totalRows_rsUsername > 0) {
         // $user_name is already in use
             echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
             $output_form = 'yes';		
 	}
-        //Kill statement and DB connection
+        //Kill statement
         $stmt_rsUsername->closeCursor();
-    }	
-    
-    if (empty($user_password)) {
-      // $user_password is blank
-      echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord.</h3>';
-      $output_form = 'yes';
-    }
-	
-    if (empty($confirm_user_password)) {
-      // $confirm_user_password is blank
-      echo '<h3>Du gl&ouml;mde att bekr&auml;fta l&ouml;senordet.</h3>';
-      $output_form = 'yes';
-    }
-	
-    if ($user_password != $confirm_user_password) {
-      // $user_password and $confirm_user_password don't match
-      echo '<h3>L&ouml;senorden &auml;r inte identiska.</h3>';
-      $output_form = 'yes';
-    }
-    
-    if (empty($club_name)) {
-      // $club_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn.</h3>';
-      $output_form = 'yes';
-    }
-
-    if (empty($contact_name)) {
-      // $contact_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn.</h3>';
-      $output_form = 'yes';
-    }    
-} 
-
+}	
   else {
     $output_form = 'yes';
-  	}
-	
-  	if ($output_form == 'yes') {
-?>
-      </div>    
+  }
+// Show form if the button Update isn't clicked	
+if ($output_form === 'yes') { ?>
+       </div>    
 <h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara &auml;ndringen p&aring; kontot.  </h3>
   </div>
   <div class="story">
@@ -252,7 +207,7 @@ Nej</label></td>
 <?php
 } 
 	//Save the updated account information if the Update button is clicked and form validated correct 
-  	else if ($output_form == 'no') {
+  	else if ($output_form === 'no') {
             //Catch anything wrong with query
             try {
             require('Connections/DBconnection.php');           
@@ -299,7 +254,7 @@ include("includes/footer.php");
 ?>
 </body>
 </html>
-<?php ob_end_flush();?>
+<?php ob_end_flush();
 
 
 

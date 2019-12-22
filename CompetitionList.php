@@ -1,5 +1,6 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Replaced comp_end_date with comp_start_time in table
+//Truncated $row_rsCompetitions['comp_start_time'] to 5 characters
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -75,8 +76,8 @@ if ($totalRows_rsCompetitions > 0) { // Show if recordset not empty ?>
     <table width="100%" border="1">
     <tr>
       <td><strong>T&auml;vling</strong></td>
-      <td><strong>Startdatum</strong></td>
-      <td><strong>Slutdatum</strong></td>
+      <td><strong>Start-datum</strong></td>
+      <td><strong>Start-tid</strong></td>
       <td><strong>Sista anm&auml;lnings-datum</strong></td>
       <td><strong>Max antal anm&auml;lningar</strong></td>
       <td><strong>Antal anm&auml;lningar</strong></td>      
@@ -117,7 +118,7 @@ catch(PDOException $ex) {
       <tr>
         <td><?php echo $row_rsCompetitions['comp_name']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_start_date']; ?></td>
-        <td><?php echo $row_rsCompetitions['comp_end_date']; ?></td>
+        <td><?php echo substr($row_rsCompetitions['comp_start_time'],0,5); ?></td>
         <td><?php echo $row_rsCompetitions['comp_end_reg_date']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_max_regs']; ?></td>
         <td><?php echo $totalRows_rsRegistrations;?></td>

@@ -1,5 +1,5 @@
-    <?php
-//Changed from $row_rsCompActive['comp_id'] in hidden field in form
+<?php
+//Added validation class with multiple validation features and removed most of existing validation code
 
 ob_start();
 session_start();
@@ -29,14 +29,16 @@ $row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
 $account_id = $_SESSION['MM_AccountId'];
 
 $pagetitle="Registrera egna t&auml;vlande";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?>   
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?>   
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -81,16 +83,23 @@ if ($row_rsClasses['COUNT(class_id)'] > 0) {
      <div class="error">        
 <?php 
 // Validate the club registration form if the "Spara" button is clicked
-    $coach_names = "";
+    $coach_names = '';
 if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") || (filter_input(INPUT_POST,"MM_update_clubregistration") === "update_club_reg")) {
     $coach_names = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'coach_names'), MB_CASE_TITLE,"UTF-8"));
-    $output_form = 'no';
-	
-    if (empty($coach_names)) {
-      // $coach_names is blank
-      echo '<h3>Du gl&ouml;mde att fylla i klubbens coacher!</h3>';
-      $output_form = 'yes';
-    } 
+
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $val->name('klubbens coacher')->value($coach_names)->pattern('text')->required()->min($length);
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
+    }
     if ($output_form === 'no') {
         //Insert new club registration if form validated ok
 	if (filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") {
@@ -182,39 +191,29 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
       <p>L&auml;gg in klubbens t&auml;vlande en och en. Ange namn, f&ouml;delsedatum och k&ouml;n.</p>
         <div class="error">
 <?php 
-    $insert_contestant_name = "";
-    $insert_contestant_birth = "";
-    $insert_contestant_gender = "";
+//Declare and initialise variables
+    $insert_contestant_name = '';$insert_contestant_birth = '';$insert_contestant_gender = '';
 // Validate the contestant input if the button is clicked	
 if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
     $insert_contestant_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contestant_name'), MB_CASE_TITLE,"UTF-8"));    
     $insert_contestant_birth = filter_input(INPUT_POST,'contestant_birth');
     $insert_contestant_gender = filter_input(INPUT_POST,'contestant_gender');
-    $output_form = 'no';
-	
-	echo '<br />';	
-        
-    if (empty($insert_contestant_name)) {
-      // $insert_contestant_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i namn!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($insert_contestant_birth)) {
-      // $insert_contestant_birth is blank
-      echo '<h3>Du gl&ouml;mde att fylla i f&ouml;delsedatum!</h3>';
-      $output_form = 'yes';
-	}
-    if (!empty($insert_contestant_birth) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $insert_contestant_birth)) {
-    // $insert_contestant_birth is wrong format
-    echo '<h3>Du anv&auml;nde fel format p&aring; f&ouml;delsedatum (YYYY-MM-DD)!</h3>';
-    $output_form = 'yes';
-    }	
-    if (empty($insert_contestant_gender)) {	
-      // $insert_contestant_gender is blank
-      echo '<h3>Du gl&ouml;mde att v&auml;lja k&ouml;n.</h3>';
-      $output_form = 'yes';
-    }
- 
+
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $val->name('namn')->value($insert_contestant_name)->pattern('text')->required()->min($length);
+    $val->name('f&ouml;delsedatum')->value($insert_contestant_birth)->datePattern('Y-m-d')->required();
+    $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('text')->required();
+	        
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
+    } 
     if ($output_form === 'no') {		
         //Catch anything wrong with query
         try {
@@ -256,7 +255,7 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
           </label></td>
         </tr>
         <tr>
-          <td>F&ouml;delsedatum (t.ex. 1996-01-31)</td>
+          <td>F&ouml;delsedatum (yyyy-mm-dd)</td>
           <td valign="top"><label>
             <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $insert_contestant_birth; ?>" size="8" maxlength="10"/>
           </label></td>
@@ -286,30 +285,35 @@ $totalRows_rsContestants = $stmt_rsContestants->rowCount();
 <?php       
 // Show if recordset not empty 
 if ($totalRows_rsContestants > 0) {
-    // Validate the contestant form if the button is clicked
-    $contestant_height = "";
-    $class_gender = "";
-    $contestant_gender = "";
+    //Declare and initialise variables
+    $contestant_height = '';$contestant_gender = '';$class_gender ='';
+  // Validate the contestant form if the button is clicked  
   if (filter_input(INPUT_POST,"MM_insert_registration") === "new_registration") {
         $colname_rsClass = filter_input(INPUT_POST,'class_id');
         $contestant_height = filter_input(INPUT_POST,'contestant_height');
         $contestant_gender = filter_input(INPUT_POST,'contestant_gender');    
         $club_reg_id = filter_input(INPUT_POST,'club_reg_id');    
         $contestant_id = filter_input(INPUT_POST,'contestant_id');    
-        $class_gender = $row_rsClassGender['class_gender'];
+        $class_gender = filter_input(INPUT_POST,'class_gender');
 
-        $output_form = 'no';
-	
-	echo '<br />';	
-    	// Check if input is numeric, if $contestant_height is entered	
-    	if (!empty($contestant_height)) {	
-	
-    		if (!ctype_digit($contestant_height)) {	
-      		// contestant_height input is not numeric
-      		echo '<h3>Bara siffror &auml;r till&aring;tet i f&auml;ltet f&ouml;r l&auml;ngd!</h3>';
-      		$output_form = 'yes';
-	    	}
-    	}  
+    $val = new Validation();
+    if(empty($contestant_height)){
+        $contestant_height = 0;
+        $val->name('l&auml;ngd')->value($contestant_height)->pattern('int');
+    }else{    
+    $min = 100;//minimum value of integers
+    $max = 225;//maximum value of integers
+    $val->name('l&auml;ngd')->value($contestant_height)->valuePattern($min,$max);
+    }    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
+    }    
     if ($output_form === 'no') {
                 
         // Search for start number already set for the competition and if not, set start number for the contestant

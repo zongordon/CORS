@@ -1,6 +1,5 @@
 <?php
-//Added $confirm_user_password = ''; in declation and initialising of variables
-//Changed to radio buttons for "Kontotyp", "Aktivt konto" and "Bekräftat konto" and simplified code for validation
+//Added validation class with multiple validation features and removed most of existing validation code
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -11,12 +10,14 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 }
 
 $pagetitle="L&auml;gga till eget konto";
-//Includes Several code functions
-include_once('includes/functions.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");     
+include_once("includes/news_sponsors_nav.php");
 ?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
@@ -29,7 +30,7 @@ include_once("includes/news_sponsors_nav.php");
 //Declare and initialise variables
   $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';$confirm_user_password='';
 // Validate insert account data if button is clicked
- if (filter_input(INPUT_POST,'MM_insert') == 'new_account') {
+ if (filter_input(INPUT_POST,'MM_insert') === 'new_account') {
     $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
     $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
     $email = filter_input(INPUT_POST,'contact_email');
@@ -41,24 +42,29 @@ include_once("includes/news_sponsors_nav.php");
     $confirmed = filter_input(INPUT_POST,'confirmed');       
     $active = filter_input(INPUT_POST,'active');       
     $captcha=filter_input(INPUT_POST,'captcha');
-    $output_form = 'no';
 	    
-    if (empty($email)) {
-    // contact_email is blank
-      echo '<h3>Du gl&ouml;mde att fylla i e-post!</h3>';
-      $output_form = 'yes';
-    }  
-    //If contact_email is not blank validate the input and check if it's already registered 
-    else {
-      // Validate contact_email
-      if(valid_email($email)){
-            $output_form = 'no';
-      } 
-      else {
-        // contact_email is invalid because LocalName is bad  
-        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+    $val->name('e-post')->value($email)->pattern('email')->required();
+    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);    
+    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+    $val->name('tecken i bilden')->value($captcha)->pattern('int')->required()->equal($_SESSION['captcha']);   
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
         $output_form = 'yes';
-      }        
+    }   
+
+    //Validate that email isn't already used
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');               
@@ -78,23 +84,10 @@ include_once("includes/news_sponsors_nav.php");
         echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
         $output_form = 'yes';		
 	}
-         //Kill statement
-        $stmt_rsContactemail->closeCursor();
-    }
-  
-    if (empty($contact_phone)) {
-      // $contact_phone is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens telefonnummer!</h3>';
-      $output_form = 'yes';
-    }
-
-    if (empty($user_name)) {
-      // $user_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
-      $output_form = 'yes';
-    }
-    //If user_name is not blank validate the input and check if it's already registered    
-    else {        
+         //Kill statement and DB connection
+        $stmt_rsContactemail->closeCursor();   
+    
+    //Check if the user name already is registered            
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');                   
@@ -110,48 +103,12 @@ include_once("includes/news_sponsors_nav.php");
         echo "An Error occured: ".$ex->getMessage();
     }       
 	if ($totalRows_rsUsername > 0) {
-            // $user_name is already in use
+        // $user_name is already in use
             echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
             $output_form = 'yes';		
 	}
-        //Kill statement
-        $stmt_rsUsername->closeCursor();
-    }	
-	
-    if (empty($user_password)) {
-      // $user_password is blank
-      echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
-    $output_form = 'yes';
-    }
-	
-    if (empty($confirm_user_password)) {
-      // $confirm_user_password is blank
-      echo '<h3>Du gl&ouml;mde att bekr&auml;fta l&ouml;senordet!</h3>';
-      $output_form = 'yes';
-    }
-	
-    if ($user_password != $confirm_user_password) {
-      // $user_password and $confirm_user_password don't match
-      echo '<h3>L&ouml;senorden var inte identiska!</h3>';
-      $output_form = 'yes';
-    }	
-    
-    if (empty($club_name)) {
-      // $club_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i klubbens namn!</h3>';
-      $output_form = 'yes';
-    }
-
-    if (empty($contact_name)) {
-      // $contact_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i kontaktpersonens namn!</h3>';
-      $output_form = 'yes';
-    }
-    
-    if ($captcha <> $_SESSION['captcha']){
-      echo '<h3>Du skrev inte in samma teckan som i bilden. Försök igen!</h3>';
-      $output_form = 'yes';
-    }    
+        //Kill statement and DB connection
+        $stmt_rsUsername->closeCursor();	
  } 
  else {
     $output_form = 'yes';
@@ -172,7 +129,7 @@ if ($output_form === 'yes') {
       </div>       
 <h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
 <p><strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
-    <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i!</br></p>
+    <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</p>
 
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
       <table width="450" border="0">

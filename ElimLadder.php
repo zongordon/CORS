@@ -74,6 +74,7 @@ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförs
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="description" content="<?php echo $pagedescription ?>" />
 <meta name="keywords" content="<?php echo $pagekeywords ?>" />
+
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="print.css" type="text/css" media="print" /> 
 <link rel="stylesheet" href="3_elimladder.css" type="text/css" media="screen"/>
@@ -1631,6 +1632,8 @@ $DBconnection = null;
 </div>
 </body>
 </html>
+
+
 
 
 

@@ -11,7 +11,7 @@
  *
  * @author zongordon
  */
-class ClassCalculations {
+class ClassCalculations_1 {
     public $registrations;
     public $repechage;
     public $roundrobin;
@@ -65,7 +65,7 @@ class ClassCalculations {
         
     }
 }
-$max_matches = new ClassCalculations;
+$max_matches = new ClassCalculations_1;
 $max_matches->limit_roundrobin = 3;
 $max_matches->registrations = 2;
 $max_matches->repechage = 'yes';

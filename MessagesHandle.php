@@ -1,5 +1,6 @@
 <?php
-//Removed $insert_message_id hidden in form due to not needed. 
+//Added validation class with multiple validation features and removed most of existing validation code
+//Removed some obsolete div tags to change layout
 ob_start();
 
 //Access level top administrator
@@ -35,58 +36,53 @@ catch(PDOException $ex) {
     echo "An Error occured with queryX: ".$ex->getMessage();
 }
 $pagetitle="Hantera meddelanden";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?>  
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div class ="content">    
-    <div class="story">
+<div id ="content">    
+    <div class ="feature">        
 <?php if ($totalRows_rsMessages == 0) { // Show if recordset empty ?>
-        <div class="error">        
         <h3>Det finns inga nyheter &auml;n!</h3>
-        </div>
 <?php } ?>
-    </div>
-    <div class="feature">
 <h3>Hantera meddelanden och nyheter p&aring; sajten.</h3>
         <div class="error">
 <?php 
-    $insert_message_subject = "";
-    $insert_message = "";
-    $insert_message_how = "";
-    $insert_message_to = "";
+    //Declare and initialise variables
+    $insert_message_subject = '';$insert_message = '';$insert_message_how = '';$insert_message_to = '';
  // Validate the contestant form if the button is clicked
 if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
     $insert_message_subject = encodeToUtf8(filter_input(INPUT_POST,'message_subject'));
     $insert_message = encodeToUtf8(filter_input(INPUT_POST,'message'));
     $insert_message_how = filter_input(INPUT_POST,'message_how');
     $insert_message_to = filter_input(INPUT_POST,'message_to');
-    $insert_message_from = "tunacup@karateklubben.com";
-    $output_form = 'no';
-     
-    if (empty($insert_message_subject)) {
-      // $insert_message_subject is blank
-      echo '<h3>Du gl&ouml;mde att fylla i titel!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($insert_message)) {
-      // $insert_message_subject is blank
-      echo '<h3>Du gl&ouml;mde att fylla i meddelandet!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($insert_message_how)) {	
-      // $insert_message_how is blank
-      echo '<h3>Du gl&ouml;mde att v&auml;lja hur meddelandet ska sparas/skickas.</h3>';
-      $output_form = 'yes';
-    }
+    $insert_message_from = $comp_email;
+
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $val->name('titel')->value($insert_message_subject)->pattern('text')->required()->min($length);
+    $val->name('meddelande')->value($insert_message)->pattern('text')->required()->min($length);
+    $val->name('hur meddelandet ska sparas/skickas')->value($insert_message_how)->pattern('alpha')->required();
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
+    }       
     // $insert_message_how is set to send emails
     if ($insert_message_how === 'EmailOnly' || $insert_message_how === 'SiteAndEmail') {
         if (empty($insert_message_to)) {

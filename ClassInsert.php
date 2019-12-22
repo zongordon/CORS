@@ -1,6 +1,5 @@
 <?php
-//Added class_discipline_variant to be able to select flag or point system for kata
-//Removed $DBconnection = null; as it's included in footer.php
+//Added validation class with multiple validation features and removed most of existing validation code
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -12,14 +11,16 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 }
 
 $pagetitle="L&auml;gga till t&auml;vlingsklass";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?> 
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -28,6 +29,8 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
         <div class="error">     
 <?php
+//Declare and initialise variables
+$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
 // Insert new class if button is clicked and all fields are validated to be correct
  if (filter_input(INPUT_POST,'MM_insert') && filter_input(INPUT_POST,'MM_insert') == 'new_class') {
     $comp_id = filter_input(INPUT_POST,'comp_id');         
@@ -45,49 +48,31 @@ include_once("includes/news_sponsors_nav.php");?>
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
     $class_match_time = filter_input(INPUT_POST, trim('class_match_time'));
-    $output_form = 'no';
-        
-        if (empty($class_age)) {
-      // $class_age is blank
-      echo '<h3>Du gl&ouml;mde att fylla i &aring;lder f&ouml;r klassen!</h3>';
-      $output_form = 'yes';
+
+    $val = new Validation();
+    $val->name('vikt-/l&auml;ngdkategori')->value($class_weight_length)->pattern('text');
+    $val->name('avgift f&ouml;r klassen')->value($class_fee)->pattern('int')->required();
+    $val->name('ber&auml;knad matchtid f&ouml;r klassen')->value($class_match_time)->pattern('float')->required();
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
     }
-    else {
         if (!ctype_digit($class_age) && !preg_match('/(\d{2})-(\d{2})/', $class_age)) {	
         // $class_age input is not numeric and doesn't match "nn-nn"
         echo '<h3>Det ska antingen vara bara siffror eller "nn-nn" f&ouml;r &aring;lder f&ouml;r klassen!</h3>';
         $output_form = 'yes';
-        }     
-    }
+        }      
     //If age < 10 remove and then add a "0" for better sorting
     if ($class_age < 10) {
         $class_age = ltrim($class_age, 0);
         $class_age = '0'.$class_age;
-    }       
-    if (empty($class_fee)) {
-      // $class_fee is blank
-      echo '<h3>Du gl&ouml;mde att fylla i avgift f&ouml;r klassen!</h1>';
-      $output_form = 'yes';
-    }
-    else {
-        if (!ctype_digit($class_fee)) {	
-        // $class_fee input is not numeric
-        echo '<h3>Bara siffror &auml;r till&aring;tet i f&auml;ltet f&ouml;r avgift!</h1>';
-        $output_form = 'yes';
-        }     
-    }
-    if (empty($class_match_time)) {
-      // $class_match_time is blank
-      echo '<h3>Du gl&ouml;mde att fylla i ber&auml;knad matchtid f&ouml;r klassen!</h3>';
-      $output_form = 'yes';
-    }
-    else {
-        if (!is_numeric($class_match_time)) {	
-        // $class_match_time is not numeric
-        echo '<h3>Bara tal eller decimaltal (t.ex. 3.8) &auml;r till&aring;tet i f&auml;ltet f&ouml;r ber&auml;knad matchtid!</h3>';
-        $output_form = 'yes';
-        }     
-    }    
+    }          
  }
  else {  
     $output_form = 'yes';
@@ -118,7 +103,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php
 while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {  
 ?>
-<option value="<?php echo $row_rsCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsCompetitions['comp_id'], $row_rsCompetitions['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsCompetitions['comp_name']?></option>
+<option value="<?php echo $row_rsCompetitions['comp_id']?>"<?php if (!(strcmp($row_rsCompetitions['comp_id'], $comp_id))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsCompetitions['comp_name']?></option>
 <?php
 }
 ?>
@@ -129,11 +114,11 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             <td>&Aring;lderskategori</td>
             <td><label>
               <select name="class_category" id="class_category">
-                <option value="Senior">Senior</option>
-                <option value="U21">U21</option>
-                <option value="Junior">Junior</option>
-                <option value="Kadett">Kadett</option>
-                <option value="Barn">Barn</option>
+                <option value="Senior" <?php if (!(strcmp("Senior", $class_category))) {echo "selected=\"selected\"";} ?>>Senior</option>
+                <option value="U21" <?php if (!(strcmp("U21", $class_category))) {echo "selected=\"selected\"";} ?>>U21</option>
+                <option value="Junior" <?php if (!(strcmp("Junior", $class_category))) {echo "selected=\"selected\"";} ?>>Junior</option>
+                <option value="Kadett" <?php if (!(strcmp("Kadett", $class_category))) {echo "selected=\"selected\"";} ?>>Kadett</option>
+                <option value="Barn" <?php if (!(strcmp("Barn", $class_category))) {echo "selected=\"selected\"";} ?>>Barn</option>
               </select>
             </label></td>
           </tr>
@@ -141,10 +126,10 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             <td>Disciplin</td>
             <td valign="top"><p>
               <label>
-                <input type="radio" name="class_discipline" value="Kata" id="class_discipline_0" checked="checked"/>
+                <input <?php if (!(strcmp($class_discipline,"Kata"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kata" id="class_discipline_0" />                
               Kata</label>
               <label>
-              <input type="radio" name="class_discipline" value="Kumite" id="class_discipline_1" />
+              <input <?php if (!(strcmp($class_discipline,"Kumite"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kumite" id="class_discipline_1" />                              
                   Kumite</label>
                 <br />
             </p></td>
@@ -153,10 +138,10 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             <td>Katasystem</td>
             <td valign="top"><p>
               <label>
-                <input type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" checked="checked" />
+               <input <?php if (!(strcmp($class_discipline_variant,0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" />                   
               Flaggor</label>
               <label>
-                <input type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1"/>
+               <input <?php if (!(strcmp($class_discipline_variant,1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1" />                                     
               Po&auml;ng</label>
               <br />
             </p></td>
@@ -165,13 +150,13 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             <td>T&auml;vlingsklass f&ouml;r (k&ouml;n) </td>
             <td valign="top"><p>
               <label>
-                <input type="radio" name="class_gender" value="Man" id="class_gender_0" checked="checked"/>
+               <input <?php if (!(strcmp($class_gender,"Man"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Man" id="class_gender_0" />                                                       
                 Man</label>
               <label>
-                <input type="radio" name="class_gender" value="Kvinna" id="class_gender_1" />
+               <input <?php if (!(strcmp($class_gender,"Kvinna"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Kvinna" id="class_gender_1" />                                                                         
               Kvinna</label>
               <label>
-                <input type="radio" name="class_gender" value="Mix" id="class_gender_2" />
+               <input <?php if (!(strcmp($class_gender,"Mix"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Mix" id="class_gender_2" />                                                                                           
               Mix</label>              
             </p></td>
           </tr>
@@ -179,31 +164,31 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             <td>K&ouml;nskategori</td>
             <td><label>
               <select name="class_gender_category" id="class_gender_category">
-                <option value="Herrar">Herrar</option>
-                <option value="Damer">Damer</option>
-                <option value="Pojkar">Pojkar</option>
-                <option value="Flickor">Flickor</option>
-                <option value="Mix">Mix</option>                
+                <option value="Herrar" <?php if (!(strcmp("Herrar", $class_gender_category))) {echo "selected=\"selected\"";} ?>>Herrar</option>
+                <option value="Damer" <?php if (!(strcmp("Damer", $class_gender_category))) {echo "selected=\"selected\"";} ?>>Damer</option>
+                <option value="Pojkar" <?php if (!(strcmp("Pojkar", $class_gender_category))) {echo "selected=\"selected\"";} ?>>Pojkar</option>
+                <option value="Flickor" <?php if (!(strcmp("Flickor", $class_gender_category))) {echo "selected=\"selected\"";} ?>>Flickor</option>
+                <option value="Mix" <?php if (!(strcmp("Mix", $class_gender_category))) {echo "selected=\"selected\"";} ?>>Mix</option>    
               </select>
             </label></td>
           </tr>
           <tr>
             <td>Vikt- eller l&auml;ngdkategori</td>
             <td><label>
-              <input name="class_weight_length" type="text" id="class_weight_length" value="<?php $class_weight_length ?>" size="15" />
+              <input name="class_weight_length" type="text" id="class_weight_length" value="<?php echo $class_weight_length ?>" size="15" />
             </label></td>
           </tr>
           <tr>
             <td>&Aring;lder eller namn p&aring; klass</td>
-            <td><input name="class_age" type="text" id="class_age" value="<?php $class_age ?>" size="15" /></td>
+            <td><input name="class_age" type="text" id="class_age" value="<?php echo $class_age ?>" size="15" /></td>
           </tr>
           <tr>
             <td>Avgift</td>
-            <td><input name="class_fee" type="number" id="class_fee" value="<?php $class_fee ?>" size="15" /></td>
+            <td><input name="class_fee" type="number" id="class_fee" value="<?php echo $class_fee ?>" size="15" /></td>
           </tr>
           <tr>
-            <td>Ber&auml;knad matchtid</td>
-            <td><input name="class_match_time" type="text" id="class_match_time" value="<?php $class_match_time ?>" size="15" /></td>
+            <td>Ber&auml;knad matchtid (heltal eller decimaltal)</td>
+            <td><input name="class_match_time" type="text" id="class_match_time" value="<?php echo $class_match_time ?>" size="15" /></td>
           </tr>          
           <tr>
             <td>&nbsp;</td>

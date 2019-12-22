@@ -1,6 +1,6 @@
 <?php
-//Added class_discipline_variant to be able to select flag or point system for kata
-//Removed $DBconnection = null; as it's included in footer.php
+//Added validation class with multiple validation features and removed most of existing validation code
+//Removed duplicate entries in list for class_category
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -15,14 +15,16 @@ $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'))
 $colname_rsClass = filter_input(INPUT_GET, 'class_id');
     
 $pagetitle="Uppdatera t&auml;vlingsklass";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?> 
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -31,6 +33,8 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class ="feature">
         <div class="error">
 <?php 
+//Declare and initialise variables
+$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
 // Update class data if button is clicked and all fields are validated to be correct
  if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
     $colname_rsClass = filter_input(INPUT_POST,'class_id');
@@ -49,49 +53,31 @@ include_once("includes/news_sponsors_nav.php");?>
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
     $class_match_time = filter_input(INPUT_POST, trim('class_match_time'));
-    $output_form = 'no';
-        
-    if (empty($class_age)) {
-      // $class_age is blank
-      echo '<h3>Du gl&ouml;mde att fylla i &aring;lder f&ouml;r klassen!</h3>';
-      $output_form = 'yes';
+
+    $val = new Validation();
+    $val->name('vikt-/l&auml;ngdkategori')->value($class_weight_length)->pattern('text');
+    $val->name('avgift f&ouml;r klassen')->value($class_fee)->pattern('int')->required();
+    $val->name('ber&auml;knad matchtid f&ouml;r klassen')->value($class_match_time)->pattern('float')->required();
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
+        $output_form = 'yes';
     }
-    else {
         if (!ctype_digit($class_age) && !preg_match('/(\d{2})-(\d{2})/', $class_age)) {	
         // $class_age input is not numeric and doesn't match "nn-nn"
         echo '<h3>Det ska antingen vara bara siffror eller "nn-nn" f&ouml;r &aring;lder f&ouml;r klassen!</h3>';
         $output_form = 'yes';
-        }     
-    }
+        }      
     //If age < 10 remove and then add a "0" for better sorting
     if ($class_age < 10) {
         $class_age = ltrim($class_age, 0);
         $class_age = '0'.$class_age;
-    }       
-    if (empty($class_fee)) {
-      // $class_fee is blank
-      echo '<h3>Du gl&ouml;mde att fylla i avgift f&ouml;r klassen!</h3>';
-      $output_form = 'yes';
-    }
-    else {
-        if (!ctype_digit($class_fee)) {	
-        // $class_fee input is not numeric
-        echo '<h3>Bara siffror &auml;r till&aring;tet i f&auml;ltet f&ouml;r avgift!</h3>';
-        $output_form = 'yes';
-        }     
-    }
-    if (empty($class_match_time)) {
-      // $class_match_time is blank
-      echo '<h3>Du gl&ouml;mde att fylla i ber&auml;knad matchtid f&ouml;r klassen!</h3>';
-      $output_form = 'yes';
-    }
-    else {
-        if (!is_numeric($class_match_time)) {	
-        // $class_match_time is not numeric
-        echo '<h3>Bara tal eller decimaltal (t.ex. 3.8) &auml;r till&aring;tet i f&auml;ltet f&ouml;r ber&auml;knad matchtid!</h3>';
-        $output_form = 'yes';
-        }     
-    }
+    }          
  }
  else {  
     $output_form = 'yes';
@@ -132,7 +118,6 @@ include_once("includes/news_sponsors_nav.php");?>
                 <option value="Junior" <?php if (!(strcmp("Junior", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Junior</option>
                 <option value="Kadett" <?php if (!(strcmp("Kadett", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Kadett</option>
                 <option value="Barn" <?php if (!(strcmp("Barn", $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>>Barn</option>
-<option value="<?php echo $row_rsClass['class_category']?>"<?php if (!(strcmp($row_rsClass['class_category'], $row_rsClass['class_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_category']?></option>
               </select>
             </label></td>
           </tr>

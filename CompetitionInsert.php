@@ -1,6 +1,6 @@
 <?php
-//Added :comp_limit_roundrobin to $insertSQL
-
+//Added validation class with multiple validation features and removed most of existing validation code
+//Removed client side date format for date input fields
 ob_start();
 
 //Access level top administrator
@@ -12,14 +12,16 @@ if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
 $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
 $pagetitle="L&auml;gga till t&auml;vling";
-// Includes Several code functions
-include_once('includes/functions.php');
-//Includes Restrict access code function
-include_once('includes/restrict_access.php');
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
 // Includes HTML Head
 include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?>  
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?>  
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -28,18 +30,8 @@ include_once("includes/news_sponsors_nav.php");?>
    <div class="feature">     
       <div class="error">
 <?php
-//Initiate global variables
-global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp_current, $comp_arranger, $comp_email, $comp_url, $comp_max_regs, $comp_limit_roundrobin;;
-    $comp_name = "";
-    $comp_start_time = "";    
-    $comp_start_date = "";
-    $comp_end_reg_date = "";
-    $comp_arranger = "";
-    $comp_email = "";
-    $comp_url = "";
-    $comp_max_regs = "";
-    $comp_current = "";
-    $comp_limit_roundrobin = "";
+//Declare and initialise variables
+$comp_name = '';$comp_start_time = '';$comp_start_date = '';$comp_end_reg_date = '';$comp_arranger = '';$comp_email = '';$comp_url = '';$comp_max_regs = '';$comp_current = '';$comp_limit_roundrobin = '';
 //Validate the form if button is clicked
  if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
     $comp_name = encodeToUtf8(filter_input(INPUT_POST,'comp_name'));
@@ -52,109 +44,34 @@ global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp
     $comp_max_regs = filter_input(INPUT_POST,'comp_max_regs');
     $comp_current = filter_input(INPUT_POST,'comp_current');
     $comp_limit_roundrobin = filter_input(INPUT_POST,'comp_limit_roundrobin');
-    $output_form = 'no';
 
-    if (empty($comp_name)) {
-      // $comp_name is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens namn!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($comp_start_time)) {
-      // $comp_start_time is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens starttid!</h3>';
-      $output_form = 'yes';
-    }    
-    if (!empty($comp_start_time) && !preg_match('#^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$#', $comp_start_time)) {
-    // $comp_start_time is not a time format
-    echo '<h3>Du anv&auml;nde annat format &auml;n "hh:mm" eller "h:mm" f&ouml;r t&auml;vlingens starttid!</h3>';
-    $output_form = 'yes';
-    }	                    
-    if (empty($comp_start_date)) {
-      // $comp_start_date is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens startdatum!</h3>';
-      $output_form = 'yes';
-    }
-    if (!empty($comp_start_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_start_date)) {
-    // $comp_start_date is wrong format
-    echo '<h3>Du anv&auml;nde fel format p&aring; t&auml;vlingens startdatum!</h3>';
-    $output_form = 'yes';
-    }	    
-    if (empty($comp_end_reg_date)) {
-      // $comp_end_reg_date is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens sista anm&auml;lningsdag!</h3>';
-      $output_form = 'yes';
-    }
-    if (!empty($comp_end_reg_date) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $comp_end_reg_date)) {
-    // $comp_end_reg_date is wrong format
-    echo '<h3>Du anv&auml;nde fel format p&aring; sista anm&auml;lningsdag!</h3>';
-    $output_form = 'yes';
-    }	            
-    if (empty($comp_arranger)) {
-      // $comp_arranger is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens arrang&ouml;r!</h3>';
-      $output_form = 'yes';
-    }
-    if (empty($comp_email)) {
-      // $comp_email is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingsarrang&ouml;rens mejladresss!</h3>';
-      $output_form = 'yes';
-    }
-    //If comp_email is not blank validate the input 
-    else {
-      // Validate contact_email
-      if(!valid_email($comp_email)){
-        // comp_email is invalid because LocalName is bad  
-        echo '<h3>Den ifyllda e-postadressen &auml;r inte giltig.</h3>';
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $min = 3;//minimum value of integers
+    $max = 5;//maximum value of integers
+    $val->name('t&auml;vlingens namn')->value($comp_name)->pattern('text')->required()->min($length);
+    $val->name('starttid')->value($comp_start_time)->timePattern()->required();
+    $val->name('startdatum')->value($comp_start_date)->datePattern('Y-m-d')->required();    
+    $val->name('sista anm&auml;lmingsdatum')->value($comp_end_reg_date)->datePattern('Y-m-d')->required();    
+    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('text')->required()->min($length);
+    $val->name('e-post')->value($comp_email)->emailPattern()->required();
+    $val->name('t&auml;vlingssajten')->value($comp_url)->urlPattern()->required();
+    $val->name('max antal anm&auml;lningar')->value($comp_max_regs)->pattern('int')->required();
+    $val->name('gr&auml;ns f&ouml;r round robin')->value($comp_limit_roundrobin)->valuePattern($min,$max)->required();
+    
+    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<h3>'.$error.'</h3></br>';
+        }
         $output_form = 'yes';
-      }
     }
-    if (empty($comp_url)) {
-      // $comp_url is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens webbadress!</h3>';
-      $output_form = 'yes';
-    }  
-    //If comp_url is not blank validate the input 
-    else {
-      // Remove all illegal characters from a url
-      $comp_url = filter_var($comp_url, FILTER_SANITIZE_URL);        
-      // Validate comp_url
-      if(!filter_var($comp_url, FILTER_VALIDATE_URL)){
-        // comp_url is invalid   
-        echo '<h3>Den ifyllda webbadressen &auml;r inte giltig.</h3>';
-        $output_form = 'yes';
-      } 
-    }         
-    if (empty($comp_max_regs)) {
-      // $comp_max_regs is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens maximala antal anm&auml;lningar!</h3>';
-      $output_form = 'yes';
-    }    
-    if (!empty($comp_max_regs) && !is_numeric($comp_max_regs)) {
-    // $comp_max_regs is not a number
-    echo '<h3>Du anv&auml;nde annat format &auml;n siffror f&ouml;r max antal anm&auml;lningar!</h3>';
-    $output_form = 'yes';
-    }	 
-    if (empty($comp_limit_roundrobin)) {
-      // $comp_limit_roundrobin is blank
-      echo '<h3>Du gl&ouml;mde att fylla i t&auml;vlingens gr&auml;ns f&ouml;r round robin!</h3>';
-      $output_form = 'yes';
-    }        
-    if (!empty($comp_limit_roundrobin) && !is_numeric($comp_limit_roundrobin)) {
-    // $comp_limit_roundrobin is not a number
-    echo '<h3>Du anv&auml;nde annat format &auml;n siffror f&ouml;r t&auml;vlingens gr&auml;ns f&ouml;r round robin!</h3>';
-    $output_form = 'yes';
-    }	                
-    if (!empty($comp_limit_roundrobin) && is_numeric($comp_limit_roundrobin) && $comp_limit_roundrobin > 5) {
-    // $comp_limit_roundrobin is more than 5 (max allowed)
-    echo '<h3>Du satte gr&auml;nsen f&ouml;r round robin &ouml;ver 5, vilket inte &auml;r till&aring;tet!</h3>';
-    $output_form = 'yes';
-    }	                        
-} 
-
+ }
  else {
     $output_form = 'yes';
  }
-
  if ($output_form == 'yes') {
 ?>  
        </div>         
@@ -169,37 +86,37 @@ global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp
             </label></td>
           </tr>
           <tr>
-            <td>Starttid</td>
+            <td>Starttid <br/>(hh:mm eller h:mm)</td>
             <td><label>
-                    <input type="text" name="comp_start_time" id="comp_start_time" value="<?php echo $comp_start_time ?>" size="5"/>
+                    <input type="text" name="comp_start_time" id="comp_start_time" value="<?php echo substr($comp_start_time,0,5) ?>" size="2"/>
             </label></td>
           </tr>          
           <tr>
-            <td>Startdatum</td>
+            <td>Startdatum <br/>(yyyy-mm-dd)</td>
             <td><label>
-              <input type="date" name="comp_start_date" id="comp_start_date" value="<?php echo $comp_start_date ?>" size="32"/>
+              <input type="text" name="comp_start_date" id="comp_start_date" value="<?php echo $comp_start_date ?>" size="8" maxlength="10"/>
             </label></td>
           </tr>
           <tr>
-            <td>Sista anm&auml;lningsdag</td>
+            <td>Sista anm&auml;lningsdag <br/>(yyyy-mm-dd)</td>
             <td><label>
-              <input type="date" name="comp_end_reg_date" id="comp_end_reg_date" value="<?php echo $comp_end_reg_date ?>" size="32"/>
+              <input type="text" name="comp_end_reg_date" id="comp_end_reg_date" value="<?php echo $comp_end_reg_date ?>" size="8" maxlength="10"/>
             </label></td>
           </tr>
           <tr>
-            <td>T&auml;vlingens arrang&ouml;r:</td>
+            <td>T&auml;vlingens arrang&ouml;r</td>
             <td><label>
               <input type="text" name="comp_arranger" id="comp_arranger" value="<?php echo $comp_arranger ?>" size="32"/>
           </label></td>
           </tr>
           <tr>
-            <td>T&auml;vlingsarrang&ouml;rens mejladress:</td>
+            <td>T&auml;vlingsarrang&ouml;rens mejladress</td>
             <td><label>
               <input type="text" name="comp_email" id="comp_email" value="<?php echo $comp_email ?>" size="32"/>
             </label></td>
           </tr>
           <tr>
-            <td>T&auml;vlingens webbadress:</td>
+            <td>T&auml;vlingens webbadress<br/>(http://sajt.com)</td>
             <td><label>
               <input type="text" name="comp_url" id="comp_url" value="<?php echo $comp_url ?>" size="32"/>
             </label></td>
@@ -211,7 +128,7 @@ global $comp_name, $comp_start_time, $comp_start_date, $comp_end_reg_date, $comp
             </label></td>
           </tr>
         <tr>
-            <td>Gr&auml;ns f&ouml;r round robin:</td>
+            <td>Gr&auml;ns f&ouml;r round robin<br/>(alla m&ouml;ter alla; 3-5)</td>
             <td><label>
               <input name="comp_limit_roundrobin" type="number" id="comp_limit_roundrobin" value="<?php echo $comp_limit_roundrobin ?>"/>              
             </label></td>
