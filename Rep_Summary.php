@@ -1,7 +1,6 @@
 <?php 
-//Removed kill DB as it's included in footer.php
-//Changed queries to SELECT COUNT(*) instead of simple SELECT
-//Added numerous queries for statistics
+//Excluded teams when counting contestants for the active competition
+
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -13,7 +12,9 @@ $MM_donotCheckaccess = "false";
 try {
 // Count clubs with registered contestants, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsAccounts = "SELECT COUNT(DISTINCT account_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+$query_rsAccounts = "SELECT COUNT(DISTINCT account_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) "
+        . "INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE comp_current = 1";
 $stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
 $row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -23,7 +24,9 @@ $row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count classes with registered contestants, for the active competition
-$query_rsClasses = "SELECT COUNT(DISTINCT class_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+$query_rsClasses = "SELECT COUNT(DISTINCT class_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) "
+        . "INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE comp_current = 1";
 $stmt_rsClasses = $DBconnection->query($query_rsClasses);
 $row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -33,7 +36,9 @@ $row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count registrations for the active competition
-$query_rsRegistrations = "SELECT COUNT(reg_id) as total FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+$query_rsRegistrations = "SELECT COUNT(reg_id) as total FROM registration AS re  INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE comp_current = 1";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
 $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -43,7 +48,9 @@ $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count potential contestants for the active competition  
-$query_rsMembers = "SELECT COUNT(DISTINCT contestant_id) as total FROM contestants AS co INNER JOIN account AS ac USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) WHERE comp_current = 1";
+$query_rsMembers = "SELECT COUNT(DISTINCT contestant_id) as total FROM contestants AS co INNER JOIN account AS ac "
+        . "USING(account_id) INNER JOIN clubregistration AS cl USING(account_id) INNER JOIN competition AS com USING(comp_id) "
+        . "WHERE comp_current = 1";
 $stmt_rsMembers = $DBconnection->query($query_rsMembers);
 $row_rsMembers = $stmt_rsMembers->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -52,8 +59,10 @@ $row_rsMembers = $stmt_rsMembers->fetch(PDO::FETCH_ASSOC);
     
 //Catch anything wrong with query
 try {
-// Count contestants for the active competition
-$query_rsContestants = "SELECT COUNT(DISTINCT contestant_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1";
+// Count contestants for the active competition, excluding teams
+$query_rsContestants = "SELECT COUNT(DISTINCT contestant_id) as total FROM registration AS re INNER JOIN classes AS cl "
+        . "USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com "
+        . "USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 AND contestant_team = 0";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -63,7 +72,9 @@ $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count contestants in Kata in the active competition
-$query_rsKata = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND comp_current = 1";
+$query_rsKata = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kata' AND comp_current = 1";
 $stmt_rsKata = $DBconnection->query($query_rsKata);
 $row_rsKata = $stmt_rsKata->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -73,7 +84,9 @@ $row_rsKata = $stmt_rsKata->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count adult contestants in Kata in the active competition
-$query_rsKataAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND class_category <> 'Barn' AND comp_current = 1";
+$query_rsKataAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kata' AND class_category <> 'Barn' AND comp_current = 1";
 $stmt_rsKataAdult = $DBconnection->query($query_rsKataAdult);
 $row_rsKataAdult = $stmt_rsKataAdult->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -83,7 +96,9 @@ $row_rsKataAdult = $stmt_rsKataAdult->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count children contestants in Kata in the active competition
-$query_rsKataChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kata' AND class_category = 'Barn' AND comp_current = 1";
+$query_rsKataChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kata' AND class_category = 'Barn' AND comp_current = 1";
 $stmt_rsKataChildren = $DBconnection->query($query_rsKataChildren);
 $row_rsKataChildren = $stmt_rsKataChildren->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -93,7 +108,9 @@ $row_rsKataChildren = $stmt_rsKataChildren->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count contestants in Kumite in the active competition
-$query_rsKumite = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND comp_current = 1";
+$query_rsKumite = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kumite' AND comp_current = 1";
 $stmt_rsKumite = $DBconnection->query($query_rsKumite);
 $row_rsKumite = $stmt_rsKumite->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -103,7 +120,9 @@ $row_rsKumite = $stmt_rsKumite->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count adult contestants in Kumite in the active competition
-$query_rsKumiteAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND class_category <> 'Barn' AND comp_current = 1";
+$query_rsKumiteAdult= "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kumite' AND class_category <> 'Barn' AND comp_current = 1";
 $stmt_rsKumiteAdult = $DBconnection->query($query_rsKumiteAdult);
 $row_rsKumiteAdult = $stmt_rsKumiteAdult->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
@@ -113,7 +132,9 @@ $row_rsKumiteAdult = $stmt_rsKumiteAdult->fetch(PDO::FETCH_ASSOC);
 //Catch anything wrong with query
 try {
 // Count children contestants in Kumite in the active competition
-$query_rsKumiteChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE class_discipline = 'Kumite' AND class_category = 'Barn' AND comp_current = 1";
+$query_rsKumiteChildren = "SELECT COUNT(reg_id) as total FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN "
+        . "contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE class_discipline = 'Kumite' AND class_category = 'Barn' AND comp_current = 1";
 $stmt_rsKumiteChildren = $DBconnection->query($query_rsKumiteChildren);
 $row_rsKumiteChildren = $stmt_rsKumiteChildren->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {

@@ -1,6 +1,6 @@
 <?php
-//Added validation class with multiple validation features and removed most of existing validation code
-//Removed duplicate entries in list for class_category
+//Added function to create team class and improved validation of form data
+//Replaced any input of ',' to '.' in class_match_time
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -34,11 +34,12 @@ include_once('includes/restrict_access.php');?>
         <div class="error">
 <?php 
 //Declare and initialise variables
-$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
+$class_team ='';$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
 // Update class data if button is clicked and all fields are validated to be correct
- if (filter_input(INPUT_POST,'MM_update') == 'update_class') {
+ if (filter_input(INPUT_POST,'MM_update') === 'update_class') {
     $colname_rsClass = filter_input(INPUT_POST,'class_id');
-    $comp_id = filter_input(INPUT_POST,'comp_id');         
+    $comp_id = filter_input(INPUT_POST,'comp_id');        
+    $class_team = filter_input(INPUT_POST,'class_team');    
     $class_category = filter_input(INPUT_POST,'class_category');             
     $class_discipline = filter_input(INPUT_POST,'class_discipline');         
     $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
@@ -52,9 +53,15 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
     }
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
-    $class_match_time = filter_input(INPUT_POST, trim('class_match_time'));
+    $class_match_time = str_replace(',','.',filter_input(INPUT_POST, trim('class_match_time')));
 
     $val = new Validation();
+    $val->name('typ av klass')->value($class_team)->pattern('int')->required();
+    $val->name('disciplin')->value($class_discipline)->pattern('alpha')->required();
+    if($class_discipline === 'Kata'){
+    $val->name('katasystem')->value($class_discipline_variant)->pattern('int')->required();
+    }
+    $val->name('k&ouml;n')->value($class_gender)->pattern('text')->required();    
     $val->name('vikt-/l&auml;ngdkategori')->value($class_weight_length)->pattern('text');
     $val->name('avgift f&ouml;r klassen')->value($class_fee)->pattern('int')->required();
     $val->name('ber&auml;knad matchtid f&ouml;r klassen')->value($class_match_time)->pattern('float')->required();
@@ -87,7 +94,7 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
     try {
         //Select Class data for selected class
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT c.class_id, c.comp_id, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
+        $query1 = "SELECT c.class_id, c.comp_id, c.class_team, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
         $stmt_rsClass = $DBconnection->prepare($query1);
         $stmt_rsClass->execute(array(':class_id' => $colname_rsClass));
         $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -122,8 +129,20 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
             </label></td>
           </tr>
           <tr>
+            <td>Typ av klass</td>
+            <td valign="top">
+              <label>
+                <input <?php if (!(strcmp($row_rsClass['class_team'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_team" value=0 id="class_team_0" />                
+              Individuell</label>
+              <label>
+              <input <?php if (!(strcmp($row_rsClass['class_team'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_team" value=1 id="class_team_1" />                              
+                  Lag</label>
+                <br />
+            </td>
+          <tr>          
+          <tr>
             <td>Disciplin</td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                 <input <?php if (!(strcmp($row_rsClass['class_discipline'],"Kata"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kata" id="class_discipline_0" />
               Kata</label>
@@ -131,11 +150,11 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
                 <input <?php if (!(strcmp($row_rsClass['class_discipline'],"Kumite"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kumite" id="class_discipline_1" />
                 Kumite</label>
               <br />
-            </p></td>
+            </td>
           </tr>
           <tr>
             <td>Katasystem</td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                 <input <?php if (!(strcmp($row_rsClass['class_discipline_variant'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" />
               Flaggor</label>
@@ -143,11 +162,11 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
                 <input <?php if (!(strcmp($row_rsClass['class_discipline_variant'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1" />
               Po&auml;ng</label>
               <br />
-            </p></td>
+            </td>
           </tr>          
           <tr>
             <td>T&auml;vlingsklass f&ouml;r (k&ouml;n)</td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                   <input <?php if (!(strcmp($row_rsClass['class_gender'],"Man"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Man" id="class_gender_0" />
             Man</label>
@@ -158,7 +177,7 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
   <input <?php if (!(strcmp($row_rsClass['class_gender'],"Mix"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Mix" id="class_gender_2" />
                 Mix</label>
               <br />
-            </p></td>
+            </td>
           </tr>
           <tr>
             <td>K&ouml;nskategori</td>
@@ -169,7 +188,6 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
     <option value="Pojkar" <?php if (!(strcmp("Pojkar", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Pojkar</option>
     <option value="Flickor" <?php if (!(strcmp("Flickor", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Flickor</option>
     <option value="Mix" <?php if (!(strcmp("Mix", $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>>Mix</option>    
-<option value="<?php echo $row_rsClass['class_gender_category']?>"<?php if (!(strcmp($row_rsClass['class_gender_category'], $row_rsClass['class_gender_category']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['class_gender_category']?></option>
   </select>
 </label></td>
           </tr>
@@ -203,12 +221,13 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
     </form>
 <?php
         }
- 	else if ($output_form === 'no') {        
+ 	else if ($output_form === 'no') {   
                  //Catch anything wrong with query
                 try {
                 require('Connections/DBconnection.php');
                 //UPDATE selected Class
                 $updateSQL = "UPDATE classes SET comp_id = :comp_id, 
+                class_team = :class_team, 
                 class_category = :class_category, 
                 class_discipline = :class_discipline, 
                 class_discipline_variant = :class_discipline_variant, 
@@ -221,6 +240,7 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
                 WHERE class_id = :class_id"; 
                 $stmt = $DBconnection->prepare($updateSQL);                                 
                 $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
+                $stmt->bindValue(':class_team', $class_team, PDO::PARAM_INT);
                 $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
                 $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
                 $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);

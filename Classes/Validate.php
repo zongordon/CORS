@@ -9,6 +9,27 @@
      * @license https://github.com/davidecesarano/Validation/blob/master/LICENSE MIT License
      * @link https://github.com/davidecesarano/Validation
      * Added public functions valuePattern($min, $max),datePattern(), timePattern(), urlPattern(), emailPattern() and changed error texts to Swedish
+    Example of call class code:
+    $val = new Validation();
+    $length = 5;//min length of strings
+    $min = 3;//minimum value of integers
+    $max = 5;//maximum value of integers
+    $val->name('starttid')->value($comp_start_time)->timePattern()->required();
+    $val->name('startdatum')->value($comp_start_date)->datePattern('Y-m-d')->required();    
+    $val->name('e-post')->value($comp_email)->emailPattern()->required();
+    $val->name('t&auml;vlingssajten')->value($comp_url)->urlPattern()->required();
+    $val->name('gr&auml;ns f&ouml;r round robin')->value($comp_limit_roundrobin)->valuePattern($min,$max)->required();    
+    $val->name('Telefon')->value($contact_phone)->pattern('tel')->required();
+    $val->name('L&ouml;senord')->value($user_password)->pattern('text')->required()->min($length)->equal($confirm_user_password);
+    
+    if($val->isSuccess()){
+    	$output_form = 'no';
+    }else{
+        foreach($val->getErrors() as $error) {
+        echo '<div class="error"><h3>'.$error.'</h3></br></div>';
+        }
+        $output_form = 'yes';
+    }
      */
     class Validation {
         /**
@@ -32,7 +53,7 @@
          //   'email'         => '[[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+'
         );
         /**
-         * #^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$#
+         * 
          * @var array $errors
          */
         public $errors = array();
@@ -258,7 +279,7 @@
          * @return boolean
          */
         public function isSuccess(){
-            if(empty($this->errors)) return true;
+            if(empty($this->errors)){return true;}
         }
         /**
          * Errori della validazione
@@ -266,7 +287,7 @@
          * @return array $this->errors
          */
         public function getErrors(){
-            if(!$this->isSuccess()) return $this->errors;
+            if(!$this->isSuccess()){return $this->errors;}
         }
         /**
          * Visualizza errori in formato Html

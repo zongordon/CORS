@@ -1,5 +1,6 @@
 <?php
-//Added validation class with multiple validation features and removed most of existing validation code
+//Added function to create team class and improved validation of form data
+//Replaced any input of ',' to '.' in class_match_time
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -30,10 +31,11 @@ include_once('includes/restrict_access.php');?>
         <div class="error">     
 <?php
 //Declare and initialise variables
-$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
+$class_team ='';$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
 // Insert new class if button is clicked and all fields are validated to be correct
  if (filter_input(INPUT_POST,'MM_insert') && filter_input(INPUT_POST,'MM_insert') == 'new_class') {
     $comp_id = filter_input(INPUT_POST,'comp_id');         
+    $class_team = filter_input(INPUT_POST,'class_team');
     $class_category = filter_input(INPUT_POST,'class_category');             
     $class_discipline = filter_input(INPUT_POST,'class_discipline');         
     $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
@@ -47,9 +49,15 @@ $class_category = '';$class_discipline = '';$class_discipline_variant = '';$clas
     }
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
-    $class_match_time = filter_input(INPUT_POST, trim('class_match_time'));
+    $class_match_time = str_replace(',','.',filter_input(INPUT_POST, trim('class_match_time')));
 
     $val = new Validation();
+    $val->name('typ av klass')->value($class_team)->pattern('int')->required();
+    $val->name('disciplin')->value($class_discipline)->pattern('alpha')->required();
+    if($class_discipline === 'Kata'){
+    $val->name('katasystem')->value($class_discipline_variant)->pattern('int')->required();
+    }
+    $val->name('k&ouml;n')->value($class_gender)->pattern('text')->required();
     $val->name('vikt-/l&auml;ngdkategori')->value($class_weight_length)->pattern('text');
     $val->name('avgift f&ouml;r klassen')->value($class_fee)->pattern('int')->required();
     $val->name('ber&auml;knad matchtid f&ouml;r klassen')->value($class_match_time)->pattern('float')->required();
@@ -123,8 +131,19 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             </label></td>
           </tr>
           <tr>
+            <td>Typ av klass</td>
+            <td valign="top">
+              <label>
+                <input <?php if (!(strcmp($class_team,0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_team" value=0 id="class_team_0" />                
+              Individuell</label>
+              <label>
+              <input <?php if (!(strcmp($class_team,1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_team" value=1 id="class_team_1" />                              
+                  Lag</label>
+                <br />
+            </td>
+          <tr>
             <td>Disciplin</td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                 <input <?php if (!(strcmp($class_discipline,"Kata"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kata" id="class_discipline_0" />                
               Kata</label>
@@ -132,11 +151,11 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
               <input <?php if (!(strcmp($class_discipline,"Kumite"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline" value="Kumite" id="class_discipline_1" />                              
                   Kumite</label>
                 <br />
-            </p></td>
+            </td>
           </tr>
           <tr>
             <td>Katasystem</td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                <input <?php if (!(strcmp($class_discipline_variant,0))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=0 id="class_discipline_variant_0" />                   
               Flaggor</label>
@@ -144,11 +163,11 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
                <input <?php if (!(strcmp($class_discipline_variant,1))) {echo "checked=\"checked\"";} ?> type="radio" name="class_discipline_variant" value=1 id="class_discipline_variant_1" />                                     
               Po&auml;ng</label>
               <br />
-            </p></td>
+            </td>
           </tr>                    
           <tr>
             <td>T&auml;vlingsklass f&ouml;r (k&ouml;n) </td>
-            <td valign="top"><p>
+            <td valign="top">
               <label>
                <input <?php if (!(strcmp($class_gender,"Man"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Man" id="class_gender_0" />                                                       
                 Man</label>
@@ -158,7 +177,7 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
               <label>
                <input <?php if (!(strcmp($class_gender,"Mix"))) {echo "checked=\"checked\"";} ?> type="radio" name="class_gender" value="Mix" id="class_gender_2" />                                                                                           
               Mix</label>              
-            </p></td>
+            </td>
           </tr>
           <tr>
             <td>K&ouml;nskategori</td>
@@ -206,9 +225,10 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             try {
             //INSERT new class in the database    
             require('Connections/DBconnection.php');             
-            $query1 = "INSERT INTO classes (comp_id, class_category, class_discipline, class_discipline_variant, class_gender, class_gender_category, class_weight_length, class_age, class_fee, class_match_time) VALUES (:comp_id, :class_category, :class_discipline, :class_discipline_variant, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee, :class_match_time)";
+            $query1 = "INSERT INTO classes (comp_id, class_team, class_category, class_discipline, class_discipline_variant, class_gender, class_gender_category, class_weight_length, class_age, class_fee, class_match_time) VALUES (:comp_id, :class_team, :class_category, :class_discipline, :class_discipline_variant, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee, :class_match_time)";
             $stmt = $DBconnection->prepare($query1);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
+            $stmt->bindValue(':class_team', $class_team, PDO::PARAM_INT);
             $stmt->bindValue(':class_category', $class_category, PDO::PARAM_STR);
             $stmt->bindValue(':class_discipline', $class_discipline, PDO::PARAM_STR);
             $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);

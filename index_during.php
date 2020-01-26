@@ -1,5 +1,5 @@
 ﻿<?php 
-//Changed information regarding Mellersta KF
+//Embedded video filmed during TKC 2019
 
 ob_start();
 
@@ -16,14 +16,14 @@ include_once("includes/news_sponsors_nav.php");
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
-<div id="content">    
+<div id="content">
   <div class="feature">
-    <img height="199" width="300" alt="" src="img/rotating/rotate.php" />
     <h1>V&auml;lkomna till <?php echo $comp_name;?>!</h1>
-    <p>En barn- och ungdomst&auml;vling f&ouml;r samtliga karatestilar och som anordnas av <?php echo $comp_arranger;?>.    </p>
-    <p>Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></p>
-    <p>L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
+    <p>En barn- och ungdomst&auml;vling f&ouml;r samtliga karatestilar och som anordnas av <?php echo $comp_arranger;?>.<br>
+    Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
+    L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
+    <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Feskilstunakarateklubb%2Fvideos%2F2420821441538024%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
   <div class="story">
     <h2>Tid och plats</h2>
     <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="http://www.facebook.com/stigasportsarena/" title="Stiga Sports Arena" target="_blank">

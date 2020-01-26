@@ -1,5 +1,5 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Added to view teams and changed sorting 
 
 if (!isset($_SESSION)) {
   session_start();
@@ -12,7 +12,9 @@ $MM_donotCheckaccess = "false";
 try {
 // Select information regarding active accounts
 require('Connections/DBconnection.php');           
-$query_rsAccounts = "SELECT DISTINCT account_id, club_name FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY club_name ASC";
+$query_rsAccounts = "SELECT DISTINCT account_id, club_name FROM registration AS re INNER JOIN classes AS cl USING (class_id) "
+        . "INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a "
+        . "USING (account_id) WHERE comp_current = 1 ORDER BY club_name ASC";
 $stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
 $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC); 
 }   catch(PDOException $ex) {
@@ -41,7 +43,9 @@ $row_rsSelectedClub = $stmt_rsSelectedClub->fetch(PDO::FETCH_ASSOC);
 try {
 // Select information regarding active accounts
 require('Connections/DBconnection.php');           
-$query_rsCost = "SELECT coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE account_id = :account_id AND comp_current = 1";
+$query_rsCost = "SELECT coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) "
+        . "INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account "
+        . "USING(account_id) WHERE account_id = :account_id AND comp_current = 1";
 $stmt_rsCost = $DBconnection->prepare($query_rsCost);
 $stmt_rsCost->execute(array(':account_id'=>$colname_rsSelectedClub));
 $row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC);
@@ -53,7 +57,12 @@ $row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC);
 try {
 // Select registrations from selected account and class data from selected account and current competition
 require('Connections/DBconnection.php');           
-$query_rsRegistrations = "SELECT a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, co.contestant_name";
+$query_rsRegistrations = "SELECT a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_id, cl.class_team, "
+        . "cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age "
+        . "FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) "
+        . "WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_team, cl.class_discipline, cl.class_gender, "
+        . "cl.class_age, cl.class_weight_length, co.contestant_name";
 $stmt_rsRegistrations = $DBconnection->prepare($query_rsRegistrations);
 $stmt_rsRegistrations->execute(array(':account_id'=>$colname_rsSelectedClub));
 $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
@@ -118,7 +127,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['club_name']; ?></td>
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['contestant_name']; ?></td>
           <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>
-          <td> <?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
+          <td> <?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
       if ($row_rsRegistrations['class_age'] == "") { 
           echo "";          
       } 

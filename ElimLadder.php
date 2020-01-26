@@ -1,5 +1,5 @@
 <?php 
-//Added code to show Round Robin protocol when limit is met
+//Added code to show teams correctly
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -8,7 +8,7 @@ $colname_rsClassData = filter_input(INPUT_GET,'class_id');
 try {
 //SELECT data för the competition class
 require('Connections/DBconnection.php');         
-$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, com.comp_limit_roundrobin, cl.class_category, cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1";
+$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, com.comp_limit_roundrobin, cl.class_team, cl.class_category, cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1";
 $stmt_rsClass = $DBconnection->prepare($queryClass);
 $stmt_rsClass->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -58,6 +58,9 @@ $comp_name = $row_rsClass['comp_name'];
 $comp_arranger = $row_rsClass['comp_arranger'];
 $comp_start_date = $row_rsClass['comp_start_date']; 
 $comp_limit_roundrobin = $row_rsClass['comp_limit_roundrobin'];
+$class_team = $row_rsClass['class_team']; 
+$team = '';
+if($class_team === 1){$team = 'Lag-';}
 $class_discipline = $row_rsClass['class_discipline']; 
 $class_discipline_variant = $row_rsClass['class_discipline_variant']; 
 $class_gender_category = $row_rsClass['class_gender_category']; 
@@ -83,7 +86,7 @@ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförs
 <div id="masthead">
 <h1>
 <?php
-echo $comp_name.' - T&Auml;VLINGSPROTOKOLL - '.$class_discipline.' | '.$class_gender_category.' | '.$class_category;
+echo $comp_name.' - T&Auml;VLINGSPROTOKOLL - '.$team.$class_discipline.' | '.$class_gender_category.' | '.$class_category;
 if ($class_age == "") { echo ""; } 
 if ($class_age <> "") { 
     echo ' | '.$class_age.' &aring;r'.'  ';     
@@ -107,7 +110,7 @@ echo ' | '.$class_weight_length;
                 echo 'Kata Point System';
             }
             else {
-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { 
+                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
                     echo 'Pool A'; 
                 } 
                 else { 
@@ -125,7 +128,7 @@ echo ' | '.$class_weight_length;
                 echo 'Kata Point System';
             }
             else {
-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { 
+                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
                     echo 'Pool B'; 
                 } 
                 else { 
@@ -1161,9 +1164,9 @@ if ($totalRows_rsClassContestants > 11) { //Show 11-24 contestans;?>
 } //Show 11-24 contestans;
 } //When not using Kata Point System
 
-//When limit for Round Robin is not met - show elimination ladder
+//When limit for Round Robin is not met or it's a team class - show elimination ladder
 //If startnumber and contestant exist - show them with the proper colours
-elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { ?>
+elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { ?>
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
@@ -1566,7 +1569,7 @@ $matchNo = 1; ?>
                       <div id="apDivResultatKataPoint">';
             }
             else {
-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3) { 
+                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1){ 
                     echo '<div id="apDivPDF">
                           <a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a></div>
                           <div id="apCompBanner"></div>
@@ -1632,16 +1635,3 @@ $DBconnection = null;
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
