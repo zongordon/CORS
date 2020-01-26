@@ -12,7 +12,9 @@ $MM_donotCheckaccess = "false";
 try {
 // Select number of contestants for each club, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT club_name, COUNT(DISTINCT contestant_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
+$query_rsContestants = "SELECT club_name, COUNT(DISTINCT contestant_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN "
+        . "registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) "
+        . "WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();

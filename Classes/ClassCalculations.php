@@ -1,15 +1,21 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of ClassCalculations
  *
  * @author zongordon
+ * Example to call class:
+$max_matches = new ClassCalculations;
+$max_matches->limit_roundrobin = 5;
+$max_matches->registrations = 5;
+$max_matches->repechage = 1;
+echo 'This is the number of matches in the class: '.$max_matches->class_max_matches().'<br/>';
+echo 'This is the repechage status of the class: '.$max_matches->repechage.'<br/>';
+echo 'This is the round robin status of the class: '.$max_matches->roundrobin.'<br/>';
+
+$total_match_time = new ClassCalculations;
+$total_match_time->class_match_time = 3.8;
+echo 'This is the total match time for the class: '.$max_matches->class_max_matches()*$total_match_time->class_total_time().'<br/>';
  */
 class ClassCalculations {
     public $registrations;
@@ -28,11 +34,11 @@ class ClassCalculations {
         else{
             $this->roundrobin = 'no'; 
         }
-        if($this->roundrobin === 'no' && $this->repechage === 'no' && $this->registrations > 0){
+        if($this->roundrobin === 'no' && $this->repechage === 0 && $this->registrations > 0){
             return $this->registrations-1;
         }
 
-        if($this->repechage === 'yes' && $this->roundrobin === 'no'){
+        if($this->repechage === 1 && $this->roundrobin === 'no'){
             if($this->registrations > 17){
                 return $this->registrations-1+6;
             }
@@ -63,14 +69,3 @@ class ClassCalculations {
         return $this->class_match_time;
     }
 }
-$max_matches = new ClassCalculations;
-$max_matches->limit_roundrobin = 5;
-$max_matches->registrations = 5;
-$max_matches->repechage = 'yes';
-echo 'This is the number of matches in the class: '.$max_matches->class_max_matches().'<br/>';
-echo 'This is the repechage status of the class: '.$max_matches->repechage.'<br/>';
-echo 'This is the round robin status of the class: '.$max_matches->roundrobin.'<br/>';
-
-$total_match_time = new ClassCalculations;
-$total_match_time->class_match_time = 3.8;
-echo 'This is the total match time for the class: '.$max_matches->class_max_matches()*$total_match_time->class_total_time().'<br/>';

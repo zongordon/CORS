@@ -1,7 +1,6 @@
 <?php
-//Added klara_fastigheter.png and link to klarafastigheter.se
-//Changed from $comp_raffled === "1" as text didn't show a supposed
-//Changed from Helpdesk link (https://karateklubben.com/Support/)
+//Changed height and width on 1spbsrekarne_mynt.png
+
 require_once('Connections/DBconnection.php');
 
 if (!isset($_SESSION)) {
@@ -53,10 +52,11 @@ $DBconnection = null;
   <div id="sponsors">
       <h3>Huvudsponsorer</h3>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
-      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="244" height="65" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
       <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
-      <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
+      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.png" width="150" height="150" border="0" alt="Room4Life"></a></p>      
 <!--Hide code       
+      <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
       <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      
       <p><a href="http://gulasidorna.eniro.se/f/narkiniemi-elkonsult:4392999" target="_blank"><img src="img/nKon.gif" alt="Narkiniemi Elkonsult" width="210" height="68" border="0" /></a></p>
@@ -66,5 +66,7 @@ $DBconnection = null;
 -->
   </div>
 </div>
+
+
 
 

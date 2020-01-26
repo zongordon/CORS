@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Added code for showing team classes
 
 if (!isset($_SESSION)) {
   session_start();
@@ -9,7 +9,7 @@ $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
 $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
-$sorting = "class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id";
+$sorting = "class_team, class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id";
 //Fetch the selected sorting
 $colname_rsCompetition = filter_input(INPUT_GET,'comp_id');
 
@@ -21,7 +21,12 @@ try {
 // Select all registered contestants for the current competition    
 require_once('Connections/DBconnection.php');    
 //Select contestants for current competition
-$query = "SELECT com.comp_current, com.comp_id, a.club_name, re.reg_id, re.contestant_result, co.contestant_name, re.contestant_height, re.contestant_startnumber, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN clubregistration AS clu USING (club_reg_id) INNER JOIN account AS a USING (account_id) INNER JOIN competition AS com USING (comp_id) INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) WHERE com.comp_current = 1 ORDER BY $sorting";
+$query = "SELECT com.comp_current, com.comp_id, a.club_name, re.reg_id, re.contestant_result, co.contestant_name, co.contestant_team, "
+        . "re.contestant_height, re.contestant_startnumber, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, "
+        . "cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN clubregistration AS clu "
+        . "USING (club_reg_id) INNER JOIN account AS a USING (account_id) INNER JOIN competition AS com USING (comp_id) INNER JOIN "
+        . "classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) WHERE com.comp_current = 1 "
+        . "ORDER BY $sorting";
 $stmt_rsRegistrations = $DBconnection->query($query);
 $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 }   catch(PDOException $ex) {
@@ -56,7 +61,7 @@ if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
       <td><label>
         <select name="sorting" id="sorting">
       <option value="club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_name"<?php if (!(strcmp($sorting, "club_name, class_discipline, class_gender, class_age, class_weight_length, contestant_name"))) {echo "selected=\"selected\"";} ?>>Klubb</option>
-      <option value="class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"<?php if (!(strcmp($sorting, "class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"))) {echo "selected=\"selected\"";} ?>>T&auml;vlingsklass</option>
+      <option value="class_team, class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"<?php if (!(strcmp($sorting, "class_team, class_discipline, class_gender, class_age, class_weight_length, club_startorder, reg_id"))) {echo "selected=\"selected\"";} ?>>T&auml;vlingsklass</option>
       <option value="contestant_name, club_name"<?php if (!(strcmp($sorting, "contestant_name, club_name"))) {echo "selected=\"selected\"";} ?>>T&auml;vlande</option>
         </select>
       </label></td>
@@ -78,7 +83,7 @@ if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
       <td><?php echo $row_rsRegistrations['club_name']; ?></td>
       <td><?php echo $row_rsRegistrations['contestant_name']; ?></td>
       <td><?php if ($row_rsRegistrations['contestant_height'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_height'] <> "") { echo $row_rsRegistrations['contestant_height'].' cm'; } ?></td>
-      <td><?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
+      <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_category'].' | '; 
       if ($row_rsRegistrations['class_age'] == "") { 
           echo "";          
       } 
