@@ -1,10 +1,29 @@
 <?php
+//Added code to update the teams' gender and max - and min age based on updated individual contestant
+
+// require Class for validation of forms
+require_once 'Classes/Validate.php';
+// Includes HTML Head
+include_once('includes/header.php');
+//Includes Several code functions
+include_once('includes/functions.php');
+//Include top navigation links, News and sponsor sections
+include_once("includes/news_sponsors_nav.php");
+//Includes Restrict access code function
+include_once('includes/restrict_access.php');?>
+<!-- start page -->
+<div id="pageName"><h1><?php echo $pagetitle?></h1></div>
+<!-- Include different navigation links depending on authority  -->
+<div id="localNav"><?php include("includes/navigation.php"); ?></div>
+<div id="content">
+        <div id="feature"> 
+<?php
 //Declare and initialise variables
-$min_birthday='';$max_birthday='';$gender_init = '';$gender_final ='';$insert_contestant_team_member_3='';$insert_contestant_team_member_4='';$insert_contestant_team_member_5='';
+$min_birthday='';$max_birthday='';$gender_init = '';$gender_final ='';$update_contestant_name='';$update_contestant_birth='';$update_contestant_birth_max='';$update_contestant_gender='';$contestant_team='';$update_contestant_team_member_1='';$update_contestant_team_member_2='';$update_contestant_team_member_3='';$update_contestant_team_member_4='';$update_contestant_team_member_5='';
 //Update contestant selected on previous page if contestant_id is provided
 if (filter_input(INPUT_GET,'contestant_id') != "") {
     $contestant_id = filter_input(INPUT_GET,'contestant_id');
-        //Catch anything wrong with query
+    //Catch anything wrong with query
     try {
     // Select data for the selected contestants
     require('Connections/DBconnection.php');               
@@ -17,7 +36,7 @@ if (filter_input(INPUT_GET,'contestant_id') != "") {
     $stmt_rsContestants->execute(array(':contestant_id'=>$contestant_id));
     $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
-        echo "An Error occured with queryX: ".$ex->getMessage();
+        echo 'An Error occured with query $query_rsContestants: '.$ex->getMessage();
     }
     $contestant_name = $row_rsContestants['contestant_name'];    
     $contestant_birth = $row_rsContestants['contestant_birth'];
@@ -29,26 +48,26 @@ if (filter_input(INPUT_GET,'contestant_id') != "") {
     $contestant_team_member_3 = $row_rsContestants['contestant_team_member_3'];
     $contestant_team_member_4 = $row_rsContestants['contestant_team_member_4'];
     $contestant_team_member_5 = $row_rsContestants['contestant_team_member_5'];
-    $account_id = $row_rsContestants['account_id'];
+    $_SESSION['MM_Account'] = $row_rsContestants['account_id'];
+    $_SESSION['contestant_team'] = $row_rsContestants['contestant_team'];
 }
 
 //Show one of the forms as a start
-$output_form = 'yes'; 
+$output_form = 'yes';
 
 //Update individual contestant
-if ($contestant_team === 0){
+if ($_SESSION['contestant_team'] === 0){
 // Validate the contestant form if the button is clicked	
 if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant") {
   $update_contestant_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contestant_name'), MB_CASE_TITLE,"UTF-8"));    
   $update_contestant_birth = filter_input(INPUT_POST,'contestant_birth');
   $update_contestant_gender = filter_input(INPUT_POST,'contestant_gender');
-  $update_contestant_birth_max = $contestant_birth;
+  $update_contestant_birth_max = $update_contestant_birth;
   if(filter_input(INPUT_POST,'contestant_team_member_1') === ''){ $update_contestant_team_member_1 = 0;}else{$update_contestant_team_member_1 = filter_input(INPUT_POST,'contestant_team_member_1');}
   if(filter_input(INPUT_POST,'contestant_team_member_2') === ''){ $update_contestant_team_member_2 = 0;}else{$update_contestant_team_member_2 = filter_input(INPUT_POST,'contestant_team_member_2');}
   if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
   if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
   if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}   
-  $account_id = filter_input(INPUT_POST,'account_id');
   $contestant_id = filter_input(INPUT_POST,'contestant_id');
   
     $val = new Validation();
@@ -65,7 +84,95 @@ if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant") {
         echo '<div class="error"><h3>'.$error.'</h3></br></div>';
         }
         $output_form = 'yes';
-    } 
+    }
+    //Search for teams related to the selected contestant to update the teams' gender and max - and min age
+    try { //Catch anything wrong with query
+    require('Connections/DBconnection.php');               
+    $query_rsTeams = "SELECT contestant_id, contestant_name, contestant_birth, contestant_birth_max, contestant_gender, "
+            . "contestant_team, contestant_team_member_1, contestant_team_member_2, contestant_team_member_3, "
+            . "contestant_team_member_4, contestant_team_member_5 "
+            . "FROM contestants "
+            . "WHERE contestant_team_member_1 = :contestant_id_1 OR contestant_team_member_2 = :contestant_id_2 OR "
+            . "contestant_team_member_3 = :contestant_id_3 OR contestant_team_member_4 = :contestant_id_4 OR "
+            . "contestant_team_member_5 = :contestant_id_5";
+    $stmt_rsTeams = $DBconnection->prepare($query_rsTeams);
+    $stmt_rsTeams->execute(array(':contestant_id_1'=>$contestant_id,':contestant_id_2'=>$contestant_id,':contestant_id_3'=>$contestant_id,':contestant_id_4'=>$contestant_id, ':contestant_id_5'=>$contestant_id));
+    }   catch(PDOException $ex) {
+            echo 'An Error occured with query $query_rsTeams: '.$ex->getMessage();
+    }
+        while($row_rsTeams = $stmt_rsTeams->fetch(PDO::FETCH_ASSOC)) {
+            $team_id = $row_rsTeams['contestant_id'];
+            $team_name = $row_rsTeams['contestant_name'];
+            $team_birth = $row_rsTeams['contestant_birth'];
+            $team_birth_max = $row_rsTeams['contestant_birth_max'];
+            $team_gender = $row_rsTeams['contestant_gender'];
+            $team_team = $row_rsTeams['contestant_team'];
+            $team_team_member_1 = $row_rsTeams['contestant_team_member_1'];
+            $team_team_member_2 = $row_rsTeams['contestant_team_member_2'];
+            $team_team_member_3 = $row_rsTeams['contestant_team_member_3'];
+            $team_team_member_4 = $row_rsTeams['contestant_team_member_4'];
+            $team_team_member_5 = $row_rsTeams['contestant_team_member_5'];
+
+                //Compare selected team member's gender and set the team's gender            
+                if($update_contestant_gender <> $team_gender) { //The members's gender is NOT the same as the team's
+                    $team_gender = 'Mix';    
+                }       
+               //Compare selected team member's birthday and set the teams' max and min birthdays            
+                if($update_contestant_birth < $team_birth) {//The members's birth is earlier than the team's
+                    $team_birth = $update_contestant_birth;
+                } 
+                elseif ($update_contestant_birth_max > $team_birth_max) {//The members's birth is later than the team's
+                    $team_birth_max = $update_contestant_birth_max; 
+                }
+            echo '<br>$team_id: '.$team_id.'<br>';
+            echo '$team_name: '.$team_name.'<br>';
+            echo '$team_birth: '.$team_birth.'<br>';
+            echo '$team_birth_max: '.$team_birth_max.'<br>';
+            echo '$team_gender: '.$team_gender.'<br>';
+            echo '$team_team: '.$team_team.'<br>';
+            echo '$team_team_member_1: '.$team_team_member_1.'<br>';
+            echo '$team_team_member_2: '.$team_team_member_2.'<br>';
+            echo '$team_team_member_3: '.$team_team_member_3.'<br>';
+            echo '$team_team_member_4: '.$team_team_member_4.'<br>';
+            echo '$team_team_member_5: '.$team_team_member_5.'<br>';
+            
+        //if($team_team_member_5 === 'No'){       
+                //UPDATE selected Team with gender and  max-/min birth                   
+                try { //Catch anything wrong with query
+                require('Connections/DBconnection.php');    
+                $updateTeamSQL = "UPDATE contestants SET 
+                account_id = :account_id, 
+                contestant_name = :contestant_name, 
+                contestant_birth = :contestant_birth, 
+                contestant_birth_max = :contestant_birth_max, 
+                contestant_gender = :contestant_gender, 
+                contestant_team = :contestant_team, 
+                contestant_team_member_1 = :contestant_team_member_1, 
+                contestant_team_member_2 = :contestant_team_member_2, 
+                contestant_team_member_3 = :contestant_team_member_3, 
+                contestant_team_member_4 = :contestant_team_member_4, 
+                contestant_team_member_5 = :contestant_team_member_5 
+                WHERE contestant_id = :contestant_id"; 
+                $stmt = $DBconnection->prepare($updateTeamSQL);                        
+                $stmt->bindValue(':account_id', $_SESSION['MM_Account'], PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_name', $team_name, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_birth', $team_birth, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_birth_max', $team_birth_max, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_gender', $team_gender, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_team', $team_team, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_1', $team_team_member_1, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_2', $team_team_member_2, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_3', $team_team_member_3, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_4', $team_team_member_4, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_5', $team_team_member_5, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_id', $team_id, PDO::PARAM_INT);
+                $stmt->execute();
+                }   catch(PDOException $ex) {
+                        echo 'An Error occured with query $updateTeamSQL: '.$ex->getMessage();
+                    }
+        //}
+        $stmt_rsTeams->closeCursor();//Kill statements
+        }
 }
 else {  
     $output_form = 'yes';
@@ -107,7 +214,6 @@ if ($output_form === 'yes') { ?>
         <input type="hidden" name="contestant_team_member_3" id="contestant_team_member_3" value="<?php echo $contestant_team_member_3; ?>" />
         <input type="hidden" name="contestant_team_member_4" id="contestant_team_member_4" value="<?php echo $contestant_team_member_4; ?>" />
         <input type="hidden" name="contestant_team_member_5" id="contestant_team_member_5" value="<?php echo $contestant_team_member_5; ?>" />
-        <input type="hidden" name="account_id" id="account_id" value="<?php echo $account_id; ?>" />
         <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />
           </td>
           <td><label>
@@ -121,22 +227,23 @@ if ($output_form === 'yes') { ?>
 }//Update individual contestant
 
 //Update team contestant
-if ($contestant_team === 1){ ?>
+if ($_SESSION['contestant_team'] === 1){ ?>
 <?php 
 //Catch anything wrong with query
 try {
-// Select all registered contestants but no teams for the club
+// Select all registered contestants but no teams for the club   
+require('Connections/DBconnection.php');                   
 $query_rsTeamMembers = "SELECT co.contestant_id, co.account_id, co.contestant_name, co.contestant_birth, "
         . "co.contestant_gender, co.contestant_team, co.contestant_team_member_1, co.contestant_team_member_2, "
         . "co.contestant_team_member_3, co.contestant_team_member_4, co.contestant_team_member_5 "
         . "FROM contestants AS co JOIN account AS a ON co.account_id = a.account_id AND co.account_id = :account_id "
-        . "WHERE contestant_team <> 1 ORDER BY co.contestant_name";
+        . "WHERE co.contestant_team <> 1 ORDER BY co.contestant_name";
 $stmt_rsTeamMembers = $DBconnection->prepare($query_rsTeamMembers);
 $stmt_rsTeamMembers ->execute(array(':account_id'=>$_SESSION['MM_Account']));
 $row_rsTeamMembers = $stmt_rsTeamMembers->fetchAll(PDO::FETCH_ASSOC);   
 $totalRows_rsTeamMembers = $stmt_rsTeamMembers->rowCount();    
 }   catch(PDOException $ex) {
-        echo "An Error occured with queryX: ".$ex->getMessage();
+        echo 'An Error occured with query $query_rsTeamMembers: '.$ex->getMessage();
     }
 // Validate the contestant form if the button is clicked	
 if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
@@ -147,7 +254,8 @@ if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
     if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
     if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
     if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}
-
+    $contestant_id = filter_input(INPUT_POST,'contestant_id');    
+    
     $val = new Validation();
     $length = 5;//min length of strings
     $val->name('lagets namn')->value($update_contestant_name)->pattern('text')->required()->min($length);
@@ -194,7 +302,7 @@ if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
             }                
         } else {//The conestant is not selected as team member    
           }          
-    }    
+     } 
     $update_contestant_birth = $min_birthday;
     $update_contestant_birth_max = $max_birthday;
     $update_contestant_gender = $gender_final;
@@ -303,11 +411,10 @@ if ($output_form === 'yes') { ?>
         </tr>        
         <tr>
           <td>
-        <input type="hidden" name="contestant_gender" value="<?php echo $contestant_gender ?>"/>
         <input type="hidden" name="contestant_birth" value="<?php echo $contestant_birth ?>"/>              
         <input type="hidden" name="contestant_birth_max" value="<?php echo $contestant_birth_max ?>"/>              
         <input type="hidden" name="contestant_team" value="<?php echo $contestant_team ?>" />
-        <input type="hidden" name="account_id" id="account_id" value="<?php echo $account_id ?>" />
+        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />        
         <input type="hidden" name="MM_update_team" value="update_team" />
           </td>
           <td><label>
@@ -319,28 +426,26 @@ if ($output_form === 'yes') { ?>
 <?php    
 }//Show team form
 
-//Kill statements
-$stmt_rsTeamMembers->closeCursor();
+$stmt_rsTeamMembers->closeCursor();//Kill statement
 }//Update team contestant 
 
 //Excute sql update and don't show form
 if ($output_form === 'no') {
     if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant" || filter_input(INPUT_POST,"MM_update_team") === "update_team") {    
-    echo 'SQL: <br>'
-        . 'AccuntId: '.$account_id.'<br>ContId: '.$contestant_id.'<br>contestant_name:'.$update_contestant_name.'<br> 
-    contestant_birth'.$update_contestant_birth.'<br> 
-    contestant_birth_max: '.$update_contestant_birth_max.'<br> 
-    contestant_gender: '.$update_contestant_gender.'<br> 
-    contestant_team: '.$contestant_team.'<br> 
-    contestant_team_member_1 : '.$update_contestant_team_member_1.'<br> 
-    contestant_team_member_2 : '.$update_contestant_team_member_2.'<br> 
-    contestant_team_member_3 : '.$update_contestant_team_member_3.'<br> 
-    contestant_team_member_4 : '.$update_contestant_team_member_4.'<br> 
-    contestant_team_member_5 :'.$update_contestant_team_member_5;    
-        //Catch anything wrong with query
-    try {
+            echo '<br>$id: '.$contestant_id.'<br>';
+            echo '$name: '.$update_contestant_name.'<br>';
+            echo '$birth: '.$update_contestant_birth.'<br>';
+            echo '$birth_max: '.$update_contestant_birth_max.'<br>';
+            echo '$gender: '.$update_contestant_gender.'<br>';
+            echo '$team: '.$update_contestant_team.'<br>';
+            echo '$team_member_1: '.$update_contestant_team_member_1.'<br>';
+            echo '$team_member_2: '.$update_contestant_team_member_2.'<br>';
+            echo '$team_member_3: '.$update_contestant_team_member_3.'<br>';
+            echo '$team_member_4: '.$update_contestant_team_member_4.'<br>';
+            echo '$team_member_5: '.$update_contestant_team_member_5.'<br>';
+    try { //Catch anything wrong with query
     require('Connections/DBconnection.php');    
-    //UPDATE selected Contestant
+    //UPDATE selected Contestant or Team    
     $updateSQL = "UPDATE contestants SET 
     account_id = :account_id, 
     contestant_name = :contestant_name, 
@@ -355,7 +460,7 @@ if ($output_form === 'no') {
     contestant_team_member_5 = :contestant_team_member_5 
     WHERE contestant_id = :contestant_id"; 
     $stmt = $DBconnection->prepare($updateSQL);                        
-    $stmt->bindValue(':account_id', $account_id, PDO::PARAM_INT);
+    $stmt->bindValue(':account_id', $_SESSION['MM_Account'], PDO::PARAM_INT);
     $stmt->bindValue(':contestant_name', $update_contestant_name, PDO::PARAM_STR);
     $stmt->bindValue(':contestant_birth', $update_contestant_birth, PDO::PARAM_STR);
     $stmt->bindValue(':contestant_birth_max', $update_contestant_birth_max, PDO::PARAM_STR);
@@ -369,18 +474,17 @@ if ($output_form === 'no') {
     $stmt->bindValue(':contestant_id', $contestant_id, PDO::PARAM_INT);
     $stmt->execute();
     }   catch(PDOException $ex) {
-            echo "An Error occured with queryX: ".$ex->getMessage();
-        } 
+            echo 'An Error occured with query $updateSQL: '.$ex->getMessage();
+        }
     if ($MM_authorizedUsers === "1") { 
         $updateGoTo = "RegsHandleAll.php#registration_insert";
     }else{
         $updateGoTo = "RegInsert_reg.php#registration_insert";
+    }        
+    header(sprintf("Location: %s", $updateGoTo));
     }
-    header(sprintf("Location: %s", $updateGoTo)); 
-    }
-//Kill statements
-$stmt->closeCursor();
-}?>
+$stmt->closeCursor();//Kill statements
+}//$output_form = no ?>
         </div>
 </div>
 <?php include("includes/footer.php");?>

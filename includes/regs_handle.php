@@ -1,4 +1,7 @@
-<?php
+<?php 
+//Corrected delete contestant link
+//Removed "<" and ">" from "SUBSTRING(cl.class_age, 1, 2) => :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) =< :contestant_age_max "
+
 //Catch anything wrong with query
 try {
 // Select account data for the selected club
@@ -510,7 +513,7 @@ if (filter_input(INPUT_POST,"MM_insert_team") === "new_team") {
       </table>
     </form>   
 <?php 
-} 
+}//Show if recordset rs_TeamMembers not empty 
 //Catch anything wrong with query
 try {
 // Select all registered contestants for the club
@@ -665,7 +668,10 @@ else {
         $diff_high = $date2->diff($date1);
         $diff_low = $date3->diff($date1);
         $contestant_age_max = $diff_high->y;
-        $contestant_age_min = $diff_low->y;
+        $contestant_age_min = $diff_low->y;/*
+      echo 'Namn: '.$row_rsContestants['contestant_name'].'<br>';    
+      echo 'Min-ålder: '.$contestant_age_min.'<br>';    
+      echo 'Max-ålder: '.$contestant_age_max.'<br>';*/
     }else{    
         //Calculate the age of the contestant at the date of the competition
         $date1 = new DateTime($comp_start_date);
@@ -698,7 +704,7 @@ else {
             . "FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id "
             . "WHERE "
             . "comp_current = 1 && cl.class_team = :contestant_team && cl.class_gender = :contestant_gender && "
-            . "SUBSTRING(cl.class_age, 1, 2) >= :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) <= :contestant_age_max "
+            . "SUBSTRING(cl.class_age, 1, 2) = :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) = :contestant_age_max "
             . "|| comp_current = 1 && cl.class_team = :contestantteam && cl.class_gender = :contestantgender && "
             . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
             . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
@@ -757,10 +763,10 @@ else {
                     <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
                   </label></td>
                   <td nowrap="nowrap">
-                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantUpdate_reg';} else {echo 'ContestantUpdate';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a> |                    
+                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantUpdate_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantUpdate';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a> |                    
                   </td>  
                   <td nowrap="nowrap">
-                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantDelete_reg';} else {echo '"ContestantDelete';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>                    
+                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantDelete_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantDelete';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>                    
                   </td>
                   </tr>
               </table>

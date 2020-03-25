@@ -1,6 +1,6 @@
 <?php
-//Added function to create team class and improved validation of form data
-//Replaced any input of ',' to '.' in class_match_time
+//Made sure that $class_discipline_variant will have the value 2 if kumite is chosen
+
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -60,6 +60,8 @@ $class_team ='';$class_category = '';$class_discipline = '';$class_discipline_va
     $val->name('disciplin')->value($class_discipline)->pattern('alpha')->required();
     if($class_discipline === 'Kata'){
     $val->name('katasystem')->value($class_discipline_variant)->pattern('int')->required();
+    }else{
+    $class_discipline_variant = 2;    
     }
     $val->name('k&ouml;n')->value($class_gender)->pattern('text')->required();    
     $val->name('vikt-/l&auml;ngdkategori')->value($class_weight_length)->pattern('text');

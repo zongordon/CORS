@@ -41,7 +41,7 @@ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförs
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="description" content="<?php echo $pagedescription ?>"/>
 <meta name="keywords" content="<?php echo $pagekeywords ?>" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="3col_leftNav.css" type="text/css" />

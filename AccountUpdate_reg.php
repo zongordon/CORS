@@ -1,5 +1,5 @@
 <?php 
-//Added validation class with multiple validation features and removed most of existing validation code
+//Added values for "confirmed", "active" and "access_level"
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -175,6 +175,9 @@ if ($output_form === 'yes') { ?>
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap">
           <input type="hidden" name="MM_update" value="AccountForm" />            
+          <input type="hidden" name="confirmed" value="0" />            
+          <input type="hidden" name="active" value="1" />            
+          <input type="hidden" name="access_level" value="0" />            
 		<input name="account_id" type="hidden" id="account_id" value="<?php echo $row_rsAccount['account_id']; ?>" /></td>
           <td><input name="AccountUpdate" type="submit" id="AccountUpdate" value="Spara" /></td>
         </tr>

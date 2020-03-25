@@ -2,7 +2,11 @@
 
 //Delete contestant selected on previous page if contestant_id is provided
 if (filter_input(INPUT_GET,'contestant_id') != "") {
+    
     $contestant_id = filter_input(INPUT_GET,'contestant_id');
+/* 
+    echo 'Id: '.$contestant_id.'<br>Access-level: '.$MM_authorizedUsers; 
+*/
     //Catch anything wrong with query
     try {
     require('Connections/DBconnection.php');         
