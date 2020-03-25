@@ -1,5 +1,6 @@
 <?php 
-//Added code to show teams correctly
+// Removed #apCompBanner
+// Added #apSponsorPic5KataPoint, #apSponsorPic5KataPoint, #apSponsorPic6KataPoint and #apSponsorPic6KataPoint
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -1562,30 +1563,36 @@ $matchNo = 1; ?>
       <?php if ($class_discipline === 'Kata' && $class_discipline_variant === 1){
                 echo '<div id="apDivPDFKataPoint">
                       <a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a></div>
-                      <div id="apCompBannerKataPoint"></div>
                       <div id="apSponsorPic1KataPoint"></div>
                       <div id="apSponsorPic2KataPoint"></div>
                       <div id="apSponsorPic3KataPoint"></div>
+                      <div id="apSponsorPic4KataPoint"></div>
+                      <div id="apSponsorPic5KataPoint"></div>
+                      <div id="apSponsorPic6KataPoint"></div>
                       <div id="apDivResultatKataPoint">';
             }
             else {
                 if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1){ 
                     echo '<div id="apDivPDF">
                           <a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a></div>
-                          <div id="apCompBanner"></div>
                           <div id="apSponsorPic1"></div>
                           <div id="apSponsorPic2"></div>
                           <div id="apSponsorPic3"></div>
+                          <div id="apSponsorPic4"></div>
+                          <div id="apSponsorPic5"></div>
+                          <div id="apSponsorPic6"></div>                          
                           <div id="apDivResultat">'; 
                 } 
                 else { 
                     echo '<div id="apDivPDF">
                           <a href=DomPDF.php?class_id='.$colname_rsClassData.'>T&auml;vlingsstege som PDF</a></div>
-                          <div id="apCompBanner"></div>    
                           <div id="apSponsorPic1"></div>
                           <div id="apSponsorPic1"></div>
                           <div id="apSponsorPic2"></div>
                           <div id="apSponsorPic3"></div>
+                          <div id="apSponsorPic4"></div>
+                          <div id="apSponsorPic5"></div>
+                          <div id="apSponsorPic6"></div>
                           <div id="apDivResultatRR">'; 
                 }
             }; 

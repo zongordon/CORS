@@ -1,5 +1,5 @@
 <?php
-//Changed height and width on 1spbsrekarne_mynt.png
+//Added sponsors,EEM, Kfast and Eskilstuna logistik
 
 require_once('Connections/DBconnection.php');
 
@@ -53,8 +53,11 @@ $DBconnection = null;
       <h3>Huvudsponsorer</h3>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
       <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
-      <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
+      <p><img src="img/sponsors/Dental_Estetik.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
       <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.png" width="150" height="150" border="0" alt="Room4Life"></a></p>      
+      <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/EEM.png" width="150" height="106" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
+      <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/Etuna_Logistik.png" width="150" height="53" border="0" alt="Eskilstuna Logistik"></a></p>      
+      <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/Kfast.png" width="150" height="64" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      
 <!--Hide code       
       <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
       <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      

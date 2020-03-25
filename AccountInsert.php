@@ -1,5 +1,5 @@
 <?php
-//Added validation class with multiple validation features and removed most of existing validation code
+//Changed validation of email to emailPattern()
 
 ob_start();
 //Access level top administrator
@@ -49,7 +49,7 @@ include_once('includes/restrict_access.php');?>
     $length = 5;//min length of strings
     $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
     $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
-    $val->name('e-post')->value($email)->pattern('email')->required();
+    $val->name('e-post')->value($email)->emailPattern()->required();
     $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
     $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
     $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);

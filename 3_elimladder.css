@@ -1,5 +1,7 @@
-/* Added #apCompBanner,#apDivResultatKataPoint, #apSponsorPic2KataPoint and #apSponsorPic3KataPoint to fit Kata Point System page
-/* Changed height and width on 1spbsrekarne_mynt.png
+/* Removed #apCompBanner
+/* Added #apSponsorPic5KataPoint, #apSponsorPic5KataPoint, #apSponsorPic6KataPoint and #apSponsorPic6KataPoint
+/* Changed font-family
+
 /***********************************************/
 /* 3col_leftNav.css                             */
 
@@ -16,7 +18,7 @@
 /***********************************************/
 
 body{
-	font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
+	font-family: Arial, Helvetica, sans-serif, DejaVu Sans;
 	color: #333333;
 	line-height: 1.166;
 	margin: 0px;
@@ -49,7 +51,7 @@ a:hover{
 }
 
 h1{
- font-family: Tahoma, Arial, sans-serif;
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 115%;
  color: #000000;
  margin: 0px;
@@ -57,7 +59,7 @@ h1{
 }
 
 h2{
- font-family: Tahoma, Arial, sans-serif;
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 114%;
  color: #333333;
  margin: 0px;
@@ -65,7 +67,7 @@ h2{
 }
 
 h3{
- font-family: Tahoma, Arial, sans-serif;
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
  color: #000000;
  margin: 0px;
@@ -82,7 +84,7 @@ h4{
 }
 
 h5{
- font-family: Tahoma, Arial, sans-serif;
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
  color: #000000;
  margin: 0px;
@@ -102,7 +104,7 @@ ul ul ul{
 }
 
 label{
- font-family: Tahoma, Arial, sans-serif;
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
  font-weight: bold;
  color: #334d55;
@@ -622,44 +624,25 @@ label{
         left: 640px;
 	top: 100px;
 }	
-#apCompBannerKataPoint {
-	position:absolute;
-	z-index:1;
-	left: 250px;
-	top: -50px;
-	width:150px;
-	height:27px;
-        background-image: url("img/Comp_Banner.jpg");
-        background-repeat: no-repeat;
-}
-#apCompBanner {
-	position:absolute;
-	z-index:1;
-	left: 220px;
-	top: 50px;
-	width:150px;
-	height:27px;
-        background-image: url("img/Comp_Banner.jpg");
-        background-repeat: no-repeat;
-}
+
 #apSponsorPic1 {
 	position:absolute;
 	z-index:1;
-	left: 10px;
-	top: 560px;
+	left: 220px;
+	top: 35px;
 	width:150px;
 	height:58px;
-        background-image: url("img/sponsors/EKA-Logo.svg");
+        background-image: url("img/sponsors/EKA-Logo.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic1KataPoint {
 	position:absolute;
 	z-index:1;
-	left: 10px;
-	top: 590px;
+	left: 250px;
+	top: -70px;
 	width:150px;
 	height:58px;
-        background-image: url("img/sponsors/EKA-Logo.svg");
+        background-image: url("img/sponsors/EKA-Logo.png");
         background-repeat: no-repeat;
 }
 
@@ -683,111 +666,89 @@ label{
         background-image: url("img/sponsors/1spbsrekarne_mynt.png");
         background-repeat: no-repeat;
 }
+
 #apSponsorPic3 {
 	position:absolute;
 	z-index:1;
-	left: 850px;
+	left: 950px;
 	top: 560px;
-	width:150px;
-	height:104px;
-        background-image: url("img/sponsors/Dental_Estetik_small.png");
+	width:75px;
+	height:53px;
+        background-image: url("img/sponsors/EEM_small.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic3KataPoint {
 	position:absolute;
 	z-index:1;
+	left: 980px;
+	top: 560px;
+	width:75px;
+	height:53px;
+        background-image: url("img/sponsors/EEM_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic4 {
+	position:absolute;
+	z-index:1;
+	left: 850px;
+	top: 560px;
+	width:75px;
+	height:52px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic4KataPoint {
+	position:absolute;
+	z-index:1;
 	left: 880px;
 	top: 560px;
-	width:150px;
-	height:104px;
+	width:75px;
+	height:52px;
         background-image: url("img/sponsors/Dental_Estetik_small.png");
         background-repeat: no-repeat;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#apSponsorPic5 {
+	position:absolute;
+	z-index:1;
+	left: 100px;
+	top: 560px;
+	width:75px;
+	height:27px;
+        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic5KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 100px;
+	top: 590px;
+	width:75px;
+	height:27px;
+        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic6 {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 560px;
+	width:75px;
+	height:32px;
+        background-image: url("img/sponsors/Kfast_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic6KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 590px;
+	width:75px;
+	height:32px;
+        background-image: url("img/sponsors/Kfast_small.png");
+        background-repeat: no-repeat;
+}
