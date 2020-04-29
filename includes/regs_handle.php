@@ -1,6 +1,5 @@
 <?php 
-//Corrected delete contestant link
-//Removed "<" and ">" from "SUBSTRING(cl.class_age, 1, 2) => :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) =< :contestant_age_max "
+//Removed troubleshooting code
 
 //Catch anything wrong with query
 try {
@@ -668,10 +667,7 @@ else {
         $diff_high = $date2->diff($date1);
         $diff_low = $date3->diff($date1);
         $contestant_age_max = $diff_high->y;
-        $contestant_age_min = $diff_low->y;/*
-      echo 'Namn: '.$row_rsContestants['contestant_name'].'<br>';    
-      echo 'Min-ålder: '.$contestant_age_min.'<br>';    
-      echo 'Max-ålder: '.$contestant_age_max.'<br>';*/
+        $contestant_age_min = $diff_low->y;
     }else{    
         //Calculate the age of the contestant at the date of the competition
         $date1 = new DateTime($comp_start_date);
