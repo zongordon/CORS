@@ -1,0 +1,2731 @@
+From f934fb2a903296240b4596c411bbb40dd27d45ff Mon Sep 17 00:00:00 2001
+From: e120130 <e120130@SEESKW10259405.vcn.ds.volvo.net>
+Date: 6 nov. 2020 21:24:09
+
+v3.3.4
+Bug fixes for showing elimination ladders correctly and error message caused by PHP >7.3.
+Reduced duplicate code and improved validation for more special characters.
+Bug fixes:
+- Changed to handle contestants or not, preventing error message "Notice: Trying to access array offset on value of type bool...", introduced by PHP 7.4: ElimLadder.php, regs_handle.php
+- Changed to show correct protocols for classes with teams, round robin, kata point system or default: ElimLadder.php
+- Changed title from "Anv&auml;ndarkonton": AccountsList.php, restrict_access.php
+- Changed as duplicated in index.php and caused error message in PHP 8.0.0: news_sponsors_nav.php, restrict_access.php
+- Changed embedded video from linked Facebook video to Youtube and changed to google maps link instead of Facebook link: index.php and index_during.php
+- Corrected and improved text validation for more special characters and to fit PHP 8.0.0 and changed validation of alphanumeric to include "-" and " ": Validate.php
+- Changed to solve Warning: Undefined variable $contestant_name when validation triggered error message with PHP 8.0.0.rc1: contestant_update.php 
+- Changed to prevent Warning: Trying to access array offset on value of type null with PHP 8.0.0.rc1: account_update.php, CompetitionUpdate.php
+- Changed order of includes to prevent Warning: session_start(): Session cannot be started after headers have already been sent: ClassContentants.php
+- Changed to show Coach field only when club is selected to prevent SQL error if data entered before selecction: regs_handle.php
+
+Enhancements:
+- Improved class for text validation for more special characters and to fit PHP 7.3->: Validate.php
+- Moved duplicate code to includes/account_insert.php: AccountInsert.php, AccountInsert_loggedout.php, account_insert.php (new)
+- Moved duplicate code to includes/account_insert.php: AccountUpdate.php, AccountUpdate_reg.php, account_update.php (new)
+- Changed from "text" validation: accont_insert.php, account_update.php, contestant_update.php; regs_handle.php
+- Changed the check boxes to disabled: AccountsList.php
+- If admin redirect to accounts list after insert: accont_insert.php
+- Changed validation from "text" for $comp_arranger: CompetitionInsert.php, CompetitionUpdate.php
+- Changed explanations of reports: Rep_Summary.php
+
+Information changes:
+- Competition cancelled: index.php, index_cancelled.php
+- Removed troubleshooting code: includes/regs_handle.php
+- Added <div class="story"> for better visual presentation: AccountsList.php
+
+SQL:
+- Added "ON DELETE CASCADE ON UPDATE CASCADE" for club_reg_id and contestant_id 
+###
+DELETE registration.* 
+FROM registration 
+LEFT JOIN clubregistration 
+  ON clubregistration.club_reg_id = registration.club_reg_id 
+WHERE clubregistration.club_reg_id IS NULL
+###
+ALTER TABLE `registration` ADD  CONSTRAINT `clubreg` FOREIGN KEY (`club_reg_id`) REFERENCES `clubregistration`(`club_reg_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+###
+DELETE registration.* 
+FROM registration 
+LEFT JOIN contestants 
+  ON contestants.contestant_id = registration.contestant_id 
+WHERE contestants.contestant_id IS NULL
+###
+ALTER TABLE `registration` ADD  CONSTRAINT `contestant` FOREIGN KEY (`contestant_id`) REFERENCES `contestants`(`contestant_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+Web Server (production/test/development): Percona Server 5.6.40/ Percona Server 5.6.40/Apache 2.4.43
+Database: MySQL 5.1.73/ MySQL 5.1.73/ 10.4.11-MariaDB
+PHP version: 7.2.29 /8.0.0rc1 /7.4.5
+
+diff --git a/AccountInsert.php b/AccountInsert.php
+index 7364a82..d15943f 100644
+--- a/AccountInsert.php
++++ b/AccountInsert.php
+@@ -1,5 +1,5 @@
+ <?php
+-//Changed validation of email to emailPattern()
++//Moved duplicate code to includes/account_insert.php 
+ 
+ ob_start();
+ //Access level top administrator
+@@ -28,249 +28,4 @@
+ <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">  
+    <div class="feature">    
+-       <div class="error">    
+-<?php
+-//Declare and initialise variables
+-  $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+-// Validate insert account data if button is clicked
+- if (filter_input(INPUT_POST,'MM_insert') === 'new_account') {
+-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
+-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
+-    $email = filter_input(INPUT_POST,'contact_email');
+-    $contact_phone = filter_input(INPUT_POST,'contact_phone');
+-    $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));
+-    $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));
+-    $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');  
+-    $access_level = filter_input(INPUT_POST,'access_level');
+-    $confirmed = filter_input(INPUT_POST,'confirmed');       
+-    $active = filter_input(INPUT_POST,'active');    
+-    
+-    $val = new Validation();
+-    $length = 5;//min length of strings
+-    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+-    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+-    $val->name('e-post')->value($email)->emailPattern()->required();
+-    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+-    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+-    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);
+-    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+-    
+-    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+-    if($val->isSuccess()){
+-    	$output_form = 'no';
+-    }else{
+-        foreach($val->getErrors() as $error) {
+-        echo '<h3>'.$error.'</h3></br>';
+-        }
+-        $output_form = 'yes';
+-    }
+-    
+-    //Validate that email isn't already used
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');               
+-    // Validate insert account data    
+-    $colname_rsContactemail = $email;     
+-    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email";
+-    $stmt_rsContactemail = $DBconnection->prepare($query1);
+-    $stmt_rsContactemail->execute(array(':contact_email' => $colname_rsContactemail));
+-    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }   
+-	if ($totalRows_rsContactemail > 0) {
+-        // $contact_email is already in use
+-        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
+-        $output_form = 'yes';		
+-	}
+-         //Kill statement
+-        $stmt_rsContactemail->closeCursor();   
+-    
+-    //Check if the user name already is registered            
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');                   
+-    //Validate account insert data against current accounts    
+-    $colname_rsUsername = $user_name;
+-    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name";
+-    $stmt_rsUsername = $DBconnection->prepare($query2);
+-    $stmt_rsUsername->execute(array(':user_name' => $colname_rsUsername));
+-    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }       
+-	if ($totalRows_rsUsername > 0) {
+-        // $user_name is already in use
+-            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+-            $output_form = 'yes';		
+-	}
+-        //Kill statement and DB connection
+-        $stmt_rsUsername->closeCursor();	
+- } 
+- else {
+-   $output_form = 'yes';
+- } 
+- 
+-if ($output_form == 'yes') { ?>
+-       </div>  
+-<h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
+-    <p>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</p>
+-
+-    <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
+-      <table width="400" border="0">
+-        <tr>
+-          <td>Klubbens namn</td>
+-          <td><label>
+-            <input name="club_name" type="text" id="club_name" size="25" value="<?php echo $club_name; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Kontaktperson</td>
+-          <td valign="top"><label>
+-            <input name="contact_name" type="text" id="contact_name" size="25" value="<?php echo $contact_name; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>E-post</td>
+-          <td valign="top"><label>
+-            <input name="contact_email" type="text" id="contact_email" size="25" value="<?php echo $email; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Telefon</td>
+-          <td><label>
+-            <input name="contact_phone" type="text" id="contact_phone" size="25" value="<?php echo $contact_phone; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Anv&auml;ndarnamn</td>
+-          <td><input name="user_name" type="text" id="user_name" size="25" value="<?php echo $user_name; ?>"/></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord</td>
+-          <td><input name="user_password" type="password" id="user_password" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord (bekr&auml;fta)</td>
+-          <td><input name="confirm_user_password" type="password" id="confirm_user_password" size="25" /></td>
+-        </tr>
+-        <tr>
+-           <td>Kontotyp</td>
+-          <td><label>
+-            <input <?php if (!(strcmp($access_level,1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_1" />
+-Admin</label><label>      
+-    <input <?php if (!(strcmp($access_level,0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_0" checked=""/>
+-Coach</label></td>
+-        </tr>
+-        <tr>
+-          <td>Aktivt konto</td>
+-          <td><label>
+-                  <input <?php if (!(strcmp($active,1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_1" checked=""/>
+-Ja</label><label>      
+-            <input <?php if (!(strcmp($active,0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_0" />
+-Nej</label></td>                  
+-        </tr>
+-        <tr>
+-          <td>Bekr&auml;ftat konto</td>
+-          <td><label>
+-                  <input <?php if (!(strcmp($confirmed,1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_1" checked=""/>
+-Ja</label><label>      
+-            <input <?php if (!(strcmp($confirmed,0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_0" />
+-Nej</label></td>                                    
+-        </tr>
+-        <tr>
+-          <td>&nbsp;</td>
+-          <td><label>
+-            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
+-          </label></td>
+-        </tr>
+-      </table>
+-      <input type="hidden" name="MM_insert" value="new_account" />
+-      </form>
+-<?php
+-} 
+-	//Send the account information to the users email address and save it
+-  	else if ($output_form == 'no') {
+-        $headers = "From: $comp_name <$comp_email>\r\n" .
+-        "MIME-Version: 1.0\r\n" . 
+-        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
+-        "Content-Type: text/plain; charset=utf-8\r\n" . 
+-        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
+-        $subject = 'Ditt nya konto: '.$comp_name;
+-        $text = "Tack för att du ville registrera ett konto på $comp_url!\n" .
+-        "Här är de inloggningsuppgifter som vi registrerade åt dig:\n" .
+-	"Klubbnamn: $club_name\n" .
+-        "Kontaktperson: $contact_name\n" .
+-        "E-post: $email\n" .
+-        "Telefon: $contact_phone\n" .
+-	"Användarnamn: $user_name\n" .
+-	"Lösenord: $user_password\n" .
+-	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
+-	"\n" .
+-	"Med vänliga hälsningar,\n" .
+-	"$comp_arranger, $comp_name, $comp_email";
+-        $msg = "Hej $contact_name,\n$text";
+-        
+-        // Send email to club contact
+-        mail($email, $subject, $msg, $headers);                
+-    
+-        echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';
+-       //Catch anything wrong with query
+-            try {
+-            require('Connections/DBconnection.php'); 
+-            //INSERT account data in DB
+-            $query = "INSERT INTO 
+-                account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level)
+-                VALUES (:user_name, :user_password, :confirmed, :contact_name, :contact_email, :contact_phone, :club_name, :active, :access_level)"; 
+-            $stmt_rsAccount = $DBconnection->prepare($query);                                  
+-            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+-            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+-            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+-            $stmt_rsAccount->execute();
+-            }   
+-            catch(PDOException $ex) {
+-                echo "An Error occured: ".$ex->getMessage();
+-            }
+-	} ?>  
+-   </div>
+-</div>    
+-<?php include("includes/footer.php");?>
+-</body>
+-</html>
+-<?php ob_end_flush();?>
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
++<?php require_once 'includes/account_insert.php';
+\ No newline at end of file
+diff --git a/AccountInsert_loggedout.php b/AccountInsert_loggedout.php
+index 2c482d2..5666c72 100644
+--- a/AccountInsert_loggedout.php
++++ b/AccountInsert_loggedout.php
+@@ -1,9 +1,9 @@
+ <?php
+-//Changed validation of email to emailPattern()
++//Moved duplicate code to includes/account_insert.php 
+ 
+-if (!isset($_SESSION)) {
+-  session_start();
+-}
++ob_start();
++//Access level unregistered user
++$MM_authorizedUsers = '';
+ 
+ $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+ if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+@@ -26,270 +26,4 @@
+ <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">
+    <div class="feature">    
+-      <div class="error">
+-<?php
+-//Declare and initialise variables
+-  $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';$confirm_user_password='';
+-// Validate insert account data if button is clicked
+- if (filter_input(INPUT_POST,'MM_insert') === 'new_account') {
+-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
+-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
+-    $email = filter_input(INPUT_POST,'contact_email');
+-    $contact_phone = filter_input(INPUT_POST,'contact_phone');
+-    $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));
+-    $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));
+-    $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');  
+-    $access_level = filter_input(INPUT_POST,'access_level');
+-    $confirmed = filter_input(INPUT_POST,'confirmed');       
+-    $active = filter_input(INPUT_POST,'active');       
+-    $captcha=filter_input(INPUT_POST,'captcha');
+-	    
+-    $val = new Validation();
+-    $length = 5;//min length of strings
+-    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+-    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+-    $val->name('e-post')->value($email)->emailPattern()->required();
+-    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+-    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+-    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);    
+-    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+-    $val->name('tecken i bilden')->value($captcha)->pattern('int')->required()->equal($_SESSION['captcha']);   
+-    
+-    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+-    if($val->isSuccess()){
+-    	$output_form = 'no';
+-    }else{
+-        foreach($val->getErrors() as $error) {
+-        echo '<h3>'.$error.'</h3></br>';
+-        }
+-        $output_form = 'yes';
+-    }   
+-
+-    //Validate that email isn't already used
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');               
+-    // Validate insert account data    
+-    $colname_rsContactemail = $email;     
+-    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email";
+-    $stmt_rsContactemail = $DBconnection->prepare($query1);
+-    $stmt_rsContactemail->execute(array(':contact_email' => $colname_rsContactemail));
+-    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }   
+-	if ($totalRows_rsContactemail > 0) {
+-        // $contact_email is already in use
+-        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
+-        $output_form = 'yes';		
+-	}
+-         //Kill statement and DB connection
+-        $stmt_rsContactemail->closeCursor();   
+-    
+-    //Check if the user name already is registered            
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');                   
+-    //Validate account insert data against current accounts    
+-    $colname_rsUsername = $user_name;
+-    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name";
+-    $stmt_rsUsername = $DBconnection->prepare($query2);
+-    $stmt_rsUsername->execute(array(':user_name' => $colname_rsUsername));
+-    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }       
+-	if ($totalRows_rsUsername > 0) {
+-        // $user_name is already in use
+-            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+-            $output_form = 'yes';		
+-	}
+-        //Kill statement and DB connection
+-        $stmt_rsUsername->closeCursor();	
+- } 
+- else {
+-    $output_form = 'yes';
+- }
+-
+-if ($output_form === 'yes') {
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');                   
+-    // Select information regarding all active accounts    
+-    $query3 = "SELECT club_name, contact_name, contact_email FROM account WHERE active = 1 ORDER BY club_name ASC";
+-    $stmt_rsAccounts = $DBconnection->query($query3);
+-    $totalRows_rsAccounts = $stmt_rsAccounts->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    } ?>
+-      </div>       
+-<h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
+-<p><strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
+-    <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</p>
+-
+-    <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
+-      <table width="450" border="0">
+-        <tr>
+-          <td>Klubbens namn</td>
+-          <td><label>
+-            <input name="club_name" type="text" id="club_name" size="25" value="<?php echo $club_name; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Kontaktperson</td>
+-          <td valign="top"><label>
+-            <input name="contact_name" type="text" id="contact_name" size="25" value="<?php echo $contact_name; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>E-post</td>
+-          <td valign="top"><label>
+-            <input name="contact_email" type="text" id="contact_email" size="25" value="<?php echo $email; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Telefon</td>
+-          <td><label>
+-            <input name="contact_phone" type="text" id="contact_phone" size="25" value="<?php echo $contact_phone; ?>"/>
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Anv&auml;ndarnamn</td>
+-          <td><input name="user_name" type="text" id="user_name" size="25" value="<?php echo $user_name; ?>"/></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord</td>
+-          <td><input name="user_password" type="password" id="user_password" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord (bekr&auml;fta)</td>
+-          <td><input name="confirm_user_password" type="password" id="confirm_user_password" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>Skriv in samma tecken som i bilden!</td>
+-          <td><input name="captcha" type="text" id="captcha" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td><img src="Captcha.php" /><input name="active" type="hidden" id="active" value="1" />
+-            <input name="access_level" type="hidden" id="access_level" value="0" />
+-            <input name="confirmed" type="hidden" id="confirmed" value="0" /></td>
+-          <td><label>
+-            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
+-          </label></td>
+-        </tr>
+-      </table>
+-      <input type="hidden" name="MM_insert" value="new_account" />
+-    </form>
+-På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
+-Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
+-Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.
+-<!-- Show current accounts -->
+-<h3>Registrerade konton</h3>
+-<?php if ($totalRows_rsAccounts > 0) { ?>    
+-      <p>Detta &auml;r konton som redan finns registrerade.</p>
+-  <table width="100%" border="1" cellpadding="2">
+-    <tr>
+-      <td nowrap="nowrap"><strong>Klubbnamn</strong></td>
+-      <td nowrap="nowrap"><strong>Kontaktnamn</strong></td>
+-      <td nowrap="nowrap"><strong>E-post</strong></td>      
+-    </tr>
+-<?php   while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) { ;?>
+-      <tr>
+-        <td><?php echo $row_rsAccounts['club_name']; ?></td>
+-        <td><?php echo $row_rsAccounts['contact_name']; ?></td>
+-        <td><?php echo $row_rsAccounts['contact_email']; ?></td>
+-      </tr>
+-<?php   } ?>
+-  </table>
+-<?php
+-      } 
+-      else {
+-          echo 'Inga konton tillg&auml;ngliga &auml;n!';
+-      }
+-//Kill statement
+-$stmt_rsAccounts->closeCursor();
+-} 
+-        
+-	//Send the account information to the users email address and save it
+-  	else if ($output_form === 'no') {
+-        //Email to Competition Admin    
+-        $headers = "From: $comp_name <$comp_email>\r\n" .
+-        "MIME-Version: 1.0\r\n" . 
+-        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
+-        "Content-Type: text/plain; charset=utf-8\r\n" . 
+-        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
+-        $adm_email = "$comp_email";
+-        $subject_adm = 'Nytt konto registrerat: '.$comp_name;
+-	$text_adm = "Detta konto har registrerats på $comp_url:\n" .
+-	"Klubbnamn: $club_name\n" .
+-        "Kontaktperson: $contact_name\n" .
+-        "E-post: $email\n" .
+-        "Telefon: $contact_phone\n" .
+-	"Användarnamn: $user_name\n" .
+-	"\n";
+-        $msg_adm = "Nytt konto registrerat!\n$text_adm";
+-
+-        // Send email to Competition Admin
+-        mail($adm_email, $subject_adm, $msg_adm, $headers);                
+-        
+-        //Email to Club Contact
+-        $headers = "From: $comp_name <$comp_email>\r\n" .
+-        "MIME-Version: 1.0\r\n" . 
+-        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
+-        "Content-Type: text/plain; charset=utf-8\r\n" . 
+-        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
+-        $subject = 'Ditt nya konto: '.$comp_name;
+-        $text = "Tack för att du registrerat ett konto på $comp_url!\n" .
+-        "Här är de inloggningsuppgifter som du registrerade:\n" .
+-	"Klubbnamn: $club_name\n" .
+-        "Kontaktperson: $contact_name\n" .
+-        "E-post: $email\n" .
+-        "Telefon: $contact_phone\n" .
+-	"Användarnamn: $user_name\n" .
+-	"Lösenord: $user_password\n" .
+-	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
+-	"\n" .
+-	"Med vänliga hälsningar,\n" .
+-	"$comp_arranger, $comp_name, $comp_email";
+-        $msg = "Hej $contact_name,\n$text";
+-        
+-        // Send email to club contact
+-        mail($email, $subject, $msg, $headers);                
+-   
+- 	echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_url.'!<br />Dina uppgifter skickades till: '. $email .'<br />Logga in och g&ouml;r dina anm&auml;lningar!</div>';
+-       //Catch anything wrong with query
+-            try {
+-            require('Connections/DBconnection.php');           
+-            //INSERT account data in DB
+-            $query = "INSERT INTO 
+-                account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level)
+-                VALUES (:user_name, :user_password, :confirmed, :contact_name, :contact_email, :contact_phone, :club_name, :active, :access_level)"; 
+-            $stmt_rsAccount = $DBconnection->prepare($query);                                  
+-            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+-            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+-            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+-            $stmt_rsAccount->execute();
+-            }   
+-            catch(PDOException $ex) {
+-                echo "An Error occured: ".$ex->getMessage();
+-            } //Kill statement
+-            $stmt_rsAccount->closeCursor();
+-	} ?>
+-   </div>
+-</div>
+-<?php include("includes/footer.php");?>
+-</body>
+-</html>
+-
+-
++<?php require_once 'includes/account_insert.php';
+\ No newline at end of file
+diff --git a/AccountUpdate.php b/AccountUpdate.php
+index 4d5aa8d..476a557 100644
+--- a/AccountUpdate.php
++++ b/AccountUpdate.php
+@@ -1,5 +1,5 @@
+ <?php 
+-//Added validation class with multiple validation features and removed most of existing validation code
++//Removed duplicate code to includes/account_updates.php
+ ob_start();
+ 
+ //Access level admin
+@@ -13,19 +13,6 @@
+ //Catch account_id for selected account
+ $colname_rsAccountId = filter_input(INPUT_GET, 'account_id');
+ 
+-//Catch anything wrong with query
+-try {
+-require('Connections/DBconnection.php');            
+-//Select data regarding all accounts
+-$query = "SELECT * FROM account WHERE account_id = :account_id";
+-$stmt_rsAccount = $DBconnection->prepare($query);
+-$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
+-$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+-}   
+-catch(PDOException $ex) {
+-    echo "An Error occured: ".$ex->getMessage();
+-}
+-
+ $pagetitle="&Auml;ndra anv&auml;ndarkonto - admin";
+ // require Class for validation of forms
+ require_once 'Classes/Validate.php';
+@@ -43,225 +30,4 @@
+ <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">      
+     <div class="feature">    
+-        <div class="error">    
+-<?php
+-//Declare and initialise variables
+-    $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+-// Update account data if button is clicked and all fields are validated to be correct
+-if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
+-    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
+-    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
+-    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
+-    $confirmed = filter_input(INPUT_POST, 'confirmed');    
+-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8"));
+-    $email = filter_input(INPUT_POST, trim('contact_email'));
+-    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
+-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
+-    $active = filter_input(INPUT_POST, 'active');
+-    $access_level = filter_input(INPUT_POST, 'access_level');
+-    $account_id = filter_input(INPUT_POST, 'account_id');			
+-    
+-    $val = new Validation();
+-    $length = 5;//min length of strings
+-    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+-    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+-    $val->name('e-post')->value($email)->emailPattern()->required();
+-    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+-    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+-    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);
+-    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+-    
+-    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+-    if($val->isSuccess()){
+-    	$output_form = 'no';
+-    }else{
+-        foreach($val->getErrors() as $error) {
+-        echo '<h3>'.$error.'</h3></br>';
+-        }
+-        $output_form = 'yes';
+-    }
+-    //Validate that email isn't already used
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');               
+-    // Validate insert account data    
+-    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email AND account_id <> :account_id";
+-    $stmt_rsContactemail = $DBconnection->prepare($query1);
+-    $stmt_rsContactemail->execute(array(':contact_email' => $email, ':account_id' => $account_id));
+-    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }   
+-	if ($totalRows_rsContactemail > 0) {
+-        // $contact_email is already in use
+-        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
+-        $output_form = 'yes';		
+-	}
+-         //Kill statement
+-        $stmt_rsContactemail->closeCursor();
+- 
+-    //Check if it's already registered    
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');                   
+-    //Validate account insert data against current accounts    
+-    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name AND account_id <> :account_id";
+-    $stmt_rsUsername = $DBconnection->prepare($query2);
+-    $stmt_rsUsername->execute(array(':user_name' => $user_name, ':account_id' => $account_id));
+-    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }       
+-	if ($totalRows_rsUsername > 0) {
+-        // $user_name is already in use
+-            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+-            $output_form = 'yes';		
+-	}
+-        //Kill statement
+-        $stmt_rsUsername->closeCursor();
+-}	
+-  else {
+-    $output_form = 'yes';
+-  }
+-// Show form if the button Update isn't clicked	
+-if ($output_form === 'yes') { ?>
+-       </div>    
+-<h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara &auml;ndringen p&aring; kontot.  </h3>
+-  </div>
+-  <div class="story">
+-    <form id="AccountForm" name="AccountForm" method="POST" action="<?php echo $editFormAction; ?>">
+-      <table width="200" border="0">
+-        <tr>
+-          <td valign="baseline" nowrap="nowrap">Klubbens namn</td>
+-          <td><label>
+-            <input name="club_name" type="text" id="club_name" value="<?php echo $row_rsAccount['club_name']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Kontaktperson</td>
+-          <td valign="top"><label>
+-            <input name="contact_name" type="text" id="contact_name" value="<?php echo $row_rsAccount['contact_name']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>E-post</td>
+-          <td valign="top"><label>
+-            <input name="contact_email" type="text" id="contact_email" value="<?php echo $row_rsAccount['contact_email']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Telefon</td>
+-          <td><label>
+-            <input name="contact_phone" type="text" id="contact_phone" value="<?php echo $row_rsAccount['contact_phone']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Anv&auml;ndarnamn</td>
+-          <td><input name="user_name" type="text" id="user_name" value="<?php echo $row_rsAccount['user_name']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord</td>
+-          <td><input name="user_password" type="password" id="user_password" value="<?php echo $row_rsAccount['user_password']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord (bekr&auml;fta)</td>
+-          <td><input name="confirm_user_password" type="password" id="confirm_user_password" value="<?php echo $row_rsAccount['user_password']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>Kontotyp</td>
+-          <td><label>
+-            <input <?php if (!(strcmp($row_rsAccount['access_level'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_0" />
+-Admin</label><label>      
+-            <input <?php if (!(strcmp($row_rsAccount['access_level'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_1" />
+-Coach</label></td>
+-        </tr>
+-        <tr>
+-          <td>Aktivt konto</td>
+-          <td><label>
+-            <input <?php if (!(strcmp($row_rsAccount['active'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_0" />
+-Ja</label><label>      
+-            <input <?php if (!(strcmp($row_rsAccount['active'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_1" />
+-Nej</label></td>                  
+-        </tr>
+-        <tr>
+-          <td>Bekr&auml;ftat konto</td>
+-          <td><label>
+-            <input <?php if (!(strcmp($row_rsAccount['confirmed'],1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_0" />
+-Ja</label><label>      
+-            <input <?php if (!(strcmp($row_rsAccount['confirmed'],0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_1" />
+-Nej</label></td>                                    
+-        </tr>
+-        <tr>
+-          <td align="right" valign="baseline" nowrap="nowrap"><input type="hidden" name="MM_update" value="AccountForm" /><input name="account_id" type="hidden" id="account_id" value="<?php echo $row_rsAccount['account_id']; ?>" /></td>
+-          <td><input name="AccountUpdate" type="submit" id="AccountUpdate" value="Spara" /></td>
+-        </tr>
+-      </table>
+-    </form>
+-    <p>&nbsp;</p>
+-</div>
+-</div>
+-<?php
+-} 
+-	//Save the updated account information if the Update button is clicked and form validated correct 
+-  	else if ($output_form === 'no') {
+-            //Catch anything wrong with query
+-            try {
+-            require('Connections/DBconnection.php');           
+-            //UPDATE account according to changes
+-            $updateSQL = "UPDATE account 
+-            SET user_name=:user_name, 
+-                user_password = :user_password, 
+-                confirmed = :confirmed, 
+-                contact_name = :contact_name, 
+-                contact_email = :contact_email, 
+-                contact_phone = :contact_phone, 
+-                club_name = :club_name, 
+-                active = :active, 
+-                access_level = :access_level 
+-                WHERE account_id = :account_id"; 
+-            $stmt_rsAccount = $DBconnection->prepare($updateSQL);                                  
+-            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+-            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+-            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':account_id', $account_id, PDO::PARAM_INT);
+-            $stmt_rsAccount->execute();
+-            }   
+-            //Catch eny error
+-            catch(PDOException $ex) {
+-                echo "An Error occured: ".$ex->getMessage();
+-            }
+-
+-            $updateGoTo = "AccountsList.php";
+-            if (isset($_SERVER['QUERY_STRING'])) {
+-                $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+-                $updateGoTo .= $_SERVER['QUERY_STRING'];
+-            }
+-            header(sprintf("Location: %s", $updateGoTo));
+-        }
+-//Kill statement
+-$stmt_rsAccount->closeCursor();        
+-include("includes/footer.php");
+-?>
+-</body>
+-</html>
+-<?php ob_end_flush();
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
++<?php require_once 'includes/account_update.php';
+\ No newline at end of file
+diff --git a/AccountUpdate_reg.php b/AccountUpdate_reg.php
+index e289109..2d2d000 100644
+--- a/AccountUpdate_reg.php
++++ b/AccountUpdate_reg.php
+@@ -1,5 +1,5 @@
+ <?php 
+-//Added values for "confirmed", "active" and "access_level"
++//Removed duplicate code to includes/account_updates.php
+ ob_start();
+ 
+ if (!isset($_SESSION)) {
+@@ -16,19 +16,6 @@
+   $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER, 'QUERY_STRING'));
+ }
+ 
+-//Catch anything wrong with query
+-try {
+-require('Connections/DBconnection.php');            
+-//Select data regarding all accounts
+-$query = "SELECT * FROM account WHERE account_id = :account_id";
+-$stmt_rsAccount = $DBconnection->prepare($query);
+-$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
+-$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
+-}   
+-catch(PDOException $ex) {
+-    echo "An Error occured: ".$ex->getMessage();
+-}
+-
+ $pagetitle="&Auml;ndra anv&auml;ndarkonto";
+ // require Class for validation of forms
+ require_once 'Classes/Validate.php';
+@@ -44,194 +31,4 @@
+ <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">
+     <div class="feature">
+-        <div class="error">
+-<?php
+-//Declare and initialise variables
+-    $user_name='';$user_password='';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
+-// Update account data if button is clicked and all fields are validated to be correct
+-if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
+-    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
+-    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
+-    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
+-    $confirmed = filter_input(INPUT_POST, 'confirmed');     
+-    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8"));
+-    $email = filter_input(INPUT_POST, trim('contact_email'));
+-    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
+-    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
+-    $active = filter_input(INPUT_POST, 'active');
+-    $access_level = filter_input(INPUT_POST, 'access_level');
+-    $account_id = filter_input(INPUT_POST, 'account_id');				
+-
+-    $val = new Validation();
+-    $length = 5;//min length of strings
+-    $val->name('klubbens namn')->value($club_name)->pattern('text')->required()->min($length);
+-    $val->name('kontaktperson')->value($contact_name)->pattern('text')->required()->min($length);
+-    $val->name('e-post')->value($email)->emailPattern()->required();
+-    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
+-    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
+-    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);
+-    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
+-    
+-    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+-    if($val->isSuccess()){
+-    	$output_form = 'no';
+-    }else{
+-        foreach($val->getErrors() as $error) {
+-        echo '<h3>'.$error.'</h3></br>';
+-        }
+-        $output_form = 'yes';
+-    }
+-    //Validate that email isn't already used
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');               
+-    // Validate insert account data    
+-    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email AND account_id <> :account_id";
+-    $stmt_rsContactemail = $DBconnection->prepare($query1);
+-    $stmt_rsContactemail->execute(array(':contact_email' => $email, ':account_id' => $account_id));
+-    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }   
+-	if ($totalRows_rsContactemail > 0) {
+-        // $contact_email is already in use
+-        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
+-        $output_form = 'yes';		
+-	}
+-         //Kill statement
+-        $stmt_rsContactemail->closeCursor();
+-
+-    //Check if it's already registered            
+-    //Catch anything wrong with query
+-    try {
+-    require('Connections/DBconnection.php');                   
+-    //Validate account insert data against current accounts    
+-    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name AND account_id <> :account_id";
+-    $stmt_rsUsername = $DBconnection->prepare($query2);
+-    $stmt_rsUsername->execute(array(':user_name' => $user_name, ':account_id' => $account_id));
+-    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
+-    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
+-    }   
+-    catch(PDOException $ex) {
+-        echo "An Error occured: ".$ex->getMessage();
+-    }       
+-	if ($totalRows_rsUsername > 0) {
+-        // $user_name is already in use
+-            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
+-            $output_form = 'yes';		
+-	}
+-        //Kill statement
+-        $stmt_rsUsername->closeCursor();
+-}
+-  else {
+-    $output_form = 'yes';
+-  }
+-// Show form if the button Update isn't clicked
+-if ($output_form === 'yes') { ?>
+-        </div>
+-<h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara &auml;ndringen p&aring; kontot. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</h3>
+-  </div>
+-  <div class="story">
+-    <form id="AccountForm" name="AccountForm" method="POST" action="<?php echo $editFormAction; ?>">
+-      <table width="200" border="0">
+-        <tr>
+-          <td valign="baseline" nowrap="nowrap">Klubbens namn</td>
+-          <td><label>
+-            <input name="club_name" type="text" id="club_name" value="<?php echo $row_rsAccount['club_name']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Kontaktperson</td>
+-          <td valign="top"><label>
+-            <input name="contact_name" type="text" id="contact_name" value="<?php echo $row_rsAccount['contact_name']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>E-post</td>
+-          <td valign="top"><label>
+-            <input name="contact_email" type="text" id="contact_email" value="<?php echo $row_rsAccount['contact_email']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Telefon</td>
+-          <td><label>
+-            <input name="contact_phone" type="text" id="contact_phone" value="<?php echo $row_rsAccount['contact_phone']; ?>" size="25" />
+-          </label></td>
+-        </tr>
+-        <tr>
+-          <td>Anv&auml;ndarnamn</td>
+-          <td><input name="user_name" type="text" id="user_name" value="<?php echo $row_rsAccount['user_name']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord</td>
+-          <td><input name="user_password" type="password" id="user_password" value="<?php echo $row_rsAccount['user_password']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td>L&ouml;senord (bekr&auml;fta)</td>
+-          <td><input name="confirm_user_password" type="password" id="confirm_user_password" value="<?php echo $row_rsAccount['user_password']; ?>" size="25" /></td>
+-        </tr>
+-        <tr>
+-          <td align="right" valign="baseline" nowrap="nowrap">
+-          <input type="hidden" name="MM_update" value="AccountForm" />            
+-          <input type="hidden" name="confirmed" value="0" />            
+-          <input type="hidden" name="active" value="1" />            
+-          <input type="hidden" name="access_level" value="0" />            
+-		<input name="account_id" type="hidden" id="account_id" value="<?php echo $row_rsAccount['account_id']; ?>" /></td>
+-          <td><input name="AccountUpdate" type="submit" id="AccountUpdate" value="Spara" /></td>
+-        </tr>
+-      </table>
+-    </form>
+-    <p>&nbsp;</p>
+-</div>
+-</div>
+-<?php
+-}
+-	//Save the updated account information if the Update button is clicked and form validated correct 
+-  	else if ($output_form === 'no') {
+-            //Catch anything wrong with query
+-            try {
+-            require('Connections/DBconnection.php');           
+-            //UPDATE account according to changes
+-            $query = "UPDATE account 
+-            SET user_name=:user_name, 
+-                user_password = :user_password, 
+-                confirmed = :confirmed, 
+-                contact_name = :contact_name, 
+-                contact_email = :contact_email, 
+-                contact_phone = :contact_phone, 
+-                club_name = :club_name, 
+-                active = :active, 
+-                access_level = :access_level 
+-                WHERE account_id = :account_id"; 
+-            $stmt_rsAccount = $DBconnection->prepare($query);                                  
+-            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
+-            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
+-            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
+-            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
+-            $stmt_rsAccount->bindValue(':account_id', $account_id, PDO::PARAM_INT);
+-            $stmt_rsAccount->execute();
+-            }   
+-            catch(PDOException $ex) {
+-                echo "An Error occured: ".$ex->getMessage();
+-            }
+-            $updateGoTo = "AccountList_reg.php";
+-            if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+-                $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+-                $updateGoTo .= filter_input(INPUT_SERVER,'QUERY_STRING');
+-            }
+-            header(sprintf("Location: %s", $updateGoTo));
+-        }
+-//Kill statement
+-$stmt_rsAccount->closeCursor();
+-include("includes/footer.php");
+-?>
+-</body>
+-</html>
+-<?php ob_end_flush();?>
+\ No newline at end of file
++<?php require_once 'includes/account_update.php';
+\ No newline at end of file
+diff --git a/AccountsList.php b/AccountsList.php
+index 87dd91f..e98097e 100644
+--- a/AccountsList.php
++++ b/AccountsList.php
+@@ -1,5 +1,5 @@
+ <?php
+-//Removed kill DB as it's included in footer.php
++//Changed the check boxes to disabled
+ 
+ //Access level admin
+ $MM_authorizedUsers = "1";
+@@ -17,7 +17,7 @@
+     echo "An Error occured: ".$ex->getMessage();
+ }   
+ 
+-$pagetitle="Anv&auml;ndarkonton";
++$pagetitle="Lista anv&auml;ndarkonton - admin";
+ // Includes several code functions
+ include_once('includes/functions.php');
+ // Includes HTML Head
+@@ -32,6 +32,7 @@
+ <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">
+   <div class="feature">
++      <div class="story">
+ <h3>Befintliga konton</h3>
+ <?php if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
+   <p>&Auml;ndra eller ta bort konton genom att klicka p&aring; respektive l&auml;nk.</p>
+@@ -43,13 +44,13 @@
+   <table width="100%" border="1">
+     <tr>
+       <td><strong>Klubbnamn</strong></td>
+-      <td><strong>Kontaktnamn</strong></td>
++      <td><strong>Kontakt</strong></td>
+       <td><strong>Anv&auml;ndarnamn</strong></td>
+       <td><strong>E-post</strong></td>
+       <td><strong>Telefon</strong></td>
+       <td><strong>Aktivt</strong></td>
+       <td><strong>&Auml;ndra</strong></td>
+-      <td nowrap="nowrap"><strong>Ta bort</strong></td>
++      <td><strong>Ta bort</strong></td>
+     </tr>
+     <?php while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) {;?>
+     <tr>
+@@ -60,7 +61,7 @@
+       <td><?php echo $row_rsAccounts['contact_phone']; ?></td>
+       <td valign="middle"><form id="activeaccount_form" name="activeaccount_form" method="post" action="">
+           <label>
+-            <input name="active" type="checkbox" id="active" value="Aktiv" <?php if (!(strcmp($row_rsAccounts['active'],1))) {echo "checked=\"checked\"";} ?> />
++            <input name="active" type="checkbox" disabled="disabled" id="active" value="Aktiv" <?php if (!(strcmp($row_rsAccounts['active'],1))) {echo "checked=\"checked\"";} ?> />
+           </label>
+         </form></td>
+       <td><a href="AccountUpdate.php?account_id=<?php echo $row_rsAccounts['account_id']; ?>">&Auml;ndra</a></td>
+@@ -70,9 +71,9 @@
+   </table>
+ <?php 
+ } // Show if recordset not empty ?>
++    </div>  
+   </div>
+-  <div class="story"></div>
+-</div>
++</div>    
+ <?php 
+ //Kill statement
+ $stmt_rsAccounts->closeCursor();
+diff --git a/ClassContestants.php b/ClassContestants.php
+index 0afb3af..befb0c7 100644
+--- a/ClassContestants.php
++++ b/ClassContestants.php
+@@ -1 +1 @@
+-<?php//Added code to show teams and moved reusable code to includes/class_contestants.php//Access level top administrator$MM_authorizedUsers = "1";$MM_donotCheckaccess = "false";$pagetitle="T&auml;vlande i klassen - admin";// require Class for validation of formsrequire_once 'Classes/Validate.php';// Includes HTML Headinclude_once('includes/header.php');//Includes Several code functionsinclude_once('includes/functions.php');//Include top navigation links, News and sponsor sectionsinclude_once("includes/news_sponsors_nav.php");//Includes Restrict access code functioninclude_once('includes/restrict_access.php');?> <!-- start page --><div id="pageName"><h1><?php echo $pagetitle?></h1></div><!-- Include different navigation links depending on authority  --><div id="localNav"><?php include_once("includes/navigation.php"); ?></div><div id="content">        <div class="feature">   <?php require_once 'includes/class_contestants.php';
+\ No newline at end of file
++<?php//Changed order of includes to prevent Warning: session_start(): Session cannot be started after headers have already been sent//Access level top administrator$MM_authorizedUsers = "1";$MM_donotCheckaccess = "false";$pagetitle="T&auml;vlande i klassen - admin";// require Class for validation of formsrequire_once 'Classes/Validate.php';// Includes Several code functionsinclude_once('includes/functions.php');//Includes Restrict access code functioninclude_once('includes/restrict_access.php');// Includes HTML Headinclude_once('includes/header.php');//Include top navigation links, News and sponsor sectionsinclude_once("includes/news_sponsors_nav.php");?> <!-- start page --><div id="pageName"><h1><?php echo $pagetitle?></h1></div><!-- Include different navigation links depending on authority  --><div id="localNav"><?php include_once("includes/navigation.php"); ?></div><div id="content">        <div class="feature">   <?php require_once 'includes/class_contestants.php';
+\ No newline at end of file
+diff --git a/ClassUpdate.php b/ClassUpdate.php
+index 7d7883f..8a4a791 100644
+--- a/ClassUpdate.php
++++ b/ClassUpdate.php
+@@ -54,7 +54,8 @@
+     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
+     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
+     $class_match_time = str_replace(',','.',filter_input(INPUT_POST, trim('class_match_time')));
+-
++echo 'Kön: '.$class_gender.'<br>';
++echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
+     $val = new Validation();
+     $val->name('typ av klass')->value($class_team)->pattern('int')->required();
+     $val->name('disciplin')->value($class_discipline)->pattern('alpha')->required();
+diff --git a/CompetitionInsert.php b/CompetitionInsert.php
+index 5025816..38b3aea 100644
+--- a/CompetitionInsert.php
++++ b/CompetitionInsert.php
+@@ -1,6 +1,6 @@
+ <?php
+-//Added validation class with multiple validation features and removed most of existing validation code
+-//Removed client side date format for date input fields
++//Changed validation from "text" for $comp_arranger
++
+ ob_start();
+ 
+ //Access level top administrator
+@@ -53,7 +53,7 @@
+     $val->name('starttid')->value($comp_start_time)->timePattern()->required();
+     $val->name('startdatum')->value($comp_start_date)->datePattern('Y-m-d')->required();    
+     $val->name('sista anm&auml;lmingsdatum')->value($comp_end_reg_date)->datePattern('Y-m-d')->required();    
+-    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('text')->required()->min($length);
++    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('alphanum')->required()->min($length);
+     $val->name('e-post')->value($comp_email)->emailPattern()->required();
+     $val->name('t&auml;vlingssajten')->value($comp_url)->urlPattern()->required();
+     $val->name('max antal anm&auml;lningar')->value($comp_max_regs)->pattern('int')->required();
+diff --git a/CompetitionList.php b/CompetitionList.php
+index f1d0659..3f4362e 100644
+--- a/CompetitionList.php
++++ b/CompetitionList.php
+@@ -76,7 +76,7 @@
+     <table width="100%" border="1">
+     <tr>
+       <td><strong>T&auml;vling</strong></td>
+-      <td><strong>Start-datum</strong></td>
++      <td nowrap="nowrap"><strong>Start-datum</strong></td>
+       <td><strong>Start-tid</strong></td>
+       <td><strong>Sista anm&auml;lnings-datum</strong></td>
+       <td><strong>Max antal anm&auml;lningar</strong></td>
+diff --git a/CompetitionUpdate.php b/CompetitionUpdate.php
+index f69229a..783a1d6 100644
+--- a/CompetitionUpdate.php
++++ b/CompetitionUpdate.php
+@@ -1,6 +1,5 @@
+ <?php
+-//Added validation class with multiple validation features and removed most of existing validation code
+-//Removed client side date format for date input fields
++//Changed code to prevent Warning: Trying to access array offset on value of type null in PHP 8.0.0.rc1
+ 
+ ob_start();
+ 
+@@ -58,7 +57,7 @@
+     $val->name('starttid')->value($comp_start_time)->timePattern()->required();
+     $val->name('startdatum')->value($comp_start_date)->datePattern('Y-m-d')->required();    
+     $val->name('sista anm&auml;lmingsdatum')->value($comp_end_reg_date)->datePattern('Y-m-d')->required();    
+-    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('text')->required()->min($length);
++    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('alphanum')->required()->min($length);
+     $val->name('e-post')->value($comp_email)->emailPattern()->required();
+     $val->name('t&auml;vlingssajten')->value($comp_url)->urlPattern()->required();
+     $val->name('max antal anm&auml;lningar')->value($comp_max_regs)->pattern('int')->required();
+@@ -87,10 +86,25 @@
+     $stmt_rsCompetition = $DBconnection->prepare($query);
+     $stmt_rsCompetition->execute(array(':comp_id' => $colname_rsCompetition));
+     $row_rsCompetition = $stmt_rsCompetition->fetch(PDO::FETCH_ASSOC);
++    $totalRows_rsCompetition = $stmt_rsCompetition->rowCount();   
+     } 
+     catch(PDOException $ex) {
+         echo "An Error occured with query1: ".$ex->getMessage();
+     }
++    //Prevent Warning: Trying to access array offset on value of type null    
++    if ($totalRows_rsCompetition  <> 0){;
++    $comp_id = $row_rsCompetition['comp_id'];     
++    $comp_name = $row_rsCompetition['comp_name'];
++    $comp_start_time = $row_rsCompetition['comp_start_time'];        
++    $comp_start_date = $row_rsCompetition['comp_start_date'];
++    $comp_end_reg_date = $row_rsCompetition['comp_end_reg_date'];
++    $comp_arranger = $row_rsCompetition['comp_arranger'];
++    $comp_email = $row_rsCompetition['comp_email'];
++    $comp_url = $row_rsCompetition['comp_url'];
++    $comp_max_regs = $row_rsCompetition['comp_max_regs'];
++    $comp_limit_roundrobin = $row_rsCompetition['comp_limit_roundrobin'];
++    $comp_current = $row_rsCompetition['comp_current'];
++    }
+ ?>          
+         </div>
+ <h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara och g&aring; tillbaka till listan &ouml;ver t&auml;vlingar.</h3>
+@@ -101,50 +115,50 @@
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens namn:</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_name" type="text" value="<?php echo $row_rsCompetition['comp_name']; ?>" size="32" /></td>
++          <td><input name="comp_name" type="text" value="<?php echo $comp_name; ?>" size="32" /></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">Starttid<br/>(hh:mm eller h:mm)</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_start_time" type="text" value="<?php echo substr($row_rsCompetition['comp_start_time'],0,5); ?>" size="2" /></td>
++          <td><input name="comp_start_time" type="text" value="<?php echo substr($comp_start_time,0,5); ?>" size="2" /></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">Startdatum<br/>(yyyy-mm-dd)</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_start_date" type="text" value="<?php echo $row_rsCompetition['comp_start_date']; ?>" size="8" maxlength="10"/></td>
++          <td><input name="comp_start_date" type="text" value="<?php echo $comp_start_date; ?>" size="8" maxlength="10"/></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">Sista anm&auml;lningsdag<br/>(yyyy-mm-dd)</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_end_reg_date" type="text" value="<?php echo $row_rsCompetition['comp_end_reg_date']; ?>" size="8" maxlength="10"/></td>
++          <td><input name="comp_end_reg_date" type="text" value="<?php echo $comp_end_reg_date; ?>" size="8" maxlength="10"/></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens arrang&ouml;r</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_arranger" type="text" value="<?php echo $row_rsCompetition['comp_arranger']; ?>" size="32" /></td>
++          <td><input name="comp_arranger" type="text" value="<?php echo $comp_arranger; ?>" size="32" /></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingsarrang&ouml;rens mejladress</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_email" type="text" value="<?php echo $row_rsCompetition['comp_email']; ?>" size="32" /></td>
++          <td><input name="comp_email" type="text" value="<?php echo $comp_email; ?>" size="32" /></td>
+         </tr>
+         <tr>
+           <td align="right" valign="baseline" nowrap="nowrap">T&auml;vlingens webbadress<br/>(http://sajt.com)</td>
+           <td>&nbsp;</td>
+-          <td><input name="comp_url" type="text" value="<?php echo $row_rsCompetition['comp_url']; ?>" size="32" /></td>
++          <td><input name="comp_url" type="text" value="<?php echo $comp_url; ?>" size="32" /></td>
+         </tr>
+         <tr>
+             <td align="right" valign="baseline" nowrap="nowrap">Max antal anm&auml;lningar</td>
+             <td>&nbsp;</td> 
+             <td><label>
+-               <input name="comp_max_regs" type="number" id="comp_max_regs" value="<?php echo $row_rsCompetition['comp_max_regs']; ?>"/>              
++               <input name="comp_max_regs" type="number" id="comp_max_regs" value="<?php echo $comp_max_regs; ?>"/>              
+             </label></td>
+         </tr>        
+         <tr>
+             <td align="right" valign="baseline" nowrap="nowrap">Gr&auml;ns f&ouml;r round robin<br/>(alla m&ouml;ter alla; 3-5)</td>
+             <td>&nbsp;</td> 
+             <td><label>
+-               <input name="comp_limit_roundrobin" type="number" id="comp_limit_roundrobin" value="<?php echo $row_rsCompetition['comp_limit_roundrobin']; ?>"/>              
++               <input name="comp_limit_roundrobin" type="number" id="comp_limit_roundrobin" value="<?php echo $comp_limit_roundrobin; ?>"/>              
+             </label></td>
+         </tr>        
+         <tr>
+@@ -152,7 +166,7 @@
+           <td>&nbsp;</td>
+           <td><label>
+           <input type="checkbox" name="comp_current" id="comp_current" 
+-          <?php if (!(strcmp($row_rsCompetition['comp_current'],1))) {
++          <?php if (!(strcmp($comp_current,1))) {
+                    //Disable checkbox if competition is current (active)
+                    echo "checked=\"checked\" disabled='disabled'/ />(&auml;ndrar du i listan &ouml;ver t&auml;vlingar)";
+                    echo "<input name='comp_current' type='hidden' value=1 />";
+@@ -168,7 +182,7 @@
+           <td><input name="CompUpdate" type="submit" id="CompUpdate" value="Spara"/></td>
+         </tr>
+       </table>
+-      <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $row_rsCompetition['comp_id']; ?>"/>
++      <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>"/>
+       <input type="hidden" name="MM_update" value="update_competition"/>
+     </form>
+     <p>&nbsp;</p>
+diff --git a/ElimLadder.php b/ElimLadder.php
+index 199ce0b..3decbd3 100644
+--- a/ElimLadder.php
++++ b/ElimLadder.php
+@@ -1,6 +1,6 @@
+ <?php 
+-// Removed #apCompBanner
+-// Added #apSponsorPic5KataPoint, #apSponsorPic5KataPoint, #apSponsorPic6KataPoint and #apSponsorPic6KataPoint
++// Changed code to show correct protocols for classes with teams, round robin, kata point system or default
++// Added code to handle contestants or not, preventing error message "Notice: Trying to access array offset on value of type bool...", introduced by PHP 7.4: ElimLadder.php
+ 
+ //Fetch the class id from previous page
+ $colname_rsClassData = filter_input(INPUT_GET,'class_id');
+@@ -53,8 +53,10 @@
+         if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
+ $contestantsArray[] = $str; 
+ $startnumbersArray[] = $startnumber;
+-} 
+-
++}
++$pagetitle="T&auml;vlingsstege";
++//If there are any class contestants
++if ($totalRows_rsClassContestants >0){
+ $comp_name = $row_rsClass['comp_name'];
+ $comp_arranger = $row_rsClass['comp_arranger'];
+ $comp_start_date = $row_rsClass['comp_start_date']; 
+@@ -68,9 +70,24 @@
+ $class_category = $row_rsClass['class_category']; 
+ $class_age = $row_rsClass['class_age']; 
+ $class_weight_length = $row_rsClass['class_weight_length'];  
+-$pagetitle="T&auml;vlingsstege";
+ $pagedescription="$comp_name som arrangeras av $comp_arranger.";
+ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
++} else { //If there are no class contestants
++$comp_name = '';
++$comp_arranger = '';
++$comp_start_date = ''; 
++$comp_limit_roundrobin = '';
++$class_team =  ''; 
++$team = '';
++$class_discipline = ''; 
++$class_discipline_variant = ''; 
++$class_gender_category = ''; 
++$class_category = ''; 
++$class_age = ''; 
++$class_weight_length = '';  
++$pagedescription = '';
++$pagekeywords="karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";    
++} //If there are no class contestants
+ ?>
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html xmlns="http://www.w3.org/1999/xhtml" >
+@@ -111,7 +128,7 @@
+                 echo 'Kata Point System';
+             }
+             else {
+-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
++                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { 
+                     echo 'Pool A'; 
+                 } 
+                 else { 
+@@ -129,7 +146,7 @@
+                 echo 'Kata Point System';
+             }
+             else {
+-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
++                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { 
+                     echo 'Pool B'; 
+                 } 
+                 else { 
+@@ -1167,7 +1184,7 @@
+ 
+ //When limit for Round Robin is not met or it's a team class - show elimination ladder
+ //If startnumber and contestant exist - show them with the proper colours
+-elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { ?>
++elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { ?>
+ <div id="apDiv1">
+   <table width="100%" border="0">
+     <tr>
+@@ -1346,7 +1363,8 @@
+ </div>
+ <div id="apDivRepechage"></div>          
+ <?php 
+-}
++}//When limit for Round Robin is not met or it's a team class - show elimination ladder
++
+ //When limit for Round Robin is met - show round robin protocol
+ //If startnumber and contestant exist - show them with the proper colours
+ else { 
+@@ -1558,7 +1576,7 @@
+   </table>    
+ </div>
+ <?php 
+-}
++}//When limit for Round Robin is met - show round robin protocol
+ ?>
+       <?php if ($class_discipline === 'Kata' && $class_discipline_variant === 1){
+                 echo '<div id="apDivPDFKataPoint">
+@@ -1628,7 +1646,11 @@
+ <?php
+         }	
+     }
+-}       
++}
++/*} else { 
++    echo 'Inga deltagare i klassen!';    
++}//If there are no class contestants*/
++
+ //Kill statements and DB connection
+ $stmt_rsClassContestants->closeCursor();
+ $stmt_rsClass->closeCursor();
+diff --git a/Raffle.php b/Raffle.php
+index bf40629..f347b18 100644
+--- a/Raffle.php
++++ b/Raffle.php
+@@ -74,7 +74,7 @@
+     <div class="feature">
+ <?php 
+ if ($totalRows_rsClubRegs === 0){
+-     echo '<h3>Finns inga anm&auml;ningar att lotta &auml;n!</h3>';
++     echo '<h3>Finns inga anm&auml;lningar att lotta &auml;n!</h3>';
+ }
+ else {
+ ?>    
+diff --git a/Rep_Summary.php b/Rep_Summary.php
+index dd5e124..764d0a9 100644
+--- a/Rep_Summary.php
++++ b/Rep_Summary.php
+@@ -1,5 +1,5 @@
+ <?php 
+-//Excluded teams when counting contestants for the active competition
++//Changed explanations of reports
+ 
+ if (!isset($_SESSION)) {
+   session_start();
+@@ -168,11 +168,11 @@
+     <td><?php echo $row_rsClasses['total'];?></td>
+   </tr>
+   <tr>
+-    <td>Antal deltagare anm&auml;lda i n&aring;gon klass (starter):</td>
++    <td>Antal starter (deltagare anm&auml;lda i n&aring;gon klass):</td>
+     <td><?php echo $row_rsRegistrations['total'];?></td>
+   </tr>
+   <tr>
+-      <td>Antal registrerade medlemmar fr&aring;n klubbar <br>(inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
++      <td>Antal medlemmar i registrerade klubbar <br>(inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
+     <td><?php echo $row_rsMembers['total'];?></td>
+   </tr>
+   <tr>
+diff --git a/includes/account_insert.php b/includes/account_insert.php
+new file mode 100644
+index 0000000..e4cfe5f
+--- /dev/null
++++ b/includes/account_insert.php
+@@ -0,0 +1,315 @@
++<?php
++//If admin redirect to accounts list after insert
++//Changed from "text" validation of $club_name and $contact_name
++
++//Declare and initialise variables
++  $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
++// Validate insert account data if button is clicked
++ if (filter_input(INPUT_POST,'MM_insert') === 'new_account') {
++    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'club_name'), MB_CASE_TITLE,"UTF-8"));
++    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contact_name'), MB_CASE_TITLE,"UTF-8"));
++    $email = filter_input(INPUT_POST,'contact_email');
++    $contact_phone = filter_input(INPUT_POST,'contact_phone');
++    $user_name = encodeToUtf8(filter_input(INPUT_POST,'user_name'));
++    $user_password = encodeToUtf8(filter_input(INPUT_POST,'user_password'));
++    $confirm_user_password = filter_input(INPUT_POST,'confirm_user_password');  
++    $access_level = filter_input(INPUT_POST,'access_level');
++    $confirmed = filter_input(INPUT_POST,'confirmed');       
++    $active = filter_input(INPUT_POST,'active');    
++    
++    //If not admin->add captcha code
++    if($MM_authorizedUsers <> "1"){
++    $captcha=filter_input(INPUT_POST,'captcha');
++    }
++    $val = new Validation();
++    $length = 5;//min length of strings
++    $val->name('klubbens namn')->value($club_name)->pattern('alphanum')->required()->min($length);
++    $val->name('kontaktperson')->value($contact_name)->pattern('words')->required()->min($length);
++    $val->name('e-post')->value($email)->emailPattern()->required();
++    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
++    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
++    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length); 
++    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
++    //If not admin->add captcha
++    if($MM_authorizedUsers <> "1"){   
++    $val->name('tecken i bilden')->value($captcha)->pattern('int')->required()->equal($_SESSION['captcha']);       
++    }
++    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
++    if($val->isSuccess()){
++    	$output_form = 'no';
++    }else{
++        foreach($val->getErrors() as $error) {
++        echo '<div class="error"><h3>'.$error.'</h3></div></br>';
++        }
++        $output_form = 'yes';
++    }
++    //Validate that email isn't already used
++    //Catch anything wrong with query
++    try {
++    require('Connections/DBconnection.php');               
++    // Validate insert account data    
++    $colname_rsContactemail = $email;     
++    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email";
++    $stmt_rsContactemail = $DBconnection->prepare($query1);
++    $stmt_rsContactemail->execute(array(':contact_email' => $colname_rsContactemail));
++    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
++    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
++    }   
++    catch(PDOException $ex) {
++        echo "An Error occured: ".$ex->getMessage();
++    }   
++	if ($totalRows_rsContactemail > 0) {
++        // $contact_email is already in use
++        echo '<div class="error"><h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3></div>';
++        $output_form = 'yes';		
++	}
++         //Kill statement
++        $stmt_rsContactemail->closeCursor();   
++    
++    //Check if the user name already is registered            
++    //Catch anything wrong with query
++    try {
++    require('Connections/DBconnection.php');                   
++    //Validate account insert data against current accounts    
++    $colname_rsUsername = $user_name;
++    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name";
++    $stmt_rsUsername = $DBconnection->prepare($query2);
++    $stmt_rsUsername->execute(array(':user_name' => $colname_rsUsername));
++    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
++    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
++    }   
++    catch(PDOException $ex) {
++        echo "An Error occured: ".$ex->getMessage();
++    }       
++	if ($totalRows_rsUsername > 0) {
++        // $user_name is already in use
++            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
++            $output_form = 'yes';		
++	}
++        //Kill statement and DB connection
++        $stmt_rsUsername->closeCursor();	
++ } 
++ else {
++   $output_form = 'yes';
++ } 
++ 
++if ($output_form === 'yes') { ?>      
++<h3>Skapa ett nytt konto f&ouml;r att kunna registera t&auml;vlande</h3>
++<p>
++<?php if($MM_authorizedUsers <> "1"){//If not admin->adapt text?>
++<strong>Obs!</strong> Titta f&ouml;rst i listan l&auml;ngst ner s&aring; att ni inte redan har ett konto, innan du skapar ett nytt!<br/><strong>T&auml;vlande &auml;r redan kopplade till dessa konton, vilket g&ouml;r det l&auml;ttare f&ouml;r dig att anm&auml;la!</strong><br/>Kontakta oss ifall ni inte l&auml;ngre har tillg&aring;ng till mejladressen i listan. 
++<?php }?>    
++<br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</p>
++    <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
++      <table width="400" border="0">
++        <tr>
++          <td>Klubbens namn</td>
++          <td><label>
++            <input name="club_name" type="text" id="club_name" size="25" value="<?php echo $club_name; ?>"/>
++          </label></td>
++        </tr>
++        <tr>
++          <td>Kontaktperson</td>
++          <td valign="top"><label>
++            <input name="contact_name" type="text" id="contact_name" size="25" value="<?php echo $contact_name; ?>"/>
++          </label></td>
++        </tr>
++        <tr>
++          <td>E-post</td>
++          <td valign="top"><label>
++            <input name="contact_email" type="text" id="contact_email" size="25" value="<?php echo $email; ?>"/>
++          </label></td>
++        </tr>
++        <tr>
++          <td>Telefon</td>
++          <td><label>
++            <input name="contact_phone" type="text" id="contact_phone" size="25" value="<?php echo $contact_phone; ?>"/>
++          </label></td>
++        </tr>
++        <tr>
++          <td>Anv&auml;ndarnamn</td>
++          <td><input name="user_name" type="text" id="user_name" size="25" value="<?php echo $user_name; ?>"/></td>
++        </tr>
++        <tr>
++          <td>L&ouml;senord</td>
++          <td><input name="user_password" type="password" id="user_password" size="25" /></td>
++        </tr>
++        <tr>
++          <td>L&ouml;senord (bekr&auml;fta)</td>
++          <td><input name="confirm_user_password" type="password" id="confirm_user_password" size="25" /></td>
++        </tr>
++<?php if($MM_authorizedUsers === "1"){//If Admin->adapt form?>
++        <tr>
++           <td>Kontotyp</td>
++          <td><label>
++            <input <?php if (!(strcmp($access_level,1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_1" />
++Admin</label><label>      
++    <input <?php if (!(strcmp($access_level,0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_0" checked=""/>
++Coach</label></td>
++        </tr>
++        <tr>
++          <td>Aktivt konto</td>
++          <td><label>
++                  <input <?php if (!(strcmp($active,1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_1" checked=""/>
++Ja</label><label>      
++            <input <?php if (!(strcmp($active,0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_0" />
++Nej</label></td>                  
++        </tr>
++        <tr>
++          <td>Bekr&auml;ftat konto</td>
++          <td><label>
++                  <input <?php if (!(strcmp($confirmed,1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_1" checked=""/>
++Ja</label><label>      
++            <input <?php if (!(strcmp($confirmed,0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_0" />
++Nej</label></td>                                    
++        </tr>
++        <tr>
++          <td>&nbsp;</td>
++          <td><label>
++            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
++          </label></td>
++        </tr>
++     </table>
++      <input type="hidden" name="MM_insert" value="new_account" />
++      </form>        
++<?php }//If Admin->adapt form
++      //If not admin->add captcha  
++      else {
++    //Catch anything wrong with query
++    try {
++    require('Connections/DBconnection.php');                   
++    // Select information regarding all active accounts    
++    $query3 = "SELECT club_name, contact_name, contact_email FROM account WHERE active = 1 ORDER BY club_name ASC";
++    $stmt_rsAccounts = $DBconnection->query($query3);
++    $totalRows_rsAccounts = $stmt_rsAccounts->rowCount();
++    }   
++    catch(PDOException $ex) {
++        echo "An Error occured: ".$ex->getMessage();
++    }?>
++        <tr>
++          <td>Skriv in samma tecken som i bilden!</td>
++          <td><input name="captcha" type="text" id="captcha" size="25" /></td>
++        </tr>
++        <tr>
++          <td><img src="Captcha.php" /><input name="active" type="hidden" id="active" value="1" />
++            <input name="access_level" type="hidden" id="access_level" value="0" />
++            <input name="confirmed" type="hidden" id="confirmed" value="0" /></td>
++          <td><label>
++            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
++          </label></td>
++        </tr>    
++      </table>
++      <input type="hidden" name="MM_insert" value="new_account" />
++      </form>
++På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
++Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
++Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.
++<!-- Show current accounts -->
++<h3>Registrerade konton</h3>
++<?php if ($totalRows_rsAccounts > 0) { ?>    
++      <p>Detta &auml;r konton som redan finns registrerade.</p>
++  <table width="100%" border="1" cellpadding="2">
++    <tr>
++      <td nowrap="nowrap"><strong>Klubbnamn</strong></td>
++      <td nowrap="nowrap"><strong>Kontaktnamn</strong></td>
++      <td nowrap="nowrap"><strong>E-post</strong></td>      
++    </tr>
++<?php   while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) { ;?>
++      <tr>
++        <td><?php echo $row_rsAccounts['club_name']; ?></td>
++        <td><?php echo $row_rsAccounts['contact_name']; ?></td>
++        <td><?php echo $row_rsAccounts['contact_email']; ?></td>
++      </tr>
++<?php   } ?>
++  </table>
++<?php
++      } 
++      else {
++          echo 'Inga konton tillg&auml;ngliga &auml;n!';
++      }
++//Kill statement
++$stmt_rsAccounts->closeCursor();      
++      }//If not admin->add captcha        
++} 
++//Send the account information to the users email address and save it
++else if ($output_form === 'no') {
++        //Email to Club Contact                
++        $headers = "From: $comp_name <$comp_email>\r\n" .
++        "MIME-Version: 1.0\r\n" . 
++        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
++        "Content-Type: text/plain; charset=utf-8\r\n" . 
++        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
++        $subject = 'Ditt nya konto: '.$comp_name;
++        $text = "Tack för att du ville registrera ett konto på $comp_url!\n" .
++        "Här är de inloggningsuppgifter som är registrerade på dig:\n" .
++	"Klubbnamn: $club_name\n" .
++        "Kontaktperson: $contact_name\n" .
++        "E-post: $email\n" .
++        "Telefon: $contact_phone\n" .
++	"Användarnamn: $user_name\n" .
++	"Lösenord: $user_password\n" .
++	"Använd ovanstående till att logga in och anmäla tävlande till $comp_name.\n" .
++	"\n" .
++	"Med vänliga hälsningar,\n" .
++	"$comp_arranger, $comp_name, $comp_email";
++        $msg = "Hej $contact_name,\n$text";
++        
++        // Send email to club contact
++        mail($email, $subject, $msg, $headers);                
++if($MM_authorizedUsers <> "1"){//If not admin->send email to competition admin    
++        //Email to Competition Admin    
++        $headers = "From: $comp_name <$comp_email>\r\n" .
++        "MIME-Version: 1.0\r\n" . 
++        'X-Mailer: PHP/' . phpversion() . "\r\n" .        
++        "Content-Type: text/plain; charset=utf-8\r\n" . 
++        "Content-Transfer-Encoding: 8bit\r\n\r\n";         
++        $adm_email = "$comp_email";
++        $subject_adm = 'Nytt konto registrerat: '.$comp_name;
++	$text_adm = "Detta konto har registrerats på $comp_url:\n" .
++	"Klubbnamn: $club_name\n" .
++        "Kontaktperson: $contact_name\n" .
++        "E-post: $email\n" .
++        "Telefon: $contact_phone\n" .
++	"Användarnamn: $user_name\n" .
++	"\n";
++        $msg_adm = "Nytt konto registrerat!\n$text_adm";
++
++        // Send email to Competition Admin
++        mail($adm_email, $subject_adm, $msg_adm, $headers);                    
++    echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';        
++}
++       //Catch anything wrong with query
++            try {
++            require('Connections/DBconnection.php'); 
++            //INSERT account data in DB
++            $query = "INSERT INTO 
++                account (user_name, user_password, confirmed, contact_name, contact_email, contact_phone, club_name, active, access_level)
++                VALUES (:user_name, :user_password, :confirmed, :contact_name, :contact_email, :contact_phone, :club_name, :active, :access_level)"; 
++            $stmt_rsAccount = $DBconnection->prepare($query);                                  
++            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
++            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
++            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
++            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':contact_email', $email, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
++            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
++            $stmt_rsAccount->execute();
++            }   
++            catch(PDOException $ex) {
++                echo "An Error occured: ".$ex->getMessage();
++            }//Kill statement
++            $stmt_rsAccount->closeCursor();
++            //If admin redirect to accounts list
++            if ($MM_authorizedUsers === "1") { 
++                $insertGoTo = "AccountsList.php";
++            header(sprintf("Location: %s", $insertGoTo));
++            };                
++} ?>  
++   </div>
++</div>    
++<?php include("includes/footer.php");?>
++</body>
++</html>
++<?php ob_end_flush();
+\ No newline at end of file
+diff --git a/includes/account_update.php b/includes/account_update.php
+new file mode 100644
+index 0000000..a5e24e9
+--- /dev/null
++++ b/includes/account_update.php
+@@ -0,0 +1,242 @@
++<?php
++//Changed code to prevent Warning: Trying to access array offset on value of type null in PHP 8.0.0.rc1
++try {
++require('Connections/DBconnection.php');            
++//Select all data regarding the account
++$query = "SELECT * FROM account WHERE account_id = :account_id";
++$stmt_rsAccount = $DBconnection->prepare($query);
++$stmt_rsAccount->execute(array(':account_id' => $colname_rsAccountId));
++$row_rsAccount = $stmt_rsAccount->fetch(PDO::FETCH_ASSOC);
++$totalRows_rsAccount = $stmt_rsAccount->rowCount();   
++}   
++catch(PDOException $ex) {
++    echo "An Error occured: ".$ex->getMessage();
++}
++//Prevent Warning: Trying to access array offset on value of type null
++if ($totalRows_rsAccount <> 0){;
++    $user_name = $row_rsAccount['user_name'];
++    $user_password = $row_rsAccount['user_password'];
++    $confirmed = $row_rsAccount['confirmed'];    
++    $contact_name = $row_rsAccount['contact_name'];
++    $contact_email =  $row_rsAccount['contact_email'];
++    $contact_phone = $row_rsAccount['contact_phone'];
++    $club_name = $row_rsAccount['club_name'];
++    $active = $row_rsAccount['active'];
++    $access_level = $row_rsAccount['access_level'];
++    $account_id = $row_rsAccount['account_id'];			
++}
++// Update account data if button is clicked and all fields are validated to be correct
++if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
++    $user_name = encodeToUtf8(filter_input(INPUT_POST, trim('user_name')));
++    $user_password = encodeToUtf8(filter_input(INPUT_POST, trim('user_password')));
++    $confirm_user_password = filter_input(INPUT_POST, trim('confirm_user_password'));
++    $confirmed = filter_input(INPUT_POST, 'confirmed');    
++    $contact_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('contact_name')), MB_CASE_TITLE,"UTF-8"));
++    $contact_email = filter_input(INPUT_POST, trim('contact_email'));
++    $contact_phone = filter_input(INPUT_POST, trim('contact_phone'));
++    $club_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST, trim('club_name')), MB_CASE_TITLE,"UTF-8"));
++    $active = filter_input(INPUT_POST, 'active');
++    $access_level = filter_input(INPUT_POST, 'access_level');
++    $account_id = filter_input(INPUT_POST, 'account_id');			
++    
++    $val = new Validation();
++    $length = 5;//min length of strings
++    $val->name('klubbens namn')->value($club_name)->pattern('alphanum')->required()->min($length);
++    $val->name('kontaktperson')->value($contact_name)->pattern('words')->required()->min($length);
++    $val->name('e-post')->value($contact_email)->emailPattern()->required();
++    $val->name('telefon')->value($contact_phone)->pattern('tel')->required();
++    $val->name('anv&auml;ndarnamn')->value($user_name)->pattern('text')->required()->min($length);
++    $val->name('l&ouml;senord')->value($user_password)->pattern('text')->required()->min($length);
++    $val->name('bekr&auml;ftande l&ouml;senord')->value($confirm_user_password)->pattern('text')->required()->min($length)->equal($user_password);   
++    
++    //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
++    if($val->isSuccess()){
++    	$output_form = 'no';
++    }else{
++        foreach($val->getErrors() as $error) {
++        echo '<div class="error"><h3>'.$error.'</h3></br></div>';
++        }
++        $output_form = 'yes';
++    }
++    //Validate that email isn't already used
++    //Catch anything wrong with query
++    try {
++    require('Connections/DBconnection.php');               
++    // Validate insert account data    
++    $query1 = "SELECT club_name, contact_email FROM account WHERE contact_email = :contact_email AND account_id <> :account_id";
++    $stmt_rsContactemail = $DBconnection->prepare($query1);
++    $stmt_rsContactemail->execute(array(':contact_email' => $contact_email, ':account_id' => $account_id));
++    $row_rsContactemail = $stmt_rsContactemail->fetch(PDO::FETCH_ASSOC);
++    $totalRows_rsContactemail = $stmt_rsContactemail->rowCount();
++    }   
++    catch(PDOException $ex) {
++        echo "An Error occured: ".$ex->getMessage();
++    }   
++	if ($totalRows_rsContactemail > 0) {
++        // $contact_email is already in use
++        echo '<h3>E-postadressen &auml;r upptagen av '.$row_rsContactemail['club_name'].'!</h3>';
++        $output_form = 'yes';		
++	}
++         //Kill statement
++        $stmt_rsContactemail->closeCursor();
++ 
++    //Check if it's already registered    
++    //Catch anything wrong with query
++    try {
++    require('Connections/DBconnection.php');                   
++    //Validate account insert data against current accounts    
++    $query2 = "SELECT club_name, user_name FROM account WHERE user_name = :user_name AND account_id <> :account_id";
++    $stmt_rsUsername = $DBconnection->prepare($query2);
++    $stmt_rsUsername->execute(array(':user_name' => $user_name, ':account_id' => $account_id));
++    $row_rsUsername = $stmt_rsUsername->fetch(PDO::FETCH_ASSOC);
++    $totalRows_rsUsername = $stmt_rsUsername->rowCount();
++    }   
++    catch(PDOException $ex) {
++        echo "An Error occured: ".$ex->getMessage();
++    }       
++	if ($totalRows_rsUsername > 0) {
++        // $user_name is already in use
++            echo '<h3>Anv&auml;ndarnamnet &auml;r upptaget!</h3>';
++            $output_form = 'yes';		
++	}
++        //Kill statement
++        $stmt_rsUsername->closeCursor();
++}	
++  else {
++    $output_form = 'yes';
++  }
++// Show form if the button Update isn't clicked	
++if ($output_form === 'yes') { ;?>
++        <p><h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara &auml;ndringen p&aring; kontot.</h3></p> 
++    <form id="AccountForm" name="AccountForm" method="POST" action="<?php echo $editFormAction; ?>">
++      <table width="200" border="0">
++        <tr>
++          <td valign="baseline" nowrap="nowrap">Klubbens namn</td>
++          <td><label>
++            <input name="club_name" type="text" id="club_name" value="<?php echo $club_name; ?>" size="25" />
++          </label></td>
++        </tr>
++        <tr>
++          <td>Kontaktperson</td>
++          <td valign="top"><label>
++            <input name="contact_name" type="text" id="contact_name" value="<?php echo $contact_name; ?>" size="25" />
++          </label></td>
++        </tr>
++        <tr>
++          <td>E-post</td>
++          <td valign="top"><label>
++            <input name="contact_email" type="text" id="contact_email" value="<?php echo $contact_email; ?>" size="25" />
++          </label></td>
++        </tr>
++        <tr>
++          <td>Telefon</td>
++          <td><label>
++            <input name="contact_phone" type="text" id="contact_phone" value="<?php echo $contact_phone; ?>" size="25" />
++          </label></td>
++        </tr>
++        <tr>
++          <td>Anv&auml;ndarnamn</td>
++          <td><input name="user_name" type="text" id="user_name" value="<?php echo $user_name; ?>" size="25" /></td>
++        </tr>
++        <tr>
++          <td>L&ouml;senord</td>
++          <td><input name="user_password" type="password" id="user_password" value="<?php echo $user_password; ?>" size="25" /></td>
++        </tr>
++        <tr>
++          <td>L&ouml;senord (bekr&auml;fta)</td>
++          <td><input name="confirm_user_password" type="password" id="confirm_user_password" value="<?php echo $user_password; ?>" size="25" /></td>
++        </tr>
++<?php if($MM_authorizedUsers === "0"){//If not admin->adapt form?>
++        <tr>
++          <td align="right" valign="baseline" nowrap="nowrap">
++          <input type="hidden" name="MM_update" value="AccountForm" />            
++          <input type="hidden" name="confirmed" value="0" />            
++          <input type="hidden" name="active" value="1" />            
++          <input type="hidden" name="access_level" value="0" />                    
++          </td>
++        </tr>
++<?php }//If Admin->adapt form
++         else {?>        
++        <tr>
++          <td>Kontotyp</td>
++          <td><label>
++            <input <?php if (!(strcmp($access_level,1))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="1" id="access_level_0" />
++Admin</label><label>      
++            <input <?php if (!(strcmp($access_level,0))) {echo "checked=\"checked\"";} ?> type="radio" name="access_level" value="0" id="access_level_1" />
++Coach</label></td>
++        </tr>
++        <tr>
++          <td>Aktivt konto</td>
++          <td><label>
++            <input <?php if (!(strcmp($active,1))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="1" id="active_0" />
++Ja</label><label>      
++            <input <?php if (!(strcmp($active,0))) {echo "checked=\"checked\"";} ?> type="radio" name="active" value="0" id="active_1" />
++Nej</label></td>                  
++        </tr>
++        <tr>
++          <td>Bekr&auml;ftat konto</td>
++          <td><label>
++            <input <?php if (!(strcmp($confirmed,1))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="1" id="confirmed_0" />
++Ja</label><label>      
++            <input <?php if (!(strcmp($confirmed,0))) {echo "checked=\"checked\"";} ?> type="radio" name="confirmed" value="0" id="confirmed_1" />
++Nej</label></td>                                    
++        </tr>
++<?php }//If Admin->adapt form ?>        
++        <tr>
++          <td align="right" valign="baseline" nowrap="nowrap"><input type="hidden" name="MM_update" value="AccountForm" /><input name="account_id" type="hidden" id="account_id" value="<?php echo $account_id; ?>" /></td>
++          <td><input name="AccountUpdate" type="submit" id="AccountUpdate" value="Spara" /></td>
++        </tr>
++      </table>
++    </form>
++    <p>&nbsp;</p>
++    </div>
++</div>      
++<?php }//If output form
++	//Save the updated account information if the Update button is clicked and form validated correct 
++  	else if ($output_form === 'no') { //Don't show form
++            //Catch anything wrong with query
++            try {
++            require('Connections/DBconnection.php');           
++            //UPDATE account according to changes
++            $updateSQL = "UPDATE account 
++            SET user_name=:user_name, 
++                user_password = :user_password, 
++                confirmed = :confirmed, 
++                contact_name = :contact_name, 
++                contact_email = :contact_email, 
++                contact_phone = :contact_phone, 
++                club_name = :club_name, 
++                active = :active, 
++                access_level = :access_level 
++                WHERE account_id = :account_id"; 
++            $stmt_rsAccount = $DBconnection->prepare($updateSQL);                                  
++            $stmt_rsAccount->bindValue(':user_name', $user_name, PDO::PARAM_STR);       
++            $stmt_rsAccount->bindValue(':user_password', $user_password, PDO::PARAM_STR);    
++            $stmt_rsAccount->bindValue(':confirmed', $confirmed, PDO::PARAM_INT);
++            $stmt_rsAccount->bindValue(':contact_name', $contact_name, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':contact_email', $contact_email, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':contact_phone', $contact_phone, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':club_name', $club_name, PDO::PARAM_STR);
++            $stmt_rsAccount->bindValue(':active', $active, PDO::PARAM_INT);
++            $stmt_rsAccount->bindValue(':access_level', $access_level, PDO::PARAM_INT);
++            $stmt_rsAccount->bindValue(':account_id', $account_id, PDO::PARAM_INT);
++            $stmt_rsAccount->execute();
++            }   
++            //Catch eny error
++            catch(PDOException $ex) {
++                echo "An Error occured: ".$ex->getMessage();
++            }
++            if ($MM_authorizedUsers === "1") { 
++                $updateGoTo = "AccountsList.php";
++            }else{
++                $updateGoTo = "AccountList_reg.php";
++            }        
++            header(sprintf("Location: %s", $updateGoTo));    
++        }
++//Kill statement
++$stmt_rsAccount->closeCursor();        
++include("includes/footer.php");
++?>
++</body>
++</html>
++<?php ob_end_flush();
+\ No newline at end of file
+diff --git a/includes/contestant_update.php b/includes/contestant_update.php
+index 01f037b..845c466 100644
+--- a/includes/contestant_update.php
++++ b/includes/contestant_update.php
+@@ -1,5 +1,6 @@
+ <?php
+-//Added code to update the teams' gender and max - and min age based on updated individual contestant
++//Changed from "text" validation of $update_contestant_name
++//Changed code to solve Warning: Undefined variable $contestant_name when validation triggered error message with PHP 8.0.0.rc1
+ 
+ // require Class for validation of forms
+ require_once 'Classes/Validate.php';
+@@ -22,7 +23,7 @@
+ $min_birthday='';$max_birthday='';$gender_init = '';$gender_final ='';$update_contestant_name='';$update_contestant_birth='';$update_contestant_birth_max='';$update_contestant_gender='';$contestant_team='';$update_contestant_team_member_1='';$update_contestant_team_member_2='';$update_contestant_team_member_3='';$update_contestant_team_member_4='';$update_contestant_team_member_5='';
+ //Update contestant selected on previous page if contestant_id is provided
+ if (filter_input(INPUT_GET,'contestant_id') != "") {
+-    $contestant_id = filter_input(INPUT_GET,'contestant_id');
++    $update_contestant_id = filter_input(INPUT_GET,'contestant_id');
+     //Catch anything wrong with query
+     try {
+     // Select data for the selected contestants
+@@ -33,21 +34,21 @@
+             . "FROM contestants "
+             . "WHERE contestant_id = :contestant_id";
+     $stmt_rsContestants = $DBconnection->prepare($query_rsContestants);
+-    $stmt_rsContestants->execute(array(':contestant_id'=>$contestant_id));
++    $stmt_rsContestants->execute(array(':contestant_id'=>$update_contestant_id));
+     $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
+ }   catch(PDOException $ex) {
+         echo 'An Error occured with query $query_rsContestants: '.$ex->getMessage();
+     }
+-    $contestant_name = $row_rsContestants['contestant_name'];    
+-    $contestant_birth = $row_rsContestants['contestant_birth'];
+-    $contestant_birth_max = $row_rsContestants['contestant_birth_max'];
+-    $contestant_gender = $row_rsContestants['contestant_gender'];
+-    $contestant_team = $row_rsContestants['contestant_team'];
+-    $contestant_team_member_1 = $row_rsContestants['contestant_team_member_1'];
+-    $contestant_team_member_2 = $row_rsContestants['contestant_team_member_2'];
+-    $contestant_team_member_3 = $row_rsContestants['contestant_team_member_3'];
+-    $contestant_team_member_4 = $row_rsContestants['contestant_team_member_4'];
+-    $contestant_team_member_5 = $row_rsContestants['contestant_team_member_5'];
++    $update_contestant_name = $row_rsContestants['contestant_name'];    
++    $update_contestant_birth = $row_rsContestants['contestant_birth'];
++    $update_contestant_birth_max = $row_rsContestants['contestant_birth_max'];
++    $update_contestant_gender = $row_rsContestants['contestant_gender'];
++    $update_contestant_team = $row_rsContestants['contestant_team'];
++    $update_contestant_team_member_1 = $row_rsContestants['contestant_team_member_1'];
++    $update_contestant_team_member_2 = $row_rsContestants['contestant_team_member_2'];
++    $update_contestant_team_member_3 = $row_rsContestants['contestant_team_member_3'];
++    $update_contestant_team_member_4 = $row_rsContestants['contestant_team_member_4'];
++    $update_contestant_team_member_5 = $row_rsContestants['contestant_team_member_5'];
+     $_SESSION['MM_Account'] = $row_rsContestants['account_id'];
+     $_SESSION['contestant_team'] = $row_rsContestants['contestant_team'];
+ }
+@@ -68,13 +69,13 @@
+   if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
+   if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
+   if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}   
+-  $contestant_id = filter_input(INPUT_POST,'contestant_id');
++  $update_contestant_id = filter_input(INPUT_POST,'contestant_id');
+   
+     $val = new Validation();
+     $length = 5;//min length of strings
+-    $val->name('namn')->value($update_contestant_name)->pattern('text')->required()->min($length);
++    $val->name('namn')->value($update_contestant_name)->pattern('words')->required()->min($length);
+     $val->name('f&ouml;delsedatum')->value($update_contestant_birth)->datePattern('Y-m-d')->required();
+-    $val->name('k&ouml;n')->value($update_contestant_gender)->pattern('text')->required();
++    $val->name('k&ouml;n')->value($update_contestant_gender)->pattern('words')->required();
+ 	        
+     //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+     if($val->isSuccess()){
+@@ -96,47 +97,35 @@
+             . "contestant_team_member_3 = :contestant_id_3 OR contestant_team_member_4 = :contestant_id_4 OR "
+             . "contestant_team_member_5 = :contestant_id_5";
+     $stmt_rsTeams = $DBconnection->prepare($query_rsTeams);
+-    $stmt_rsTeams->execute(array(':contestant_id_1'=>$contestant_id,':contestant_id_2'=>$contestant_id,':contestant_id_3'=>$contestant_id,':contestant_id_4'=>$contestant_id, ':contestant_id_5'=>$contestant_id));
++    $stmt_rsTeams->execute(array(':contestant_id_1'=>$update_contestant_id,':contestant_id_2'=>$update_contestant_id,':contestant_id_3'=>$update_contestant_id,':contestant_id_4'=>$update_contestant_id, ':contestant_id_5'=>$update_contestant_id));
+     }   catch(PDOException $ex) {
+             echo 'An Error occured with query $query_rsTeams: '.$ex->getMessage();
+     }
+         while($row_rsTeams = $stmt_rsTeams->fetch(PDO::FETCH_ASSOC)) {
+-            $team_id = $row_rsTeams['contestant_id'];
+-            $team_name = $row_rsTeams['contestant_name'];
+-            $team_birth = $row_rsTeams['contestant_birth'];
+-            $team_birth_max = $row_rsTeams['contestant_birth_max'];
+-            $team_gender = $row_rsTeams['contestant_gender'];
+-            $team_team = $row_rsTeams['contestant_team'];
+-            $team_team_member_1 = $row_rsTeams['contestant_team_member_1'];
+-            $team_team_member_2 = $row_rsTeams['contestant_team_member_2'];
+-            $team_team_member_3 = $row_rsTeams['contestant_team_member_3'];
+-            $team_team_member_4 = $row_rsTeams['contestant_team_member_4'];
+-            $team_team_member_5 = $row_rsTeams['contestant_team_member_5'];
++            $update_team_id = $row_rsTeams['contestant_id'];
++            $update_team_name = $row_rsTeams['contestant_name'];
++            $update_team_birth = $row_rsTeams['contestant_birth'];
++            $update_team_birth_max = $row_rsTeams['contestant_birth_max'];
++            $update_team_gender = $row_rsTeams['contestant_gender'];
++            $update_team_team = $row_rsTeams['contestant_team'];
++            $update_team_team_member_1 = $row_rsTeams['contestant_team_member_1'];
++            $update_team_team_member_2 = $row_rsTeams['contestant_team_member_2'];
++            $update_team_team_member_3 = $row_rsTeams['contestant_team_member_3'];
++            $update_team_team_member_4 = $row_rsTeams['contestant_team_member_4'];
++            $update_team_team_member_5 = $row_rsTeams['contestant_team_member_5'];
+ 
+                 //Compare selected team member's gender and set the team's gender            
+-                if($update_contestant_gender <> $team_gender) { //The members's gender is NOT the same as the team's
++                if($update_contestant_gender <> $update_team_gender) { //The members's gender is NOT the same as the team's
+                     $team_gender = 'Mix';    
+                 }       
+                //Compare selected team member's birthday and set the teams' max and min birthdays            
+-                if($update_contestant_birth < $team_birth) {//The members's birth is earlier than the team's
+-                    $team_birth = $update_contestant_birth;
++                if($update_contestant_birth < $update_team_birth) {//The members's birth is earlier than the team's
++                    $update_team_birth = $update_contestant_birth;
+                 } 
+-                elseif ($update_contestant_birth_max > $team_birth_max) {//The members's birth is later than the team's
+-                    $team_birth_max = $update_contestant_birth_max; 
++                elseif ($update_contestant_birth_max > $update_team_birth_max) {//The members's birth is later than the team's
++                    $update_team_birth_max = $update_contestant_birth_max; 
+                 }
+-            echo '<br>$team_id: '.$team_id.'<br>';
+-            echo '$team_name: '.$team_name.'<br>';
+-            echo '$team_birth: '.$team_birth.'<br>';
+-            echo '$team_birth_max: '.$team_birth_max.'<br>';
+-            echo '$team_gender: '.$team_gender.'<br>';
+-            echo '$team_team: '.$team_team.'<br>';
+-            echo '$team_team_member_1: '.$team_team_member_1.'<br>';
+-            echo '$team_team_member_2: '.$team_team_member_2.'<br>';
+-            echo '$team_team_member_3: '.$team_team_member_3.'<br>';
+-            echo '$team_team_member_4: '.$team_team_member_4.'<br>';
+-            echo '$team_team_member_5: '.$team_team_member_5.'<br>';
+-            
+-        //if($team_team_member_5 === 'No'){       
++
+                 //UPDATE selected Team with gender and  max-/min birth                   
+                 try { //Catch anything wrong with query
+                 require('Connections/DBconnection.php');    
+@@ -155,22 +144,21 @@
+                 WHERE contestant_id = :contestant_id"; 
+                 $stmt = $DBconnection->prepare($updateTeamSQL);                        
+                 $stmt->bindValue(':account_id', $_SESSION['MM_Account'], PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_name', $team_name, PDO::PARAM_STR);
+-                $stmt->bindValue(':contestant_birth', $team_birth, PDO::PARAM_STR);
+-                $stmt->bindValue(':contestant_birth_max', $team_birth_max, PDO::PARAM_STR);
+-                $stmt->bindValue(':contestant_gender', $team_gender, PDO::PARAM_STR);
+-                $stmt->bindValue(':contestant_team', $team_team, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_team_member_1', $team_team_member_1, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_team_member_2', $team_team_member_2, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_team_member_3', $team_team_member_3, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_team_member_4', $team_team_member_4, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_team_member_5', $team_team_member_5, PDO::PARAM_INT);
+-                $stmt->bindValue(':contestant_id', $team_id, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_name', $update_team_name, PDO::PARAM_STR);
++                $stmt->bindValue(':contestant_birth', $update_team_birth, PDO::PARAM_STR);
++                $stmt->bindValue(':contestant_birth_max', $update_team_birth_max, PDO::PARAM_STR);
++                $stmt->bindValue(':contestant_gender', $update_team_gender, PDO::PARAM_STR);
++                $stmt->bindValue(':contestant_team', $update_team_team, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_team_member_1', $update_team_team_member_1, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_team_member_2', $update_team_team_member_2, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_team_member_3', $update_team_team_member_3, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_team_member_4', $update_team_team_member_4, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_team_member_5', $update_team_team_member_5, PDO::PARAM_INT);
++                $stmt->bindValue(':contestant_id', $update_team_id, PDO::PARAM_INT);
+                 $stmt->execute();
+                 }   catch(PDOException $ex) {
+                         echo 'An Error occured with query $updateTeamSQL: '.$ex->getMessage();
+                     }
+-        //}
+         $stmt_rsTeams->closeCursor();//Kill statements
+         }
+ }
+@@ -185,36 +173,36 @@
+         <tr>
+           <td>T&auml;vlandes namn</td>
+           <td><label>
+-              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $contestant_name; ?>"/>
++              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $update_contestant_name; ?>"/>
+           </label></td>
+         </tr>
+         <tr>
+           <td>F&ouml;delsedatum (yyyy-mm-dd)</td>
+           <td valign="top"><label>
+-            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $contestant_birth; ?>" size="8" maxlength="10"/>
++            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $update_contestant_birth; ?>" size="8" maxlength="10"/>
+           </label></td>
+         </tr>
+         <tr>
+           <td>K&ouml;n</td>
+           <td valign="top">
+             <label>
+-              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($contestant_gender === "Man") {echo "checked='checked'";} ?>//>
++              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($update_contestant_gender === "Man") {echo "checked='checked'";} ?>//>
+               Man</label>
+             <label>
+-              <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($contestant_gender === "Kvinna") {echo "checked='checked'";} ?>/>
++              <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($update_contestant_gender === "Kvinna") {echo "checked='checked'";} ?>/>
+               Kvinna</label>
+           </td>
+         </tr>
+         <tr>
+           <td>
+         <input type="hidden" name="MM_update_contestant" value="update_contestant" />
+-        <input type="hidden" name="contestant_team" id="contestant_team" value="<?php echo $contestant_team; ?>" />
+-        <input type="hidden" name="contestant_team_member_1" id="contestant_team_member_1" value="<?php echo $contestant_team_member_1; ?>" />
+-        <input type="hidden" name="contestant_team_member_2" id="contestant_team_member_2" value="<?php echo $contestant_team_member_2; ?>" />
+-        <input type="hidden" name="contestant_team_member_3" id="contestant_team_member_3" value="<?php echo $contestant_team_member_3; ?>" />
+-        <input type="hidden" name="contestant_team_member_4" id="contestant_team_member_4" value="<?php echo $contestant_team_member_4; ?>" />
+-        <input type="hidden" name="contestant_team_member_5" id="contestant_team_member_5" value="<?php echo $contestant_team_member_5; ?>" />
+-        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />
++        <input type="hidden" name="contestant_team" id="contestant_team" value="<?php echo $update_contestant_team; ?>" />
++        <input type="hidden" name="contestant_team_member_1" id="contestant_team_member_1" value="<?php echo $update_contestant_team_member_1; ?>" />
++        <input type="hidden" name="contestant_team_member_2" id="contestant_team_member_2" value="<?php echo $update_contestant_team_member_2; ?>" />
++        <input type="hidden" name="contestant_team_member_3" id="contestant_team_member_3" value="<?php echo $update_contestant_team_member_3; ?>" />
++        <input type="hidden" name="contestant_team_member_4" id="contestant_team_member_4" value="<?php echo $update_contestant_team_member_4; ?>" />
++        <input type="hidden" name="contestant_team_member_5" id="contestant_team_member_5" value="<?php echo $update_contestant_team_member_5; ?>" />
++        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $update_contestant_id; ?>" />
+           </td>
+           <td><label>
+               <input type="submit" name="update_contestant" id="update_contestant" value="Spara" />
+@@ -248,17 +236,17 @@
+ // Validate the contestant form if the button is clicked	
+ if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
+     $update_contestant_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contestant_name'), MB_CASE_TITLE,"UTF-8"));    
+-    $contestant_team = filter_input(INPUT_POST,'contestant_team');
++    $update_contestant_team = filter_input(INPUT_POST,'contestant_team');
+     $update_contestant_team_member_1 = filter_input(INPUT_POST,'contestant_team_member_1');
+     $update_contestant_team_member_2 = filter_input(INPUT_POST,'contestant_team_member_2');
+     if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
+     if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
+     if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}
+-    $contestant_id = filter_input(INPUT_POST,'contestant_id');    
++    $update_contestant_id = filter_input(INPUT_POST,'contestant_id');    
+     
+     $val = new Validation();
+     $length = 5;//min length of strings
+-    $val->name('lagets namn')->value($update_contestant_name)->pattern('text')->required()->min($length);
++    $val->name('lagets namn')->value($update_contestant_name)->pattern('alphanum')->required()->min($length);
+     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($update_contestant_team_member_1)->pattern('int')->required();
+     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($update_contestant_team_member_2)->pattern('int')->required();
+ 	        
+@@ -316,7 +304,7 @@
+         <tr>
+           <td>Lagets namn</td>
+           <td><label>
+-              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $contestant_name; ?>"/>
++              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $update_contestant_name; ?>"/>
+           </label></td>
+         </tr>
+         <tr>
+@@ -324,13 +312,13 @@
+           <td nowrap="nowrap">
+           <label><select name="contestant_team_member_1" id="contestant_team_member_1">             
+ <?php
+-        if ($contestant_team_member_1 === 0 || $contestant_team_member_1 === ''){
++        if ($update_contestant_team_member_1 === 0 || $update_contestant_team_member_1 === ''){
+             echo '<option value="">V&auml;lj lagmedlem 1!';
+         }
+     foreach($row_rsTeamMembers as $row_rsTeamMember) {
+ ?>
+       <option value="<?php echo $row_rsTeamMember['contestant_id']?>"
+-<?php if (!(strcmp($contestant_team_member_1, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
++<?php if (!(strcmp($update_contestant_team_member_1, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+ <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
+       </option>
+ <?php
+@@ -342,13 +330,13 @@
+           <td nowrap="nowrap">
+           <label><select name="contestant_team_member_2" id="contestant_team_member_2">
+ <?php
+-        if ($contestant_team_member_2 === 0 || $contestant_team_member_2 === ''){
++        if ($update_contestant_team_member_2 === 0 || $update_contestant_team_member_2 === ''){
+             echo '<option value="">V&auml;lj lagmedlem 2!';
+         }
+     foreach($row_rsTeamMembers as $row_rsTeamMember) {
+ ?>
+       <option value="<?php echo $row_rsTeamMember['contestant_id']?>"
+-<?php if (!(strcmp($contestant_team_member_2, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
++<?php if (!(strcmp($update_contestant_team_member_2, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+ <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
+       </option>
+ <?php
+@@ -360,13 +348,13 @@
+           <td nowrap="nowrap">
+           <label><select name="contestant_team_member_3" id="contestant_team_member_3">
+ <?php
+-        if ($contestant_team_member_3 === 0 || $contestant_team_member_3 === ''){
++        if ($update_contestant_team_member_3 === 0 || $update_contestant_team_member_3 === ''){
+             echo '<option value="">V&auml;lj lagmedlem 3!';
+         }
+     foreach($row_rsTeamMembers as $row_rsTeamMember) {
+ ?>
+       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
+-<?php if (!(strcmp($contestant_team_member_3, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
++<?php if (!(strcmp($update_contestant_team_member_3, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+ <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
+       </option>
+ <?php
+@@ -378,13 +366,13 @@
+           <td nowrap="nowrap">
+           <label><select name="contestant_team_member_4" id="contestant_team_member_4">
+ <?php
+-        if ($contestant_team_member_4=== 0 || $contestant_team_member_4 === ''){
++        if ($update_contestant_team_member_4=== 0 || $update_contestant_team_member_4 === ''){
+             echo '<option value="">V&auml;lj lagmedlem 4!';
+         }
+     foreach($row_rsTeamMembers as $row_rsTeamMember) {
+ ?>
+       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
+-<?php if (!(strcmp($contestant_team_member_4, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
++<?php if (!(strcmp($update_contestant_team_member_4, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+ <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
+       </option>
+ <?php
+@@ -396,13 +384,13 @@
+           <td nowrap="nowrap">
+           <label><select name="contestant_team_member_5" id="contestant_team_member_5">
+ <?php
+-        if ($contestant_team_member_5 === 0 || $contestant_team_member_5 === ''){
++        if ($update_contestant_team_member_5 === 0 || $update_contestant_team_member_5 === ''){
+             echo '<option value="">V&auml;lj lagmedlem 5!';
+         }
+     foreach($row_rsTeamMembers as $row_rsTeamMember) {
+ ?>
+       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
+-<?php if (!(strcmp($contestant_team_member_5, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
++<?php if (!(strcmp($update_contestant_team_member_5, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+ <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
+       </option>
+ <?php
+@@ -411,10 +399,10 @@
+         </tr>        
+         <tr>
+           <td>
+-        <input type="hidden" name="contestant_birth" value="<?php echo $contestant_birth ?>"/>              
+-        <input type="hidden" name="contestant_birth_max" value="<?php echo $contestant_birth_max ?>"/>              
+-        <input type="hidden" name="contestant_team" value="<?php echo $contestant_team ?>" />
+-        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />        
++        <input type="hidden" name="contestant_birth" value="<?php echo $update_contestant_birth ?>"/>              
++        <input type="hidden" name="contestant_birth_max" value="<?php echo $update_contestant_birth_max ?>"/>              
++        <input type="hidden" name="contestant_team" value="<?php echo $update_contestant_team ?>" />
++        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $update_contestant_id; ?>" />        
+         <input type="hidden" name="MM_update_team" value="update_team" />
+           </td>
+           <td><label>
+@@ -432,17 +420,6 @@
+ //Excute sql update and don't show form
+ if ($output_form === 'no') {
+     if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant" || filter_input(INPUT_POST,"MM_update_team") === "update_team") {    
+-            echo '<br>$id: '.$contestant_id.'<br>';
+-            echo '$name: '.$update_contestant_name.'<br>';
+-            echo '$birth: '.$update_contestant_birth.'<br>';
+-            echo '$birth_max: '.$update_contestant_birth_max.'<br>';
+-            echo '$gender: '.$update_contestant_gender.'<br>';
+-            echo '$team: '.$update_contestant_team.'<br>';
+-            echo '$team_member_1: '.$update_contestant_team_member_1.'<br>';
+-            echo '$team_member_2: '.$update_contestant_team_member_2.'<br>';
+-            echo '$team_member_3: '.$update_contestant_team_member_3.'<br>';
+-            echo '$team_member_4: '.$update_contestant_team_member_4.'<br>';
+-            echo '$team_member_5: '.$update_contestant_team_member_5.'<br>';
+     try { //Catch anything wrong with query
+     require('Connections/DBconnection.php');    
+     //UPDATE selected Contestant or Team    
+@@ -465,13 +442,13 @@
+     $stmt->bindValue(':contestant_birth', $update_contestant_birth, PDO::PARAM_STR);
+     $stmt->bindValue(':contestant_birth_max', $update_contestant_birth_max, PDO::PARAM_STR);
+     $stmt->bindValue(':contestant_gender', $update_contestant_gender, PDO::PARAM_STR);
+-    $stmt->bindValue(':contestant_team', $contestant_team, PDO::PARAM_INT);
++    $stmt->bindValue(':contestant_team', $update_contestant_team, PDO::PARAM_INT);
+     $stmt->bindValue(':contestant_team_member_1', $update_contestant_team_member_1, PDO::PARAM_INT);
+     $stmt->bindValue(':contestant_team_member_2', $update_contestant_team_member_2, PDO::PARAM_INT);
+     $stmt->bindValue(':contestant_team_member_3', $update_contestant_team_member_3, PDO::PARAM_INT);
+     $stmt->bindValue(':contestant_team_member_4', $update_contestant_team_member_4, PDO::PARAM_INT);
+     $stmt->bindValue(':contestant_team_member_5', $update_contestant_team_member_5, PDO::PARAM_INT);
+-    $stmt->bindValue(':contestant_id', $contestant_id, PDO::PARAM_INT);
++    $stmt->bindValue(':contestant_id', $update_contestant_id, PDO::PARAM_INT);
+     $stmt->execute();
+     }   catch(PDOException $ex) {
+             echo 'An Error occured with query $updateSQL: '.$ex->getMessage();
+@@ -483,7 +460,8 @@
+     }        
+     header(sprintf("Location: %s", $updateGoTo));
+     }
+-$stmt->closeCursor();//Kill statements
++ 
++//$stmt->closeCursor();//Kill statements
+ }//$output_form = no ?>
+         </div>
+ </div>
+diff --git a/includes/footer.php b/includes/footer.php
+index da37920..92bfe86 100644
+--- a/includes/footer.php
++++ b/includes/footer.php
+@@ -3,7 +3,7 @@
+  $stmt_rsCurrentComp->closeCursor();
+  $DBconnection = null;
+  ?>
+-<div id="siteInfo">v3.3.3 - &copy;2014 zongordon</div>
++<div id="siteInfo">v3.3.4 - &copy;2014 zongordon</div>
+ 
+ 
+ 
+diff --git a/includes/functions.php b/includes/functions.php
+index 3f5e4ea..04937a9 100644
+--- a/includes/functions.php
++++ b/includes/functions.php
+@@ -80,5 +80,4 @@
+ //Convert strings to ISO-8859-1
+ function encodeToISO($string) {
+      return mb_convert_encoding($string, "ISO-8859-1", mb_detect_encoding($string, "UTF-8, ISO-8859-1, ISO-8859-15", true));
+-}
+-?>
+\ No newline at end of file
++}
+\ No newline at end of file
+diff --git a/includes/news_sponsors_nav.php b/includes/news_sponsors_nav.php
+index f6f8482..bf28812 100644
+--- a/includes/news_sponsors_nav.php
++++ b/includes/news_sponsors_nav.php
+@@ -1,11 +1,11 @@
+ <?php
+-//Added sponsors,EEM, Kfast and Eskilstuna logistik
+-
+-require_once('Connections/DBconnection.php');
+-
++/*Removed code as duplicated in index.php and caused error message in PHP8
+ if (!isset($_SESSION)) {
+   session_start();
+ }
++*/
++
++require_once('Connections/DBconnection.php');
+ 
+ $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
+ if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
+diff --git a/includes/regs_handle.php b/includes/regs_handle.php
+index fe34a76..32b2a5c 100644
+--- a/includes/regs_handle.php
++++ b/includes/regs_handle.php
+@@ -1,5 +1,7 @@
+ <?php 
+-//Removed troubleshooting code
++//Added code to prevent error message "Notice: Trying to access array offset on value of type bool..." with empty recordset, introduced by PHP 7.4
++//Changed from "text" validation for $insert_contestant_name and $insert_contestant_gender
++//Changed to show Coach field only when club is selected to prevent SQL error if data entered before selecction
+ 
+ //Catch anything wrong with query
+ try {
+@@ -70,9 +72,10 @@
+ //Show if logged in is Admin
+ if ($MM_authorizedUsers === "1"){ ?>
+ <h3>1. V&auml;lj klubb</h3>
+-<p><?php if (empty($_SESSION['MM_Account'])) {
+- echo "<strong>Ingen klubb &auml;r vald &auml;n! </strong>";    
+-} ?>
++<p>
++<?php if (empty($_SESSION['MM_Account'])) {//Show if no club is selected
++        echo "<strong>Ingen klubb &auml;r vald &auml;n! </strong>";    
++      } ?>
+ V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
+ <form id="SelectClub" name="SelectClub" method="post" action="<?php echo $editFormAction; ?>">
+   <table width="200" border="0">
+@@ -102,9 +105,12 @@
+ //Show club registration form if a club is selected and "Välj" button is clicked 
+ if ($totalRows_rsSelectedClub <> "") { // Do not show if recordset empty
+ ?>
+-<h3><?php if ($MM_authorizedUsers === "0") { echo '1';} else {echo '2';} ?>. Skriv in klubbens coacher</h3>
+-<p>Skriv in namnen p&aring; de coacher som ska st&ouml;tta era t&auml;vlande och klicka p&aring; spara.</p>
+-<?php
++<h3>
++<?php 
++    if (!empty($_SESSION['MM_Account'])) {//Show if club is selected
++        if ($MM_authorizedUsers === "0") { echo '1';} else {echo '2';} ?>. Skriv in klubbens coacher</h3>
++        <p>Skriv in namnen p&aring; de coacher som ska st&ouml;tta era t&auml;vlande och klicka p&aring; spara.</p>
++<?php 
+ // Validate the club registration form if the "Spara" or "Uppdatera" button is clicked
+     $coach_names = '';
+ if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") || (filter_input(INPUT_POST,"MM_update_clubregistration") === "update_club_reg")) {
+@@ -185,7 +191,7 @@
+       <tr>
+         <td valign="top">Coacher</td>
+         <td><label>
+-          <input name="coach_names" type="text" id="coach_names" value="<?php echo $row_rsClubReg['coach_names']; ?>" size="55" /></label></td>
++          <input name="coach_names" type="text" id="coach_names" value="<?php if ($totalRows_rsClubReg <> 0) { echo $row_rsClubReg['coach_names'];} ?>" size="55" /></label></td>
+       </tr>
+       <tr>
+         <td>
+@@ -206,6 +212,7 @@
+     </table>      
+     </form>
+  <?php   
++    }//Show if club is selected
+  }
+  ?>
+ <?php 
+@@ -223,9 +230,9 @@
+ 
+     $val = new Validation();
+     $length = 5;//min length of strings
+-    $val->name('namn')->value($insert_contestant_name)->pattern('text')->required()->min($length);
++    $val->name('namn')->value($insert_contestant_name)->pattern('words')->required()->min($length);
+     $val->name('f&ouml;delsedatum')->value($insert_contestant_birth)->datePattern('Y-m-d')->required();
+-    $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('text')->required();
++    $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('words')->required();
+ 	        
+     //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
+     if($val->isSuccess()){
+@@ -333,7 +340,7 @@
+ 
+     $val = new Validation();
+     $length = 5;//min length of strings
+-    $val->name('lagets namn')->value($insert_contestant_name)->pattern('text')->required()->min($length);
++    $val->name('lagets namn')->value($insert_contestant_name)->pattern('alphanum')->required()->min($length);
+     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($insert_contestant_team_member_1)->pattern('int')->required();
+     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($insert_contestant_team_member_2)->pattern('int')->required();
+ 	        
+diff --git a/includes/restrict_access.php b/includes/restrict_access.php
+index 1593b64..fc6959c 100644
+--- a/includes/restrict_access.php
++++ b/includes/restrict_access.php
+@@ -1,5 +1,5 @@
+ <?php
+-//Changed default redirect page from "LogIn.php"
++//Changed page title from "Anv&auml;ndarkonton"
+ if (!isset($_SESSION)) {
+   session_start();
+ }
+@@ -35,7 +35,7 @@
+     if ($pagetitle === "L&auml;gga till ett konto - admin") {
+     $MM_restrictGoTo = "AccountInsert_loggedout.php";
+     }
+-    if ($pagetitle === "Lista konton - admin") {
++    if ($pagetitle === "Lista anv&auml;ndarkonton - admin") {
+     $MM_restrictGoTo = "AccountList_reg.php";
+     }
+     if ($pagetitle === "&Auml;ndra anv&auml;ndarkonto - admin") {
+@@ -69,5 +69,4 @@
+   $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+   header("Location: ". $MM_restrictGoTo); 
+   exit;
+-}
+-?>
+\ No newline at end of file
++}
+\ No newline at end of file
+diff --git a/index.php b/index.php
+index 91ce4c4..9e49e09 100644
+--- a/index.php
++++ b/index.php
+@@ -1,29 +1,73 @@
+-<?php
+-// Competition cancelled 
++﻿<?php 
++//Changed embedded video from linked Facebook video to Youtube
++//Changed to google maps link instead of Facebook link
++
+ ob_start();
+ 
+ if (!isset($_SESSION)) {
+   session_start();
+ }
+-$pagetitle="T&auml;vling";
++$pagetitle = "T&auml;vling";
+ // Includes HTML Head
+-include_once('includes/header.php');?>
++include_once('includes/header.php');
++//Include top navigation links, News and sponsor sections
++include_once("includes/news_sponsors_nav.php");
++?>
+ <!-- start page -->
+-<div id="masthead">
+-    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
+-    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
+-    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
+-</div>
+ <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
++<!-- Include different navigation links depending on authority  -->
++<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
+ <div id="content">
+   <div class="feature">
+-    <h1>&nbsp;</h1>
+-    <h1>T&auml;vlingen &auml;r INST&Auml;LLD!</h1>
+-    <p>T&auml;vlingsledningen har tagit beslutet att s&auml;lla oss till flertalet andra t&auml;vlingsarrang&ouml;rer och st&auml;lla in &aring;rets t&auml;vling, i dessa Corona-tider. Vi hoppas f&ouml;rst&aring;s att ni vill g&ouml;ra ett nytt f&ouml;rs&ouml;k tillsammans med oss n&auml;sta &aring;r och att vi kan genomf&ouml;ra t&auml;vlingen då ist&auml;llet!</p>
++    <h1>V&auml;lkomna till <?php echo $comp_name;?>!</h1>
++    <p>En barn- och ungdomst&auml;vling f&ouml;r samtliga karatestilar och som anordnas av <?php echo $comp_arranger;?>.<br>
++    Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
++    L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
+   </div>
+-   <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Feskilstunakarateklubb%2Fvideos%2F2420821441538024%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
+-  <div class="story"></div>
++<iframe width="640" height="360" src="https://www.youtube.com/embed/pl9HgW5pgTQ?rel=0&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    
++  <div class="story">
++    <h2>Tid och plats</h2>
++    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">
++    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
++    Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
++    <h2>Anm&auml;lning av t&auml;vlande</h2>
++    <p>Anm&auml;lan g&ouml;rs h&auml;r p&aring; <strong>t&auml;vlingssajten</strong> av klubbledare/coach genom att f&ouml;rst skapa ett klubbkonto 
++        via l&auml;nken &quot;Nytt konto&quot;, logga in och d&auml;refter g&ouml;ra anm&auml;lningar via l&auml;nken 
++        &quot;Anm&auml;lan&quot;. Ni kan g&ouml;ra f&ouml;r&auml;ndringar av era anm&auml;lningar &auml;nda fram till sista 
++        anm&auml;lningsdagen. OBS! En coach per fem t&auml;vlande. Ange namn p&aring; coacher i anm&auml;lan. <br />
++    <h2>Sista anm&auml;lningsdag</h2>
++    <p>Anm&auml;lan kan g&ouml;ras online av klubbledare/coach under rubriken &quot;Anm&auml;lan&quot; ovan, fram till 
++        <strong><?php echo $comp_end_reg_date?></strong>. Ni kan INTE g&ouml;ra n&aring;gon efteranm&auml;lan!</p>
++    <h2>T&auml;vlingsstegar</h2>
++    <p><?php if ($comp_raffled === 1) { echo 'Nu &auml;r lottningen avklarad och du kan sj&auml;lv skriva ut t&auml;vlingsstegar via l&auml;nken Lottning ovan'; } else { echo 'N&auml;r lottningen &auml;r avklarad kan du sj&auml;lv skriva ut t&auml;vlingsstegar h&auml;r fr&aring;n t&auml;vlingssajten'; } ?>, direkt fr&aring;n sidan eller som pdf! <br><strong>Inga stegar delas ut p&aring; plats!</strong></p>
++    <h2>Startavgift och inbetalning</h2>
++    <p>Avgiften &auml;r 300 kr per individuellklass och 600 kr per lagklass. Anv&auml;nd bankgironummer 176-6526 eller Swish till 123 26 70 180 f&ouml;r inbetalning av t&auml;vlingsavgiften! Obs! <strong>Den ska vara inbetald senast p&aring; sista anm&auml;lningsdagen och vara gemensam fr&aring;n respektive klubb!</strong> Under l&auml;nken "Rapporter" hittar du, som inloggad, er kostnad.</p>
++    <h2>Registrering, strykningar och inv&auml;gning</h2>
++    <p>Klubben registreras p&aring; t&auml;vlingsdagen av <strong>en</strong> lagledare eller coach vid p&aring;visad plats i t&auml;vlingshallen. Coach/lagledare f&aring;r h&auml;r ta emot tidsplanering. Eventuella strykningar meddelar ni vid registrering eller direkt p&aring; respektive matta. Obs! De t&auml;vlande m&aring;ste inte sj&auml;lva vara p&aring; plats vid registreringen! Inv&auml;gning och registrering sker p&aring; t&auml;vlingsdagen 08.30-09.30 samt 12.00- 12.30.</p>
++    <h2>Entr&eacute; 50 kr</h2>
++    <p>F&ouml;r &aring;sk&aring;dare (icke t&auml;vlande eller deras coacher) kostar det 50 kr i entr&eacute;. F&ouml;rskolebarn kommer in gratis!</p>
++    <h2>Regler mm.</h2>
++    <ul>
++      <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
++      <li>Obligatorisk coachlicens g&auml;ller f&ouml;r samtliga som ska coacha under t&auml;vlingen - <a href="http://skfcoach.se/" target=_blank>Coachlicensverktyget</a></li>
++      <li>Konsekvensbeslut vid ol&auml;mplig coachning av barn - <a href="http://www.swekarate.se/globalassets/svenska-karateforbundet-tavling/tavling/info--dokument/konsekvensbeslut-vid-olamplig-coachning_barn_v2.pdf" target=_blank>l&auml;nk</a></li>
++      <li>Alla evenemang i Svenska Karatef&ouml;rbundets regi skall vara trygga f&ouml;r alla medlemmar och deltagare samt helt fria fr&aring;n alla former av psykiska och fysiska kr&auml;nkningar, verbala trakasserier och maktmissbruk. Om n&aring;gon skulle beh&ouml;va rapportera en h&auml;ndelse eller f&aring; ytterligare information ang&aring;ende F&ouml;rbundets skyddshanteringssystem v.g. kontakta Ove Viggedal, f&ouml;rbundets huvudskyddsombud i dessa fr&aring;gor. Maila ditt &auml;rende till <a href="mailto:safety@swekarate.se." title="Skyddad adress">safety@swekarate.se.</a></li>
++      <li>Kadetter och juniorer har inga krav p&aring; shitei kata, men ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
++      <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
++      <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter och juniorer (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>
++      <li>&Aring;terkval g&auml;ller f&ouml;r alla klasser</li>
++      <li>Round Robin (alla m&ouml;ter alla) vid f&auml;rre &auml;n fem i klassen</li>
++      <li>Duo kata (tv&aring; t&auml;vlande samtidigt) upp till 12 &aring;r</li>
++      <li>Vi f&ouml;rbeh&aring;ller oss r&auml;tten att &auml;ndra t&auml;vlingsklasserna vid f&ouml;r f&aring; deltagare</li>
++    </ul>
++    <h2>Boende i Eskilstuna</h2>
++    <p>Kontakta turistbyr&aring;n f&ouml;r information om boende: <a href="https://eskilstuna.nu/om-oss/eskilstuna-tourist-information/" target="_blank">Turistbyr&aring;n i Eskilstuna</a>!</p>
+ </div>
+-<?php include_once("includes/footer.php");?>
++</div>
++<?php 
++$stmt_rsCurrentComp->closeCursor();
++include_once("includes/footer.php");
++?>
++</body>
+ </html>
+-<?php ob_end_flush();?>
+\ No newline at end of file
++<?php ob_end_flush();?>
+diff --git a/index_during.php b/index_during.php
+index 4a36dbc..9e49e09 100644
+--- a/index_during.php
++++ b/index_during.php
+@@ -1,5 +1,6 @@
+ ﻿<?php 
+-//Embedded video filmed during TKC 2019
++//Changed embedded video from linked Facebook video to Youtube
++//Changed to google maps link instead of Facebook link
+ 
+ ob_start();
+ 
+@@ -23,10 +24,10 @@
+     Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
+     L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
+   </div>
+-    <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Feskilstunakarateklubb%2Fvideos%2F2420821441538024%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
++<iframe width="640" height="360" src="https://www.youtube.com/embed/pl9HgW5pgTQ?rel=0&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    
+   <div class="story">
+     <h2>Tid och plats</h2>
+-    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="http://www.facebook.com/stigasportsarena/" title="Stiga Sports Arena" target="_blank">
++    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">
+     Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
+     Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
+     <h2>Anm&auml;lning av t&auml;vlande</h2>
