@@ -54,7 +54,8 @@ $class_team ='';$class_category = '';$class_discipline = '';$class_discipline_va
     $class_age = encodeToUtf8(filter_input(INPUT_POST,trim('class_age')));    
     $class_fee = filter_input(INPUT_POST, trim('class_fee'));
     $class_match_time = str_replace(',','.',filter_input(INPUT_POST, trim('class_match_time')));
-
+echo 'Kön: '.$class_gender.'<br>';
+echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
     $val = new Validation();
     $val->name('typ av klass')->value($class_team)->pattern('int')->required();
     $val->name('disciplin')->value($class_discipline)->pattern('alpha')->required();

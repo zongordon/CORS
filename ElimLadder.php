@@ -1,6 +1,6 @@
 <?php 
-// Removed #apCompBanner
-// Added #apSponsorPic5KataPoint, #apSponsorPic5KataPoint, #apSponsorPic6KataPoint and #apSponsorPic6KataPoint
+// Changed code to show correct protocols for classes with teams, round robin, kata point system or default
+// Added code to handle contestants or not, preventing error message "Notice: Trying to access array offset on value of type bool...", introduced by PHP 7.4: ElimLadder.php
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -53,8 +53,10 @@ $str = $name.', '.$club;
         if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
 $contestantsArray[] = $str; 
 $startnumbersArray[] = $startnumber;
-} 
-
+}
+$pagetitle="T&auml;vlingsstege";
+//If there are any class contestants
+if ($totalRows_rsClassContestants >0){
 $comp_name = $row_rsClass['comp_name'];
 $comp_arranger = $row_rsClass['comp_arranger'];
 $comp_start_date = $row_rsClass['comp_start_date']; 
@@ -68,9 +70,24 @@ $class_gender_category = $row_rsClass['class_gender_category'];
 $class_category = $row_rsClass['class_category']; 
 $class_age = $row_rsClass['class_age']; 
 $class_weight_length = $row_rsClass['class_weight_length'];  
-$pagetitle="T&auml;vlingsstege";
 $pagedescription="$comp_name som arrangeras av $comp_arranger.";
 $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";
+} else { //If there are no class contestants
+$comp_name = '';
+$comp_arranger = '';
+$comp_start_date = ''; 
+$comp_limit_roundrobin = '';
+$class_team =  ''; 
+$team = '';
+$class_discipline = ''; 
+$class_discipline_variant = ''; 
+$class_gender_category = ''; 
+$class_category = ''; 
+$class_age = ''; 
+$class_weight_length = '';  
+$pagedescription = '';
+$pagekeywords="karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";    
+} //If there are no class contestants
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
@@ -111,7 +128,7 @@ echo ' | '.$class_weight_length;
                 echo 'Kata Point System';
             }
             else {
-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
+                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { 
                     echo 'Pool A'; 
                 } 
                 else { 
@@ -129,7 +146,7 @@ echo ' | '.$class_weight_length;
                 echo 'Kata Point System';
             }
             else {
-                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { 
+                if ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { 
                     echo 'Pool B'; 
                 } 
                 else { 
@@ -1167,7 +1184,7 @@ if ($totalRows_rsClassContestants > 11) { //Show 11-24 contestans;?>
 
 //When limit for Round Robin is not met or it's a team class - show elimination ladder
 //If startnumber and contestant exist - show them with the proper colours
-elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team = 1) { ?>
+elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsClassContestants < 3 || $class_team === 1) { ?>
 <div id="apDiv1">
   <table width="100%" border="0">
     <tr>
@@ -1346,7 +1363,8 @@ elseif ($totalRows_rsClassContestants > $comp_limit_roundrobin || $totalRows_rsC
 </div>
 <div id="apDivRepechage"></div>          
 <?php 
-}
+}//When limit for Round Robin is not met or it's a team class - show elimination ladder
+
 //When limit for Round Robin is met - show round robin protocol
 //If startnumber and contestant exist - show them with the proper colours
 else { 
@@ -1558,7 +1576,7 @@ $matchNo = 1; ?>
   </table>    
 </div>
 <?php 
-}
+}//When limit for Round Robin is met - show round robin protocol
 ?>
       <?php if ($class_discipline === 'Kata' && $class_discipline_variant === 1){
                 echo '<div id="apDivPDFKataPoint">
@@ -1628,7 +1646,11 @@ else {
 <?php
         }	
     }
-}       
+}
+/*} else { 
+    echo 'Inga deltagare i klassen!';    
+}//If there are no class contestants*/
+
 //Kill statements and DB connection
 $stmt_rsClassContestants->closeCursor();
 $stmt_rsClass->closeCursor();

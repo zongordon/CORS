@@ -1,11 +1,11 @@
 <?php
-//Added sponsors,EEM, Kfast and Eskilstuna logistik
-
-require_once('Connections/DBconnection.php');
-
+/*Removed code as duplicated in index.php and caused error message in PHP8
 if (!isset($_SESSION)) {
   session_start();
 }
+*/
+
+require_once('Connections/DBconnection.php');
 
 $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {

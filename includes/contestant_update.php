@@ -1,5 +1,6 @@
 <?php
-//Added code to update the teams' gender and max - and min age based on updated individual contestant
+//Changed from "text" validation of $update_contestant_name
+//Changed code to solve Warning: Undefined variable $contestant_name when validation triggered error message with PHP 8.0.0.rc1
 
 // require Class for validation of forms
 require_once 'Classes/Validate.php';
@@ -22,7 +23,7 @@ include_once('includes/restrict_access.php');?>
 $min_birthday='';$max_birthday='';$gender_init = '';$gender_final ='';$update_contestant_name='';$update_contestant_birth='';$update_contestant_birth_max='';$update_contestant_gender='';$contestant_team='';$update_contestant_team_member_1='';$update_contestant_team_member_2='';$update_contestant_team_member_3='';$update_contestant_team_member_4='';$update_contestant_team_member_5='';
 //Update contestant selected on previous page if contestant_id is provided
 if (filter_input(INPUT_GET,'contestant_id') != "") {
-    $contestant_id = filter_input(INPUT_GET,'contestant_id');
+    $update_contestant_id = filter_input(INPUT_GET,'contestant_id');
     //Catch anything wrong with query
     try {
     // Select data for the selected contestants
@@ -33,21 +34,21 @@ if (filter_input(INPUT_GET,'contestant_id') != "") {
             . "FROM contestants "
             . "WHERE contestant_id = :contestant_id";
     $stmt_rsContestants = $DBconnection->prepare($query_rsContestants);
-    $stmt_rsContestants->execute(array(':contestant_id'=>$contestant_id));
+    $stmt_rsContestants->execute(array(':contestant_id'=>$update_contestant_id));
     $row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo 'An Error occured with query $query_rsContestants: '.$ex->getMessage();
     }
-    $contestant_name = $row_rsContestants['contestant_name'];    
-    $contestant_birth = $row_rsContestants['contestant_birth'];
-    $contestant_birth_max = $row_rsContestants['contestant_birth_max'];
-    $contestant_gender = $row_rsContestants['contestant_gender'];
-    $contestant_team = $row_rsContestants['contestant_team'];
-    $contestant_team_member_1 = $row_rsContestants['contestant_team_member_1'];
-    $contestant_team_member_2 = $row_rsContestants['contestant_team_member_2'];
-    $contestant_team_member_3 = $row_rsContestants['contestant_team_member_3'];
-    $contestant_team_member_4 = $row_rsContestants['contestant_team_member_4'];
-    $contestant_team_member_5 = $row_rsContestants['contestant_team_member_5'];
+    $update_contestant_name = $row_rsContestants['contestant_name'];    
+    $update_contestant_birth = $row_rsContestants['contestant_birth'];
+    $update_contestant_birth_max = $row_rsContestants['contestant_birth_max'];
+    $update_contestant_gender = $row_rsContestants['contestant_gender'];
+    $update_contestant_team = $row_rsContestants['contestant_team'];
+    $update_contestant_team_member_1 = $row_rsContestants['contestant_team_member_1'];
+    $update_contestant_team_member_2 = $row_rsContestants['contestant_team_member_2'];
+    $update_contestant_team_member_3 = $row_rsContestants['contestant_team_member_3'];
+    $update_contestant_team_member_4 = $row_rsContestants['contestant_team_member_4'];
+    $update_contestant_team_member_5 = $row_rsContestants['contestant_team_member_5'];
     $_SESSION['MM_Account'] = $row_rsContestants['account_id'];
     $_SESSION['contestant_team'] = $row_rsContestants['contestant_team'];
 }
@@ -68,13 +69,13 @@ if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant") {
   if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
   if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
   if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}   
-  $contestant_id = filter_input(INPUT_POST,'contestant_id');
+  $update_contestant_id = filter_input(INPUT_POST,'contestant_id');
   
     $val = new Validation();
     $length = 5;//min length of strings
-    $val->name('namn')->value($update_contestant_name)->pattern('text')->required()->min($length);
+    $val->name('namn')->value($update_contestant_name)->pattern('words')->required()->min($length);
     $val->name('f&ouml;delsedatum')->value($update_contestant_birth)->datePattern('Y-m-d')->required();
-    $val->name('k&ouml;n')->value($update_contestant_gender)->pattern('text')->required();
+    $val->name('k&ouml;n')->value($update_contestant_gender)->pattern('words')->required();
 	        
     //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
     if($val->isSuccess()){
@@ -96,47 +97,35 @@ if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant") {
             . "contestant_team_member_3 = :contestant_id_3 OR contestant_team_member_4 = :contestant_id_4 OR "
             . "contestant_team_member_5 = :contestant_id_5";
     $stmt_rsTeams = $DBconnection->prepare($query_rsTeams);
-    $stmt_rsTeams->execute(array(':contestant_id_1'=>$contestant_id,':contestant_id_2'=>$contestant_id,':contestant_id_3'=>$contestant_id,':contestant_id_4'=>$contestant_id, ':contestant_id_5'=>$contestant_id));
+    $stmt_rsTeams->execute(array(':contestant_id_1'=>$update_contestant_id,':contestant_id_2'=>$update_contestant_id,':contestant_id_3'=>$update_contestant_id,':contestant_id_4'=>$update_contestant_id, ':contestant_id_5'=>$update_contestant_id));
     }   catch(PDOException $ex) {
             echo 'An Error occured with query $query_rsTeams: '.$ex->getMessage();
     }
         while($row_rsTeams = $stmt_rsTeams->fetch(PDO::FETCH_ASSOC)) {
-            $team_id = $row_rsTeams['contestant_id'];
-            $team_name = $row_rsTeams['contestant_name'];
-            $team_birth = $row_rsTeams['contestant_birth'];
-            $team_birth_max = $row_rsTeams['contestant_birth_max'];
-            $team_gender = $row_rsTeams['contestant_gender'];
-            $team_team = $row_rsTeams['contestant_team'];
-            $team_team_member_1 = $row_rsTeams['contestant_team_member_1'];
-            $team_team_member_2 = $row_rsTeams['contestant_team_member_2'];
-            $team_team_member_3 = $row_rsTeams['contestant_team_member_3'];
-            $team_team_member_4 = $row_rsTeams['contestant_team_member_4'];
-            $team_team_member_5 = $row_rsTeams['contestant_team_member_5'];
+            $update_team_id = $row_rsTeams['contestant_id'];
+            $update_team_name = $row_rsTeams['contestant_name'];
+            $update_team_birth = $row_rsTeams['contestant_birth'];
+            $update_team_birth_max = $row_rsTeams['contestant_birth_max'];
+            $update_team_gender = $row_rsTeams['contestant_gender'];
+            $update_team_team = $row_rsTeams['contestant_team'];
+            $update_team_team_member_1 = $row_rsTeams['contestant_team_member_1'];
+            $update_team_team_member_2 = $row_rsTeams['contestant_team_member_2'];
+            $update_team_team_member_3 = $row_rsTeams['contestant_team_member_3'];
+            $update_team_team_member_4 = $row_rsTeams['contestant_team_member_4'];
+            $update_team_team_member_5 = $row_rsTeams['contestant_team_member_5'];
 
                 //Compare selected team member's gender and set the team's gender            
-                if($update_contestant_gender <> $team_gender) { //The members's gender is NOT the same as the team's
+                if($update_contestant_gender <> $update_team_gender) { //The members's gender is NOT the same as the team's
                     $team_gender = 'Mix';    
                 }       
                //Compare selected team member's birthday and set the teams' max and min birthdays            
-                if($update_contestant_birth < $team_birth) {//The members's birth is earlier than the team's
-                    $team_birth = $update_contestant_birth;
+                if($update_contestant_birth < $update_team_birth) {//The members's birth is earlier than the team's
+                    $update_team_birth = $update_contestant_birth;
                 } 
-                elseif ($update_contestant_birth_max > $team_birth_max) {//The members's birth is later than the team's
-                    $team_birth_max = $update_contestant_birth_max; 
+                elseif ($update_contestant_birth_max > $update_team_birth_max) {//The members's birth is later than the team's
+                    $update_team_birth_max = $update_contestant_birth_max; 
                 }
-            echo '<br>$team_id: '.$team_id.'<br>';
-            echo '$team_name: '.$team_name.'<br>';
-            echo '$team_birth: '.$team_birth.'<br>';
-            echo '$team_birth_max: '.$team_birth_max.'<br>';
-            echo '$team_gender: '.$team_gender.'<br>';
-            echo '$team_team: '.$team_team.'<br>';
-            echo '$team_team_member_1: '.$team_team_member_1.'<br>';
-            echo '$team_team_member_2: '.$team_team_member_2.'<br>';
-            echo '$team_team_member_3: '.$team_team_member_3.'<br>';
-            echo '$team_team_member_4: '.$team_team_member_4.'<br>';
-            echo '$team_team_member_5: '.$team_team_member_5.'<br>';
-            
-        //if($team_team_member_5 === 'No'){       
+
                 //UPDATE selected Team with gender and  max-/min birth                   
                 try { //Catch anything wrong with query
                 require('Connections/DBconnection.php');    
@@ -155,22 +144,21 @@ if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant") {
                 WHERE contestant_id = :contestant_id"; 
                 $stmt = $DBconnection->prepare($updateTeamSQL);                        
                 $stmt->bindValue(':account_id', $_SESSION['MM_Account'], PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_name', $team_name, PDO::PARAM_STR);
-                $stmt->bindValue(':contestant_birth', $team_birth, PDO::PARAM_STR);
-                $stmt->bindValue(':contestant_birth_max', $team_birth_max, PDO::PARAM_STR);
-                $stmt->bindValue(':contestant_gender', $team_gender, PDO::PARAM_STR);
-                $stmt->bindValue(':contestant_team', $team_team, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_team_member_1', $team_team_member_1, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_team_member_2', $team_team_member_2, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_team_member_3', $team_team_member_3, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_team_member_4', $team_team_member_4, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_team_member_5', $team_team_member_5, PDO::PARAM_INT);
-                $stmt->bindValue(':contestant_id', $team_id, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_name', $update_team_name, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_birth', $update_team_birth, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_birth_max', $update_team_birth_max, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_gender', $update_team_gender, PDO::PARAM_STR);
+                $stmt->bindValue(':contestant_team', $update_team_team, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_1', $update_team_team_member_1, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_2', $update_team_team_member_2, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_3', $update_team_team_member_3, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_4', $update_team_team_member_4, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_team_member_5', $update_team_team_member_5, PDO::PARAM_INT);
+                $stmt->bindValue(':contestant_id', $update_team_id, PDO::PARAM_INT);
                 $stmt->execute();
                 }   catch(PDOException $ex) {
                         echo 'An Error occured with query $updateTeamSQL: '.$ex->getMessage();
                     }
-        //}
         $stmt_rsTeams->closeCursor();//Kill statements
         }
 }
@@ -185,36 +173,36 @@ if ($output_form === 'yes') { ?>
         <tr>
           <td>T&auml;vlandes namn</td>
           <td><label>
-              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $contestant_name; ?>"/>
+              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $update_contestant_name; ?>"/>
           </label></td>
         </tr>
         <tr>
           <td>F&ouml;delsedatum (yyyy-mm-dd)</td>
           <td valign="top"><label>
-            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $contestant_birth; ?>" size="8" maxlength="10"/>
+            <input name="contestant_birth" type="text" id="contestant_birth" value="<?php echo $update_contestant_birth; ?>" size="8" maxlength="10"/>
           </label></td>
         </tr>
         <tr>
           <td>K&ouml;n</td>
           <td valign="top">
             <label>
-              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($contestant_gender === "Man") {echo "checked='checked'";} ?>//>
+              <input name="contestant_gender" type="radio" id="contestant_gender" value="Man" <?php if ($update_contestant_gender === "Man") {echo "checked='checked'";} ?>//>
               Man</label>
             <label>
-              <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($contestant_gender === "Kvinna") {echo "checked='checked'";} ?>/>
+              <input type="radio" name="contestant_gender" id="contestant_gender" value="Kvinna" <?php if ($update_contestant_gender === "Kvinna") {echo "checked='checked'";} ?>/>
               Kvinna</label>
           </td>
         </tr>
         <tr>
           <td>
         <input type="hidden" name="MM_update_contestant" value="update_contestant" />
-        <input type="hidden" name="contestant_team" id="contestant_team" value="<?php echo $contestant_team; ?>" />
-        <input type="hidden" name="contestant_team_member_1" id="contestant_team_member_1" value="<?php echo $contestant_team_member_1; ?>" />
-        <input type="hidden" name="contestant_team_member_2" id="contestant_team_member_2" value="<?php echo $contestant_team_member_2; ?>" />
-        <input type="hidden" name="contestant_team_member_3" id="contestant_team_member_3" value="<?php echo $contestant_team_member_3; ?>" />
-        <input type="hidden" name="contestant_team_member_4" id="contestant_team_member_4" value="<?php echo $contestant_team_member_4; ?>" />
-        <input type="hidden" name="contestant_team_member_5" id="contestant_team_member_5" value="<?php echo $contestant_team_member_5; ?>" />
-        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />
+        <input type="hidden" name="contestant_team" id="contestant_team" value="<?php echo $update_contestant_team; ?>" />
+        <input type="hidden" name="contestant_team_member_1" id="contestant_team_member_1" value="<?php echo $update_contestant_team_member_1; ?>" />
+        <input type="hidden" name="contestant_team_member_2" id="contestant_team_member_2" value="<?php echo $update_contestant_team_member_2; ?>" />
+        <input type="hidden" name="contestant_team_member_3" id="contestant_team_member_3" value="<?php echo $update_contestant_team_member_3; ?>" />
+        <input type="hidden" name="contestant_team_member_4" id="contestant_team_member_4" value="<?php echo $update_contestant_team_member_4; ?>" />
+        <input type="hidden" name="contestant_team_member_5" id="contestant_team_member_5" value="<?php echo $update_contestant_team_member_5; ?>" />
+        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $update_contestant_id; ?>" />
           </td>
           <td><label>
               <input type="submit" name="update_contestant" id="update_contestant" value="Spara" />
@@ -248,17 +236,17 @@ $totalRows_rsTeamMembers = $stmt_rsTeamMembers->rowCount();
 // Validate the contestant form if the button is clicked	
 if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
     $update_contestant_name = encodeToUtf8(mb_convert_case(filter_input(INPUT_POST,'contestant_name'), MB_CASE_TITLE,"UTF-8"));    
-    $contestant_team = filter_input(INPUT_POST,'contestant_team');
+    $update_contestant_team = filter_input(INPUT_POST,'contestant_team');
     $update_contestant_team_member_1 = filter_input(INPUT_POST,'contestant_team_member_1');
     $update_contestant_team_member_2 = filter_input(INPUT_POST,'contestant_team_member_2');
     if(filter_input(INPUT_POST,'contestant_team_member_3') === ''){ $update_contestant_team_member_3 = 0;}else{$update_contestant_team_member_3 = filter_input(INPUT_POST,'contestant_team_member_3');}
     if(filter_input(INPUT_POST,'contestant_team_member_4') === ''){ $update_contestant_team_member_4 = 0;}else{$update_contestant_team_member_4 = filter_input(INPUT_POST,'contestant_team_member_4');}
     if(filter_input(INPUT_POST,'contestant_team_member_5') === ''){ $update_contestant_team_member_5 = 0;}else{$update_contestant_team_member_5 = filter_input(INPUT_POST,'contestant_team_member_5');}
-    $contestant_id = filter_input(INPUT_POST,'contestant_id');    
+    $update_contestant_id = filter_input(INPUT_POST,'contestant_id');    
     
     $val = new Validation();
     $length = 5;//min length of strings
-    $val->name('lagets namn')->value($update_contestant_name)->pattern('text')->required()->min($length);
+    $val->name('lagets namn')->value($update_contestant_name)->pattern('alphanum')->required()->min($length);
     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($update_contestant_team_member_1)->pattern('int')->required();
     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($update_contestant_team_member_2)->pattern('int')->required();
 	        
@@ -316,7 +304,7 @@ if ($output_form === 'yes') { ?>
         <tr>
           <td>Lagets namn</td>
           <td><label>
-              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $contestant_name; ?>"/>
+              <input name="contestant_name" type="text" id="contestant_name" size="30" value="<?php echo $update_contestant_name; ?>"/>
           </label></td>
         </tr>
         <tr>
@@ -324,13 +312,13 @@ if ($output_form === 'yes') { ?>
           <td nowrap="nowrap">
           <label><select name="contestant_team_member_1" id="contestant_team_member_1">             
 <?php
-        if ($contestant_team_member_1 === 0 || $contestant_team_member_1 === ''){
+        if ($update_contestant_team_member_1 === 0 || $update_contestant_team_member_1 === ''){
             echo '<option value="">V&auml;lj lagmedlem 1!';
         }
     foreach($row_rsTeamMembers as $row_rsTeamMember) {
 ?>
       <option value="<?php echo $row_rsTeamMember['contestant_id']?>"
-<?php if (!(strcmp($contestant_team_member_1, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+<?php if (!(strcmp($update_contestant_team_member_1, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
 <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
       </option>
 <?php
@@ -342,13 +330,13 @@ if ($output_form === 'yes') { ?>
           <td nowrap="nowrap">
           <label><select name="contestant_team_member_2" id="contestant_team_member_2">
 <?php
-        if ($contestant_team_member_2 === 0 || $contestant_team_member_2 === ''){
+        if ($update_contestant_team_member_2 === 0 || $update_contestant_team_member_2 === ''){
             echo '<option value="">V&auml;lj lagmedlem 2!';
         }
     foreach($row_rsTeamMembers as $row_rsTeamMember) {
 ?>
       <option value="<?php echo $row_rsTeamMember['contestant_id']?>"
-<?php if (!(strcmp($contestant_team_member_2, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+<?php if (!(strcmp($update_contestant_team_member_2, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
 <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
       </option>
 <?php
@@ -360,13 +348,13 @@ if ($output_form === 'yes') { ?>
           <td nowrap="nowrap">
           <label><select name="contestant_team_member_3" id="contestant_team_member_3">
 <?php
-        if ($contestant_team_member_3 === 0 || $contestant_team_member_3 === ''){
+        if ($update_contestant_team_member_3 === 0 || $update_contestant_team_member_3 === ''){
             echo '<option value="">V&auml;lj lagmedlem 3!';
         }
     foreach($row_rsTeamMembers as $row_rsTeamMember) {
 ?>
       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
-<?php if (!(strcmp($contestant_team_member_3, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+<?php if (!(strcmp($update_contestant_team_member_3, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
 <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
       </option>
 <?php
@@ -378,13 +366,13 @@ if ($output_form === 'yes') { ?>
           <td nowrap="nowrap">
           <label><select name="contestant_team_member_4" id="contestant_team_member_4">
 <?php
-        if ($contestant_team_member_4=== 0 || $contestant_team_member_4 === ''){
+        if ($update_contestant_team_member_4=== 0 || $update_contestant_team_member_4 === ''){
             echo '<option value="">V&auml;lj lagmedlem 4!';
         }
     foreach($row_rsTeamMembers as $row_rsTeamMember) {
 ?>
       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
-<?php if (!(strcmp($contestant_team_member_4, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+<?php if (!(strcmp($update_contestant_team_member_4, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
 <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
       </option>
 <?php
@@ -396,13 +384,13 @@ if ($output_form === 'yes') { ?>
           <td nowrap="nowrap">
           <label><select name="contestant_team_member_5" id="contestant_team_member_5">
 <?php
-        if ($contestant_team_member_5 === 0 || $contestant_team_member_5 === ''){
+        if ($update_contestant_team_member_5 === 0 || $update_contestant_team_member_5 === ''){
             echo '<option value="">V&auml;lj lagmedlem 5!';
         }
     foreach($row_rsTeamMembers as $row_rsTeamMember) {
 ?>
       <option value="<?php echo $row_rsTeamMember['contestant_id'] ?>"
-<?php if (!(strcmp($contestant_team_member_5, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
+<?php if (!(strcmp($update_contestant_team_member_5, $row_rsTeamMember['contestant_id']))) { echo "selected=\"selected\"";} ?>>
 <?php echo $row_rsTeamMember['contestant_name'].' | '.$row_rsTeamMember['contestant_birth'].' | '.$row_rsTeamMember['contestant_gender'];?>
       </option>
 <?php
@@ -411,10 +399,10 @@ if ($output_form === 'yes') { ?>
         </tr>        
         <tr>
           <td>
-        <input type="hidden" name="contestant_birth" value="<?php echo $contestant_birth ?>"/>              
-        <input type="hidden" name="contestant_birth_max" value="<?php echo $contestant_birth_max ?>"/>              
-        <input type="hidden" name="contestant_team" value="<?php echo $contestant_team ?>" />
-        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $contestant_id; ?>" />        
+        <input type="hidden" name="contestant_birth" value="<?php echo $update_contestant_birth ?>"/>              
+        <input type="hidden" name="contestant_birth_max" value="<?php echo $update_contestant_birth_max ?>"/>              
+        <input type="hidden" name="contestant_team" value="<?php echo $update_contestant_team ?>" />
+        <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $update_contestant_id; ?>" />        
         <input type="hidden" name="MM_update_team" value="update_team" />
           </td>
           <td><label>
@@ -432,17 +420,6 @@ $stmt_rsTeamMembers->closeCursor();//Kill statement
 //Excute sql update and don't show form
 if ($output_form === 'no') {
     if (filter_input(INPUT_POST,"MM_update_contestant") === "update_contestant" || filter_input(INPUT_POST,"MM_update_team") === "update_team") {    
-            echo '<br>$id: '.$contestant_id.'<br>';
-            echo '$name: '.$update_contestant_name.'<br>';
-            echo '$birth: '.$update_contestant_birth.'<br>';
-            echo '$birth_max: '.$update_contestant_birth_max.'<br>';
-            echo '$gender: '.$update_contestant_gender.'<br>';
-            echo '$team: '.$update_contestant_team.'<br>';
-            echo '$team_member_1: '.$update_contestant_team_member_1.'<br>';
-            echo '$team_member_2: '.$update_contestant_team_member_2.'<br>';
-            echo '$team_member_3: '.$update_contestant_team_member_3.'<br>';
-            echo '$team_member_4: '.$update_contestant_team_member_4.'<br>';
-            echo '$team_member_5: '.$update_contestant_team_member_5.'<br>';
     try { //Catch anything wrong with query
     require('Connections/DBconnection.php');    
     //UPDATE selected Contestant or Team    
@@ -465,13 +442,13 @@ if ($output_form === 'no') {
     $stmt->bindValue(':contestant_birth', $update_contestant_birth, PDO::PARAM_STR);
     $stmt->bindValue(':contestant_birth_max', $update_contestant_birth_max, PDO::PARAM_STR);
     $stmt->bindValue(':contestant_gender', $update_contestant_gender, PDO::PARAM_STR);
-    $stmt->bindValue(':contestant_team', $contestant_team, PDO::PARAM_INT);
+    $stmt->bindValue(':contestant_team', $update_contestant_team, PDO::PARAM_INT);
     $stmt->bindValue(':contestant_team_member_1', $update_contestant_team_member_1, PDO::PARAM_INT);
     $stmt->bindValue(':contestant_team_member_2', $update_contestant_team_member_2, PDO::PARAM_INT);
     $stmt->bindValue(':contestant_team_member_3', $update_contestant_team_member_3, PDO::PARAM_INT);
     $stmt->bindValue(':contestant_team_member_4', $update_contestant_team_member_4, PDO::PARAM_INT);
     $stmt->bindValue(':contestant_team_member_5', $update_contestant_team_member_5, PDO::PARAM_INT);
-    $stmt->bindValue(':contestant_id', $contestant_id, PDO::PARAM_INT);
+    $stmt->bindValue(':contestant_id', $update_contestant_id, PDO::PARAM_INT);
     $stmt->execute();
     }   catch(PDOException $ex) {
             echo 'An Error occured with query $updateSQL: '.$ex->getMessage();
@@ -483,7 +460,8 @@ if ($output_form === 'no') {
     }        
     header(sprintf("Location: %s", $updateGoTo));
     }
-$stmt->closeCursor();//Kill statements
+ 
+//$stmt->closeCursor();//Kill statements
 }//$output_form = no ?>
         </div>
 </div>

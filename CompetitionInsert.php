@@ -1,6 +1,6 @@
 <?php
-//Added validation class with multiple validation features and removed most of existing validation code
-//Removed client side date format for date input fields
+//Changed validation from "text" for $comp_arranger
+
 ob_start();
 
 //Access level top administrator
@@ -53,7 +53,7 @@ $comp_name = '';$comp_start_time = '';$comp_start_date = '';$comp_end_reg_date =
     $val->name('starttid')->value($comp_start_time)->timePattern()->required();
     $val->name('startdatum')->value($comp_start_date)->datePattern('Y-m-d')->required();    
     $val->name('sista anm&auml;lmingsdatum')->value($comp_end_reg_date)->datePattern('Y-m-d')->required();    
-    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('text')->required()->min($length);
+    $val->name('arrang&ouml;r')->value($comp_arranger)->pattern('alphanum')->required()->min($length);
     $val->name('e-post')->value($comp_email)->emailPattern()->required();
     $val->name('t&auml;vlingssajten')->value($comp_url)->urlPattern()->required();
     $val->name('max antal anm&auml;lningar')->value($comp_max_regs)->pattern('int')->required();

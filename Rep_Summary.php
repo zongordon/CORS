@@ -1,5 +1,5 @@
 <?php 
-//Excluded teams when counting contestants for the active competition
+//Changed explanations of reports
 
 if (!isset($_SESSION)) {
   session_start();
@@ -168,11 +168,11 @@ include_once("includes/news_sponsors_nav.php");?>
     <td><?php echo $row_rsClasses['total'];?></td>
   </tr>
   <tr>
-    <td>Antal deltagare anm&auml;lda i n&aring;gon klass (starter):</td>
+    <td>Antal starter (deltagare anm&auml;lda i n&aring;gon klass):</td>
     <td><?php echo $row_rsRegistrations['total'];?></td>
   </tr>
   <tr>
-      <td>Antal registrerade medlemmar fr&aring;n klubbar <br>(inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
+      <td>Antal medlemmar i registrerade klubbar <br>(inte n&ouml;dv&auml;ndigtvis anm&auml;lda &auml;n):</td>
     <td><?php echo $row_rsMembers['total'];?></td>
   </tr>
   <tr>

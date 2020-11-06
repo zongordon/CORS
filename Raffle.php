@@ -74,7 +74,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <?php 
 if ($totalRows_rsClubRegs === 0){
-     echo '<h3>Finns inga anm&auml;ningar att lotta &auml;n!</h3>';
+     echo '<h3>Finns inga anm&auml;lningar att lotta &auml;n!</h3>';
 }
 else {
 ?>    
