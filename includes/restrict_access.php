@@ -1,5 +1,5 @@
 <?php
-//Changed default redirect page from "LogIn.php"
+//Changed page title from "Anv&auml;ndarkonton"
 if (!isset($_SESSION)) {
   session_start();
 }
@@ -35,7 +35,7 @@ function isAuthorized($strUsers, $strGroups, $AccountId, $UserGroup) {
     if ($pagetitle === "L&auml;gga till ett konto - admin") {
     $MM_restrictGoTo = "AccountInsert_loggedout.php";
     }
-    if ($pagetitle === "Lista konton - admin") {
+    if ($pagetitle === "Lista anv&auml;ndarkonton - admin") {
     $MM_restrictGoTo = "AccountList_reg.php";
     }
     if ($pagetitle === "&Auml;ndra anv&auml;ndarkonto - admin") {
@@ -70,4 +70,3 @@ if (!((isset($_SESSION['MM_AccountId'])) && (isAuthorized("",$MM_authorizedUsers
   header("Location: ". $MM_restrictGoTo); 
   exit;
 }
-?>

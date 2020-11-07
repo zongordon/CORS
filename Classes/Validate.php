@@ -1,7 +1,8 @@
 <?php
     /**
      * Validation 
-     *
+     //Corrected and improved text validation for more special characters and to fit PHP 8.0.0
+     //Changed validation of alphanumeric to include "-" and " "->
      * Semplice classe PHP per la validazione.
      *
      * @author Davide Cesarano <davide.cesarano@unipegaso.it>
@@ -37,18 +38,16 @@
          */
         public $patterns = array(
             'uri'           => '[A-Za-z0-9-\/_?&=]+',
-        //    'url'           => '[A-Za-z0-9-:.\/_?&=#]+',
             'alpha'         => '[\p{L}]+',
             'words'         => '[\p{L}\s]+',
-            'alphanum'      => '[\p{L}0-9]+',
+            'alphanum'      => '[\p{L}0-9\s\-]+',
             'int'           => '[0-9]+',
             'float'         => '[0-9\.,]+',
             'tel'           => '[0-9+\s()-]+',
-            'text'          => '[\p{L}0-9\s-.,;:!"%&()?+\'°#\/@]+',
+            'text'          => '[\p{L}0-9\s\-.,;:§½!"#¤%&{}()=+?\[\]\'´°\/@£$€`^¨~*]+',
             'file'          => '[\p{L}\s0-9-_!%&()=\[\]#@,.;+]+\.[A-Za-z0-9]{2,4}',
             'folder'        => '[\p{L}\s0-9-_!%&()=\[\]#@,.;+]+',
             'address'       => '[\p{L}0-9\s.,()°-]+',
-        //    'date_dmy'      => '[0-9]{1,2}\-[0-9]{1,2}\-[0-9]{4}',
             'date_ymd'      => '[0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2}',
          //   'email'         => '[[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+'
         );

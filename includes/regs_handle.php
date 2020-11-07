@@ -1,5 +1,7 @@
 <?php 
-//Removed troubleshooting code
+//Added code to prevent error message "Notice: Trying to access array offset on value of type bool..." with empty recordset, introduced by PHP 7.4
+//Changed from "text" validation for $insert_contestant_name and $insert_contestant_gender
+//Changed to show Coach field only when club is selected to prevent SQL error if data entered before selecction
 
 //Catch anything wrong with query
 try {
@@ -70,9 +72,10 @@ if ($MM_authorizedUsers === "1") {
 //Show if logged in is Admin
 if ($MM_authorizedUsers === "1"){ ?>
 <h3>1. V&auml;lj klubb</h3>
-<p><?php if (empty($_SESSION['MM_Account'])) {
- echo "<strong>Ingen klubb &auml;r vald &auml;n! </strong>";    
-} ?>
+<p>
+<?php if (empty($_SESSION['MM_Account'])) {//Show if no club is selected
+        echo "<strong>Ingen klubb &auml;r vald &auml;n! </strong>";    
+      } ?>
 V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
 <form id="SelectClub" name="SelectClub" method="post" action="<?php echo $editFormAction; ?>">
   <table width="200" border="0">
@@ -102,9 +105,12 @@ foreach($row_rsAccounts as $row_rsAccount) {
 //Show club registration form if a club is selected and "Välj" button is clicked 
 if ($totalRows_rsSelectedClub <> "") { // Do not show if recordset empty
 ?>
-<h3><?php if ($MM_authorizedUsers === "0") { echo '1';} else {echo '2';} ?>. Skriv in klubbens coacher</h3>
-<p>Skriv in namnen p&aring; de coacher som ska st&ouml;tta era t&auml;vlande och klicka p&aring; spara.</p>
-<?php
+<h3>
+<?php 
+    if (!empty($_SESSION['MM_Account'])) {//Show if club is selected
+        if ($MM_authorizedUsers === "0") { echo '1';} else {echo '2';} ?>. Skriv in klubbens coacher</h3>
+        <p>Skriv in namnen p&aring; de coacher som ska st&ouml;tta era t&auml;vlande och klicka p&aring; spara.</p>
+<?php 
 // Validate the club registration form if the "Spara" or "Uppdatera" button is clicked
     $coach_names = '';
 if ((filter_input(INPUT_POST,"MM_insert_clubregistration") === "new_club_reg") || (filter_input(INPUT_POST,"MM_update_clubregistration") === "update_club_reg")) {
@@ -185,7 +191,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
       <tr>
         <td valign="top">Coacher</td>
         <td><label>
-          <input name="coach_names" type="text" id="coach_names" value="<?php echo $row_rsClubReg['coach_names']; ?>" size="55" /></label></td>
+          <input name="coach_names" type="text" id="coach_names" value="<?php if ($totalRows_rsClubReg <> 0) { echo $row_rsClubReg['coach_names'];} ?>" size="55" /></label></td>
       </tr>
       <tr>
         <td>
@@ -206,6 +212,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
     </table>      
     </form>
  <?php   
+    }//Show if club is selected
  }
  ?>
 <?php 
@@ -223,9 +230,9 @@ if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
 
     $val = new Validation();
     $length = 5;//min length of strings
-    $val->name('namn')->value($insert_contestant_name)->pattern('text')->required()->min($length);
+    $val->name('namn')->value($insert_contestant_name)->pattern('words')->required()->min($length);
     $val->name('f&ouml;delsedatum')->value($insert_contestant_birth)->datePattern('Y-m-d')->required();
-    $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('text')->required();
+    $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('words')->required();
 	        
     //If validation succeeds set flag for entering data and show no form else show all errors and show form again      
     if($val->isSuccess()){
@@ -333,7 +340,7 @@ if (filter_input(INPUT_POST,"MM_insert_team") === "new_team") {
 
     $val = new Validation();
     $length = 5;//min length of strings
-    $val->name('lagets namn')->value($insert_contestant_name)->pattern('text')->required()->min($length);
+    $val->name('lagets namn')->value($insert_contestant_name)->pattern('alphanum')->required()->min($length);
     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($insert_contestant_team_member_1)->pattern('int')->required();
     $val->name('tillr&auml;ckligt m&aring;nga lagmedlemmar')->value($insert_contestant_team_member_2)->pattern('int')->required();
 	        

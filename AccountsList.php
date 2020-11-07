@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Changed the check boxes to disabled
 
 //Access level admin
 $MM_authorizedUsers = "1";
@@ -17,7 +17,7 @@ catch(PDOException $ex) {
     echo "An Error occured: ".$ex->getMessage();
 }   
 
-$pagetitle="Anv&auml;ndarkonton";
+$pagetitle="Lista anv&auml;ndarkonton - admin";
 // Includes several code functions
 include_once('includes/functions.php');
 // Includes HTML Head
@@ -32,6 +32,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">
   <div class="feature">
+      <div class="story">
 <h3>Befintliga konton</h3>
 <?php if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
   <p>&Auml;ndra eller ta bort konton genom att klicka p&aring; respektive l&auml;nk.</p>
@@ -43,13 +44,13 @@ if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
   <table width="100%" border="1">
     <tr>
       <td><strong>Klubbnamn</strong></td>
-      <td><strong>Kontaktnamn</strong></td>
+      <td><strong>Kontakt</strong></td>
       <td><strong>Anv&auml;ndarnamn</strong></td>
       <td><strong>E-post</strong></td>
       <td><strong>Telefon</strong></td>
       <td><strong>Aktivt</strong></td>
       <td><strong>&Auml;ndra</strong></td>
-      <td nowrap="nowrap"><strong>Ta bort</strong></td>
+      <td><strong>Ta bort</strong></td>
     </tr>
     <?php while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) {;?>
     <tr>
@@ -60,7 +61,7 @@ if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
       <td><?php echo $row_rsAccounts['contact_phone']; ?></td>
       <td valign="middle"><form id="activeaccount_form" name="activeaccount_form" method="post" action="">
           <label>
-            <input name="active" type="checkbox" id="active" value="Aktiv" <?php if (!(strcmp($row_rsAccounts['active'],1))) {echo "checked=\"checked\"";} ?> />
+            <input name="active" type="checkbox" disabled="disabled" id="active" value="Aktiv" <?php if (!(strcmp($row_rsAccounts['active'],1))) {echo "checked=\"checked\"";} ?> />
           </label>
         </form></td>
       <td><a href="AccountUpdate.php?account_id=<?php echo $row_rsAccounts['account_id']; ?>">&Auml;ndra</a></td>
@@ -70,9 +71,9 @@ if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
   </table>
 <?php 
 } // Show if recordset not empty ?>
+    </div>  
   </div>
-  <div class="story"></div>
-</div>
+</div>    
 <?php 
 //Kill statement
 $stmt_rsAccounts->closeCursor();

@@ -1,5 +1,6 @@
 ﻿<?php 
-//Embedded video filmed during TKC 2019
+//Changed embedded video from linked Facebook video to Youtube
+//Changed to google maps link instead of Facebook link
 
 ob_start();
 
@@ -23,10 +24,10 @@ include_once("includes/news_sponsors_nav.php");
     Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
     L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
-    <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Feskilstunakarateklubb%2Fvideos%2F2420821441538024%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
+<iframe width="640" height="360" src="https://www.youtube.com/embed/pl9HgW5pgTQ?rel=0&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    
   <div class="story">
     <h2>Tid och plats</h2>
-    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="http://www.facebook.com/stigasportsarena/" title="Stiga Sports Arena" target="_blank">
+    <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">
     Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
     Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
     <h2>Anm&auml;lning av t&auml;vlande</h2>
