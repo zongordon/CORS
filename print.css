@@ -1,8 +1,6 @@
 /***********************************************/
-/*  Added apDivRepechage 
-
-*/
-
+/* Added #apCompBanner, #apDivResultatKataPoint, #apSponsorPic2KataPoint and #apSponsorPic3KataPoint to fit Kata Point System page
+/* Changed height and width on 1spbsrekarne_mynt.png
 /* print.css                             */
 
 /* Used for printing          */
@@ -23,7 +21,7 @@ body{
 
 	color : #000000;
 
-	font-family: Georgia, ‘Times New Roman’, serif; 
+	font-family: Georgia, ‘Times New Roman’, serif, DejaVu Serif; 
 
 	font-size: 12pt;
 
@@ -217,31 +215,6 @@ label{
 
 }
 
-
-/*
-#headlines{
-
-  float:right;
-
-	width: 20%;
-
-	border-left: 1px solid #cccccc;
-
-	border-bottom: 1px solid #cccccc;
-
-	padding-right: 10px;
-
-}
-                                  
-
-#content{
-
-	float: left;
-
-    width: 75%;
-
-}
-*/
 /************** masthead classes (omgång = round) ***************/
 .masthead_table {
   table-layout: auto;
@@ -434,18 +407,6 @@ color: #cccccc;
 
 }
 
-
-/*
-.feature img{
-
-	float: left;
-
-	padding: 10px 10px 0px 0px;
-
-}
-*/
-
-
 /************** .story styles *****************/
 
 
@@ -501,33 +462,22 @@ color: #cccccc;
 /************** .result_tbl styles *****************/
 
 .result_tbl  {
-
 	border-top-width: 1px;
-
 	border-right-width: 1px;
-
 	border-bottom-width: 1px;
-
 	border-left-width: 1px;
-
 	border-top-style: solid;
-
 	border-right-style: solid;
-
 	border-bottom-style: solid;
-
 	border-left-style: solid;
-
 	empty-cells: show;
-
 	table-layout: auto;
-
 	visibility: visible;
-
 	text-align: left;
-
-	font-size: 80%;	
-
+        font-family: DejaVu Serif;
+        font-weight: normal;
+        color: #333333;
+	font-size: 100%;	
 }
 
 /************** .tbl_picture styles *****************/
@@ -615,50 +565,7 @@ color: #cccccc;
 }
 
 
-
-
-
-/*#SiteSearch{
-
-	float: left;
-
-	width: 29%;
-
-}
-
-
-
-}
-
-
-
-/*#VideoSearch{
-
-	float: left;
-
-	width: 29%;
-
-}
-
-}
-
-
-
-/*#WebSearch{
-
-	float: left;
-
-	width: 29%;
-
-}
-
-
-
-
-
 /*********** #navBar link styles ***********/
-
-
 
 #navBar ul a:link, #navBar ul a:visited {display: block;}
 
@@ -822,577 +729,492 @@ color: #cccccc;
 
 /*********** Elimination Ladder positioning Divs ***********/
 
-
-
 #apDiv1 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 75pt;
-
 }
 
 #apDiv9 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 75pt;
-
 }
 
-
-
 #apDiv2 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 120pt;
-
 }
 
 #apDiv10 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 120pt;
-
 }
 
-
-
 #apDiv3 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 170pt;
-
 }
 
 #apDiv11 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 170pt;
-
 }
 
-
-
 #apDiv4 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 215pt;
-
 }
 
 #apDiv12 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 280px;
-
 }
 
-
-
 #apDiv5 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 260pt;
-
 }
 
 #apDiv13 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 260pt;
-
 }
 
-
-
 #apDiv6 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 305pt;
-
 }
 
 #apDiv14 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 305pt;
-
 }
 
-
-
 #apDiv7 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 350pt;
-
 }
 
 #apDiv15 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 350pt;
-
 }
 
-
-
 #apDiv8 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
 	left: 0pt;
-
 	top: 390pt;
-
 }
 
 #apDiv16 {
-
 	position:absolute;
-
 	width:160pt;
-
 	height:33pt;
-
 	z-index:1;
-
-	left: 660pt;
-
+	left: 615pt;
 	top: 390pt;
-
 }
 
-
-
 #apDivOmg2_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 158pt;
-
 	top: 90pt;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 158pt;
-
 	top: 182pt;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 158pt;
-
 	top: 272pt;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 158pt;
-
 	top: 362pt;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_5 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 600pt;
-
+	left: 555pt;
 	top: 90pt;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_6 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 600pt;
-
+	left: 555pt;
 	top: 182pt;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_7 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 600pt;
-
+	left: 555pt;
 	top: 272pt;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_8 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 600pt;
-
+	left: 555pt;
 	top: 362pt;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg3_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:3;
-
 	left: 220pt;
-
 	top: 114pt;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:3;
-
 	left: 220pt;
-
 	top: 295pt;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:3;
-
-	left: 540pt;
-
+	left: 495pt;
 	top: 114pt;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg3_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:3;
-
-	left: 540pt;
-
+	left: 495pt;
 	top: 295pt;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg4_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:2;
-
 	left: 280pt;
-
 	top: 156pt;
-
 	background-image: url(img/pool_A_3.gif);
-
 }
 
 #apDivOmg4_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:2;
-
-	left: 480pt;
-
+	left: 435pt;
 	top: 156pt;
-
 	background-image: url(img/pool_B_3.gif);
-
 }
 
 #apDivFinal {
-
 	position:absolute;
-
-	width:147px;
-
-	height:50px;
-
+	width:130px;
+	height:43px;
 	z-index:1;
-
-	left: 355pt;
-
+	left: 340pt;
 	top: 220pt;
-
 	background-image: url(img/Final.gif);
-
 }
 
 #apDivResultat {
-
 	position:absolute;
-
+	z-index:1;
+	left: 320pt;
+	top: 340pt;
 	width:180px;
+	height:115px;        
+}
 
+#apDivResultatRR {
+	position:absolute;
+	z-index:1;
+	left: 600pt;
+	top: 300pt;        
+	width:220px;
 	height:115px;
-
-	z-index:5;
-
-	left: 345pt;
-
-	top: 330pt;
-
+}
+#apDivResultatKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 720pt;
+	top: 0pt;        
+	width:220px;
+	height:115px;
 }
 
 #apDivRepechage {
 	position:absolute;
 	z-index:1;
-	left: 315px;
-	top: 560px;
+	left: 200pt;
+	top: 430pt;
 	width:500px;
 	height:114px;
         background-image: url("img/Repechage.png");
         background-repeat: no-repeat;
 }
-
+#apDivPDF {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 500pt; 
+}
+#apDivPDFKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 350pt;
+	top: 450pt; 
+}
+#apMatchTbl {
+	position:absolute;
+	z-index:1;
+	left: 25pt;
+	top: 70pt;        
+}
+#apContTbl {
+	position:absolute;
+	z-index:1;
+        left: 520pt;
+	top: 70pt;
+}
+#apCompBannerKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 150pt;
+	top: -40pt;
+	width:150px;
+	height:27px;
+        background-image: url("img/Comp_Banner.jpg");
+        background-repeat: no-repeat;
+}
+#apCompBanner {
+	position:absolute;
+	z-index:1;
+	left: 150pt;
+	top: 35pt;
+	width:150px;
+	height:27px;
+        background-image: url("img/Comp_Banner.jpg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic1 {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 430pt;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-logo.svg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic1KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 10pt;
+	top: 430pt;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-logo.svg");
+        background-repeat: no-repeat;
+}
+#apSponsorPic2 {
+	position:absolute;
+	z-index:1;
+	left: 600pt;
+	top: 15pt;
+	width:241px;
+	height:55px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic2KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 500pt;
+	top: -50pt;
+	width:241px;
+	height:55px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic3 {
+	position:absolute;
+	z-index:1;
+	left: 650pt;
+	top: 430pt;
+	width:150px;
+	height:104px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic3KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 650pt;
+	top: 430pt;
+	width:150px;
+	height:104px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
 /*
 
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
-/*  Added code to add repechage picture through #apDivRepechage but commented it out - is only for printing
+/* Removed #apCompBanner
+/* Added #apSponsorPic5KataPoint, #apSponsorPic5KataPoint, #apSponsorPic6KataPoint and #apSponsorPic6KataPoint
+/* Changed font-family
 
-*/
 /***********************************************/
 /* 3col_leftNav.css                             */
 
@@ -14,236 +15,113 @@
 
 /* HTML tag styles                             */
 
-/***********************************************/ 
-
-
+/***********************************************/
 
 body{
-
-	font-family: Tahoma, Arial, sans-serif;
-
+	font-family: Arial, Helvetica, sans-serif, DejaVu Sans;
 	color: #333333;
-
 	line-height: 1.166;
-
 	margin: 0px;
-
 	padding: 0px;
-
-	width: 100%;
-        
-        /*
-        background-color: #D2ECF0;        
-
-        background-color: #FFFFFF;
-                */
+	width: 100%;        
 }
+
+  @page { 
+      margin: 0px; 
+  }
 
 a{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:link{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:visited{
-
 	color: #006699;
-
 	text-decoration: none;
-
 }
-
-
 
 a:hover{
-
 	color: #006699;
-
 	text-decoration: underline;
-
 }
-
-
 
 h1{
-
- font-family: Tahoma, Arial, sans-serif;
-
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 115%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h2{
-
- font-family: Tahoma, Arial, sans-serif;
-
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 114%;
-
  color: #333333;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h3{
-
- font-family: Tahoma, Arial, sans-serif;
-
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h4{
-
- font-family: Tahoma, Arial, sans-serif;
-
- font-size: 100%;
-
+ font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
+ font-size: 80%;
  font-weight: normal;
-
  color: #333333;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 h5{
-
- font-family: Tahoma, Arial, sans-serif;
-
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
-
  color: #000000;
-
  margin: 0px;
-
  padding: 0px;
-
 }
-
-
 
 ul{
-
  list-style-type: square;
-
 }
-
-
 
 ul ul{
-
  list-style-type: disc;
-
 }
-
-
 
 ul ul ul{
-
  list-style-type: circle;
-
 }
-
-
 
 label{
-
- font-family: Tahoma, Arial, sans-serif;
-
+ font-family: Arial, Helvetica, sans-serif;
  font-size: 100%;
-
  font-weight: bold;
-
  color: #334d55;
-
 }
 
-
-
 /***********************************************/
-
 /* Layout Divs                                 */
-
 /***********************************************/
-
-
-
 #masthead{
-
 	padding: 10px 0px 10px 0px;
-/*
-	border-bottom: 1px solid #cccccc;
-
-	border-left: 1px solid #cccccc;
-
-	border-right: 1px solid #cccccc;
-        
-        background-color: #FFFFFF;
-
-
-*/
         width: 1130px;
-
         margin-left: 1%;
 }
 
 #content{
-
         float: left;
-
         width: 90%;
-        
-        
-/*
-        width: 75%;
-
-        margin-left: 5%;
-
-        border-left: 1px solid #cccccc;
-        
-        border-bottom: 1px solid #cccccc;
-        
-        background-color: #FFFFFF;
-*/
 }
 
 /***********************************************/
@@ -319,641 +197,360 @@ label{
 
 /************** .feature styles ***************/
 
-
-
 .feature{
-
 	padding: 0px 0px 10px 10px;
-
 	font-size: 80%;
-
 }
-
-
 
 .feature h3{
-
 	padding: 30px 0px 5px 0px;
-
 	text-align: left;
-
 }
-
-
 
 .feature h1{
-
 	color: #000000;
-
 }
 
-
-
 .feature img{
-
 	float: left;
-
 	padding: 10px 10px 0px 0px;
-
 }
 
 
 /************** .story styles *****************/
 
-
-
 .story{
-
 	clear: both;
-
 	padding: 10px 0px 0px 10px;
-
-	font-size: 80%;
-
+	font-size: 12px;
 	border-top-style: none;
-
 	border-right-style: none;
-
 	border-bottom-style: none;
-
 	border-left-style: none;
-
 }
-
-
 
 .story p{
-
 	padding: 0px 0px 10px 0px;
-
 }
 
-
-
 #masthead h1{
-
 	text-align: center;
-
 }
 
 /************** .error styles *****************/
 
 .error h3{
-
 	padding: 10px 10px 10px 0px;
-
 	text-align: left;
-
 	color: #FF0000;
-
 	font-size: 100%;	
-
 }
 
 /************** .result_tbl styles *****************/
 
 .result_tbl  {
-
 	border-top-width: 1px;
-
 	border-right-width: 1px;
-
 	border-bottom-width: 1px;
-
 	border-left-width: 1px;
-
 	border-top-style: solid;
-
 	border-right-style: solid;
-
 	border-bottom-style: solid;
-
 	border-left-style: solid;
-
 	empty-cells: show;
-
 	table-layout: auto;
-
 	visibility: visible;
-
 	text-align: left;
-
-	font-size: 100%;	
-
+        font-family: Tahoma, Arial, sans-serif, DejaVu Sans;
+        font-weight: normal;
+        color: #333333;
+	font-size: 12px;		
 }
 
 /*********** Elimination Ladder positioning Divs ***********/
 
-
-
 #apDiv1 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 100px;
-
 }
 
 #apDiv2 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 160px;
-
 }
 
 #apDiv3 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 220px;
-
 }
 
 #apDiv4 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 280px;
-
 }
 
 #apDiv5 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 340px;
-
 }
 
 #apDiv6 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 400px;
-
 }
 
 #apDiv7 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 460px;
-
 }
 
 #apDiv8 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
 	left: 0px;
-
 	top: 520px;
-
 }
 
-
-
 #apDiv9 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 100px;
-
 }
 
 #apDiv10 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 160px;
-
 }
 
 #apDiv11 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 220px;
-
 }
 
 #apDiv12 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 280px;
-
 }
 
 #apDiv13 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 340px;
-
 }
 
 #apDiv14 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 400px;
-
 }
 
 #apDiv15 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 460px;
-
 }
 
 #apDiv16 {
-
 	position:absolute;
-
 	width:250px;
-
 	height:43px;
-
 	z-index:1;
-
-	left: 880px;
-
+	left: 860px;
 	top: 520px;
-
 }
 
 #apDivOmg2_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 123px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 243px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 363px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
 	left: 248px;
-
 	top: 483px;
-
 	background-image: url(img/pool_A.gif);
-
 }
 
 #apDivOmg2_5 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 123px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_6 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 243px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_7 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 363px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg2_8 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:62px;
-
 	z-index:4;
-
-	left: 800px;
-
+	left: 780px;
 	top: 483px;
-
 	background-image: url(img/pool_B.gif);
-
 }
 
 #apDivOmg3_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
 	left: 330px;
-
 	top: 154px;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
 	left: 330px;
-
 	top: 394px;
-
 	background-image: url(img/pool_A_2.gif);
-
 }
 
 #apDivOmg3_3 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
-	left: 720px;
-
+	left: 700px;
 	top: 154px;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg3_4 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:122px;
-
 	z-index:4;
-
-	left: 720px;
-
+	left: 700px;
 	top: 394px;
-
 	background-image: url(img/pool_B_2.gif);
-
 }
 
 #apDivOmg4_1 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:4;
-
 	left: 410px;
-
 	top: 210px;
-
 	background-image: url(img/pool_A_3.gif);
-
 }
 
 #apDivOmg4_2 {
-
 	position:absolute;
-
 	width:82px;
-
 	height:242px;
-
 	z-index:4;
-
-	left: 639px;
-
+	left: 619px;
 	top: 210px;
-
 	background-image: url(img/pool_B_3.gif);
-
 }
 
 #apDivFinal {
@@ -961,8 +558,8 @@ label{
 	z-index:4;
 	left: 493px;
 	top: 300px;
-	width:147px;
-	height:50px;
+	width:130px;
+	height:43px;
         background-image: url("img/Final.gif");
         background-repeat: no-repeat;
 }
@@ -971,22 +568,187 @@ label{
 	position:absolute;
 	width:220px;
 	height:115px;
-	z-index:5;
-	left: 465px;
+	z-index:1;
+	left: 445px;
 	top: 480px;
 }
+#apDivResultatRR {
+	position:absolute;
+	width:220px;
+	height:115px;
+	z-index:1;
+	left: 800px;
+	top: 250px;
+}
+#apDivResultatKataPoint {
+	position:absolute;
+	width:220px;
+	height:115px;
+	z-index:1;
+	left: 880px;
+	top: 0px;
+}
 
-
-/*
 #apDivRepechage {
 	position:absolute;
 	z-index:1;
-	left: 315px;
+	left: 305px;
 	top: 560px;
 	width:500px;
 	height:114px;
         background-image: url("img/Repechage.png");
         background-repeat: no-repeat;
 }
-*/
 
+#apDivPDF {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 650px;        
+}
+#apDivPDFKataPoint {
+	position:absolute;
+	z-index:1;
+	left: 400px;
+	top: 590px;        
+}
+#apMatchTbl {
+	position:absolute;
+	z-index:1;
+	left: 25px;
+	top: 100px;        
+}
+#apContTbl {
+	position:absolute;
+	z-index:1;
+        left: 640px;
+	top: 100px;
+}	
+
+#apSponsorPic1 {
+	position:absolute;
+	z-index:1;
+	left: 220px;
+	top: 35px;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-Logo.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic1KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 250px;
+	top: -70px;
+	width:150px;
+	height:58px;
+        background-image: url("img/sponsors/EKA-Logo.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic2 {
+	position:absolute;
+	z-index:1;
+	left: 665px;
+	top: 30px;
+	width:241px;
+	height:55px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic2KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 600px;
+	top: -72px;
+	width:241px;
+	height:55px;
+        background-image: url("img/sponsors/1spbsrekarne_mynt.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic3 {
+	position:absolute;
+	z-index:1;
+	left: 950px;
+	top: 560px;
+	width:75px;
+	height:53px;
+        background-image: url("img/sponsors/EEM_small.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic3KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 980px;
+	top: 560px;
+	width:75px;
+	height:53px;
+        background-image: url("img/sponsors/EEM_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic4 {
+	position:absolute;
+	z-index:1;
+	left: 850px;
+	top: 560px;
+	width:75px;
+	height:52px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
+#apSponsorPic4KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 880px;
+	top: 560px;
+	width:75px;
+	height:52px;
+        background-image: url("img/sponsors/Dental_Estetik_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic5 {
+	position:absolute;
+	z-index:1;
+	left: 100px;
+	top: 560px;
+	width:75px;
+	height:27px;
+        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic5KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 100px;
+	top: 590px;
+	width:75px;
+	height:27px;
+        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic6 {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 560px;
+	width:75px;
+	height:32px;
+        background-image: url("img/sponsors/Kfast_small.png");
+        background-repeat: no-repeat;
+}
+
+#apSponsorPic6KataPoint {
+	position:absolute;
+	z-index:1;
+	left: 10px;
+	top: 590px;
+	width:75px;
+	height:32px;
+        background-image: url("img/sponsors/Kfast_small.png");
+        background-repeat: no-repeat;
+}

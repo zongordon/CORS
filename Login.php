@@ -1,5 +1,5 @@
 <?php 
-//Moved meta description and keywords to header.php
+//Added information about and link to GDPR policy
 
  ob_start();
 
@@ -35,6 +35,7 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
   $MM_redirecttoReferrer = true;
   $loginUsername=filter_input(INPUT_POST,trim('user_name'));
   $password=filter_input(INPUT_POST,trim('user_password'));
+  $captcha=filter_input(INPUT_POST,'captcha');
   $tryLogin = "yes";
   
       if (empty($loginUsername)) {
@@ -47,6 +48,10 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
       echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
       $tryLogin = "no";
       }      
+      if ($captcha <> $_SESSION['captcha']){
+      echo '<h3>Du skrev inte in samma teckan som i bilden. Försök igen!</h3>';
+      $tryLogin = "no";
+      }
       
   if ($tryLogin == "yes") {	    
     //Catch anything wrong with query 
@@ -100,7 +105,6 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
      $stmt_LoginRS->closeCursor();        
      }                  
    $stmt_rsUserexists->closeCursor();
-   $DBconnection = null;        
    }
 }
 ?>
@@ -118,14 +122,21 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
             <td><input name="user_password" type="password" id="user_password" size="25" /></td>
           </tr>
           <tr>
-            <td>&nbsp;</td>
-<td><input type="submit" name="LoginButton" id="LoginButton" value="Logga in" /></td>
+            <td>Skriv in samma tecken som i bilden!</td>
+            <td><input name="captcha" type="text" id="captcha" size="25" /></td>
+          </tr>
+          <tr>
+            <td><img src="Captcha.php" /></td>
+            <td><input type="submit" name="LoginButton" id="LoginButton" value="Logga in" /></td>
           </tr>
         </table>
     </form>
+På <?php echo $comp_url ?> använder vi cookies för att webbplatsen ska fungera på ett bra sätt för dig. 
+Genom att använda siten samtycker du till vårt användande av cookies och vår behandling av personuppgifter.
+Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" target="_blank">dataintegritet</a>.         
 <p><a href="ForgottenPassword.php">Gl&ouml;mt l&ouml;senordet eller anv&auml;ndarnamnet?</a></p>
       <p>Har du inget anv&auml;ndarkonto &auml;n? <a href="AccountInsert.php">Skapa ett h&auml;r!</a></p>
-  </div>
+    </div>
   <div class="story"></div>
 </div>
 <?php

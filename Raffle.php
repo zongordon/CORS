@@ -1,5 +1,5 @@
 <?php 
-//Changed sql to retrieve only club registrations where contestants have been registered
+//Removed kill DB as it's included in footer.php
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -27,9 +27,8 @@ if (filter_input(INPUT_POST,"MM_update") === "UpdateRaffle") {
     catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }  
-//Kill statements and DB connection
+//Kill statement
 $stmt->closeCursor();
-$DBconnection = null;        
 }
 
 //Update to raffle done when when selected "Lottning klar" and button is clicked
@@ -49,9 +48,8 @@ if (filter_input(INPUT_POST,"MM_RaffleDone") === "RaffleDone") {
     catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }      
-//Kill statements and DB connection
-$stmt->closeCursor();
-$DBconnection = null;    
+//Kill statement
+$stmt->closeCursor();    
 }
 //Select the current raffle data from the active competition
 require('Connections/DBconnection.php');           
@@ -76,7 +74,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <?php 
 if ($totalRows_rsClubRegs === 0){
-     echo '<h3>Finns inga anm&auml;ningar att lotta &auml;n!</h3>';
+     echo '<h3>Finns inga anm&auml;lningar att lotta &auml;n!</h3>';
 }
 else {
 ?>    
@@ -140,11 +138,11 @@ $stmt_rsRaffle->closeCursor();
     <p>&nbsp;</p>
 </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsClubRegs->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsClubRegs->closeCursor();
-$DBconnection = null; 
-ob_end_flush();?>
+<?php ob_end_flush();?>

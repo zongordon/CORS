@@ -1,0 +1,54 @@
+﻿v3.3.4
+Bug fixes for showing elimination ladders correctly and error message caused by PHP >7.3.
+Reduced duplicate code and improved validation for more special characters.
+Bug fixes:
+- Changed to handle contestants or not, preventing error message "Notice: Trying to access array offset on value of type bool...", introduced by PHP 7.4: ElimLadder.php, regs_handle.php
+- Changed to show correct protocols for classes with teams, round robin, kata point system or default: ElimLadder.php
+- Changed title from "Anv&auml;ndarkonton": AccountsList.php, restrict_access.php
+- Changed as duplicated in index.php and caused error message in PHP 8.0.0: news_sponsors_nav.php, restrict_access.php
+- Changed embedded video from linked Facebook video to Youtube and changed to google maps link instead of Facebook link: index.php and index_during.php
+- Corrected and improved text validation for more special characters and to fit PHP 8.0.0 and changed validation of alphanumeric to include "-" and " ": Validate.php
+- Changed to solve Warning: Undefined variable $contestant_name when validation triggered error message with PHP 8.0.0.rc1: contestant_update.php 
+- Changed to prevent Warning: Trying to access array offset on value of type null with PHP 8.0.0.rc1: account_update.php, CompetitionUpdate.php
+- Changed order of includes to prevent Warning: session_start(): Session cannot be started after headers have already been sent: ClassContentants.php
+- Changed to show Coach field only when club is selected to prevent SQL error if data entered before selecction: regs_handle.php
+
+Enhancements:
+- Improved class for text validation for more special characters and to fit PHP 7.3->: Validate.php
+- Moved duplicate code to includes/account_insert.php: AccountInsert.php, AccountInsert_loggedout.php, account_insert.php (new)
+- Moved duplicate code to includes/account_insert.php: AccountUpdate.php, AccountUpdate_reg.php, account_update.php (new)
+- Changed from "text" validation: accont_insert.php, account_update.php, contestant_update.php; regs_handle.php
+- Changed the check boxes to disabled: AccountsList.php
+- If admin redirect to accounts list after insert: accont_insert.php
+- Changed validation from "text" for $comp_arranger: CompetitionInsert.php, CompetitionUpdate.php
+- Changed explanations of reports: Rep_Summary.php
+
+Information changes:
+- Competition cancelled: index.php, index_cancelled.php
+- Removed troubleshooting code: includes/regs_handle.php
+- Added <div class="story"> for better visual presentation: AccountsList.php
+
+SQL:
+- Added "ON DELETE CASCADE ON UPDATE CASCADE" for club_reg_id and contestant_id 
+###
+DELETE registration.* 
+FROM registration 
+LEFT JOIN clubregistration 
+  ON clubregistration.club_reg_id = registration.club_reg_id 
+WHERE clubregistration.club_reg_id IS NULL
+###
+ALTER TABLE `registration` ADD  CONSTRAINT `clubreg` FOREIGN KEY (`club_reg_id`) REFERENCES `clubregistration`(`club_reg_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+###
+DELETE registration.* 
+FROM registration 
+LEFT JOIN contestants 
+  ON contestants.contestant_id = registration.contestant_id 
+WHERE contestants.contestant_id IS NULL
+###
+ALTER TABLE `registration` ADD  CONSTRAINT `contestant` FOREIGN KEY (`contestant_id`) REFERENCES `contestants`(`contestant_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+Web Server (production/test/development): Percona Server 5.6.40/ Percona Server 5.6.40/Apache 2.4.43
+Database: MySQL 5.1.73/ MySQL 5.1.73/ 10.4.11-MariaDB
+PHP version: 7.2.29 /8.0.0rc1 /7.4.5
+

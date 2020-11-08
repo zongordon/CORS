@@ -1,5 +1,5 @@
 <?php 
-//Removed '$row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)'to show all data in recordset 
+//Changed SQL from number of registrations to contestants in current competition
 
 if (!isset($_SESSION)) {
   session_start();
@@ -10,9 +10,11 @@ $MM_donotCheckaccess = "false";
 
 //Catch anything wrong with query
 try {
-// Select number of registrations for each club, for the active competition
+// Select number of contestants for each club, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT club_name, COUNT(reg_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
+$query_rsContestants = "SELECT club_name, COUNT(DISTINCT contestant_id) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN "
+        . "registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) "
+        . "WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
@@ -43,18 +45,19 @@ include_once("includes/news_sponsors_nav.php");?>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
         <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(reg_id)']; ?></td>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(DISTINCT contestant_id)']; ?></td>
         </tr>
     <?php } ?>
 </table>
     <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsContestants->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsContestants->closeCursor();
-$DBconnection = null;
-?>
+
+

@@ -1,7 +1,5 @@
-<?php 
-///Replaced $row_rsCurrentComp['xxx'] with $xxx defined in header.php
-// Removed navigation: include_once("includes/navigation.php")
-//Inserted top banner
+<?php
+//Competition cancelled
 ob_start();
 
 if (!isset($_SESSION)) {
@@ -17,15 +15,13 @@ include_once('includes/header.php');?>
     <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
 </div>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
-<div id="localNav"><?php include_once("includes/navigation.php"); ?></div>    
 <div id="content">
   <div class="feature">
-    <img src="img/DSC_0069.jpg" alt="" width="300" height="253" />
     <h1>&nbsp;</h1>
-    <h1><?php echo $comp_name;?>  &auml;r INST&Auml;LLD!</h1>
-    <p>Med respekt f&ouml;r de t&auml;vlande och v&aring;ra egna sponsorer beslutade idag t&auml;vlingsledningen att st&auml;lla in &aring;rets upplaga av t&auml;vlingen. Vi har f&aring;tt allt f&ouml;r f&aring; anm&auml;lningar, vilket orsakade mycket f&aring; deltagare i flertalet klasser. Det vore inte r&auml;ttvist mot de t&auml;vlande som reser hit f&ouml;r att f&aring; t&auml;vla, anser vi.</p>
-    <p>Vi ska f&ouml;rs&ouml;ka analysera orsaken till de f&aring; anm&auml;lningarna och tar g&auml;rna emot hj&auml;lp av er ledare i den fr&aring;gan. Om analysen visar att v&aring;r t&auml;vling trots allt har en plats i karate-Sverige kommer vi att f&ouml;rs&ouml;ka igen.</p>
+    <h1>T&auml;vlingen &auml;r INST&Auml;LLD!</h1>
+    <p>T&auml;vlingsledningen har tagit beslutet att s&auml;lla oss till flertalet andra t&auml;vlingsarrang&ouml;rer och st&auml;lla in &aring;rets t&auml;vling, i dessa Corona-tider. Vi hoppas f&ouml;rst&aring;s att ni vill g&ouml;ra ett nytt f&ouml;rs&ouml;k tillsammans med oss n&auml;sta &aring;r och att vi kan genomf&ouml;ra t&auml;vlingen då ist&auml;llet!</p>
   </div>
+   <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Feskilstunakarateklubb%2Fvideos%2F2420821441538024%2F&show_text=0&width=560" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>
   <div class="story"></div>
 </div>
 <?php include_once("includes/footer.php");?>

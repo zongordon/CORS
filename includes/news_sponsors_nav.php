@@ -1,11 +1,11 @@
 <?php
-//Changed all sponsors to 'Huvudsponsorer'
-
-require_once('Connections/DBconnection.php');
-
+/*Removed code as duplicated in index.php and caused error message in PHP8
 if (!isset($_SESSION)) {
   session_start();
 }
+*/
+
+require_once('Connections/DBconnection.php');
 
 $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
@@ -24,11 +24,11 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
 ?>
 <body>
 <div id="masthead">
-    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
-    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
-    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="90" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="503" height="90"></a>
+    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="90" height="90" hspace="10"></a>
 </div>
-<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a>|<a href="Results.php">Resultat</a>|<a href="https://karateklubben.com/Support/" target="_blank">L&auml;nk till Helpdesk-sajt</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://github.com/zongordon/CORS/issues" target="_blank">GitHub Issues</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
 <div id="headlines">
   <div id="latestnews">
@@ -52,9 +52,15 @@ $DBconnection = null;
   <div id="sponsors">
       <h3>Huvudsponsorer</h3>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
-      <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
-      <p><img src="img/sponsors/Dental_Estetik_small.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
+      <p><img src="img/sponsors/Dental_Estetik.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
+      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.png" width="150" height="150" border="0" alt="Room4Life"></a></p>      
+      <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/EEM.png" width="150" height="106" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
+      <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/Etuna_Logistik.png" width="150" height="53" border="0" alt="Eskilstuna Logistik"></a></p>      
+      <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/Kfast.png" width="150" height="64" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      
 <!--Hide code       
+      <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
+      <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      
       <p><a href="http://gulasidorna.eniro.se/f/narkiniemi-elkonsult:4392999" target="_blank"><img src="img/nKon.gif" alt="Narkiniemi Elkonsult" width="210" height="68" border="0" /></a></p>
       <p><a href="http://gulasidorna.eniro.se/f/k08-entreprenad-ab:14539027?search_word=k08-entreprenad&geo_area=v%C3%A4ster%C3%A5s" target="_blank"><img src="img/k08-entreprenad.gif" alt="K08 Entreprenad AB, Anl&auml;ggningsarbeten f;ouml;r el och telekommunikation" width="210" height="21" border="0" /></a></p>
@@ -63,3 +69,7 @@ $DBconnection = null;
 -->
   </div>
 </div>
+
+
+
+

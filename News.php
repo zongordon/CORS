@@ -1,5 +1,5 @@
 <?php
-//Moved meta description and keywords to header.php
+//Removed kill DB as it's included in footer.php
 
 if (!isset($_SESSION)) {
   session_start();
@@ -57,12 +57,13 @@ include_once("includes/news_sponsors_nav.php");?>
           </tr>
 <?php   } ; ?>
       </table>
-<?php } 
+<?php } ?>                       
+</div>
+</div>
+<?php 
+//Kill statement
 $stmt_rsNews->closeCursor();
-$DBconnection = null;
-?>                       
-</div>
-</div>
-<?php include_once("includes/footer.php");?>
+include_once("includes/footer.php");
+?>
 </body>
 </html>

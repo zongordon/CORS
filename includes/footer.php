@@ -1,3 +1,10 @@
-<div id="siteInfo">v3.1.7 - &copy;2014 zongordon</div>
+ <?php
+ //New version
+ $stmt_rsCurrentComp->closeCursor();
+ $DBconnection = null;
+ ?>
+<div id="siteInfo">v3.3.4 - &copy;2014 zongordon</div>
+
+
 
 

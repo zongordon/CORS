@@ -1,4 +1,4 @@
-<?php 
+<?php //Added to select and display contestant_birth too
 
 if (!isset($_SESSION)) {
   session_start();
@@ -11,7 +11,7 @@ $MM_donotCheckaccess = "false";
 try {
 // Select registrations for each club and all competitions
 require('Connections/DBconnection.php');           
-$query_rsContestants = "SELECT club_name, contact_email, contestant_name FROM contestants INNER JOIN account USING(account_id) WHERE active = 1 ORDER BY club_name, contact_email, contestant_name";
+$query_rsContestants = "SELECT club_name, contact_email, contestant_name, contestant_birth FROM contestants INNER JOIN account USING(account_id) WHERE active = 1 ORDER BY club_name, contact_email, contestant_name";
 $stmt_rsContestants = $DBconnection->query($query_rsContestants);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
@@ -39,23 +39,24 @@ include_once("includes/news_sponsors_nav.php");?>
           <td><strong>Klubb</strong></td>
           <td><strong>E-post kontakt</strong></td>
           <td><strong>T&auml;vlande</strong></td>          
+          <td><strong>F&ouml;delsedatum</strong></td>          
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
         <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
         <td nowrap="nowrap"><?php echo $row_rsContestants['contact_email']; ?></td>        
         <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_name']; ?></td>
+        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_birth']; ?></td>
         </tr>
     <?php } ?>
 </table>
     <p><a href="javascript:history.go(-1);">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
   </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsContestants->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsContestants->closeCursor();
-$DBconnection = null;
-?>

@@ -1,5 +1,5 @@
 <?php 
-//Removed $row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC) to show all data in recordset
+//Added to view teams, changed sorting and called class to calculate number of matches and total match time
 
 if (!isset($_SESSION)) {
   session_start();
@@ -12,13 +12,19 @@ $MM_donotCheckaccess = "false";
 try {
 // Select number of registrations for each class, for the active competition
 require('Connections/DBconnection.php');           
-$query_rsRegistrations = "SELECT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT com.comp_limit_roundrobin, cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, "
+        . "cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, cl.class_match_time, cl.class_repechage, "
+        . "COUNT(class_id) FROM classes AS cl INNER JOIN registration AS re USING (class_id) INNER JOIN competition as com "
+        . "USING (comp_id) WHERE comp_current = 1 GROUP BY class_id ORDER BY cl.class_team, cl.class_discipline, cl.class_gender, "
+        . "cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations); 
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
 
 $pagetitle="Rapport: antal anm&auml;lningar och tids&aring;tg&aringng per t&auml;vlingsklass";
+//Require Class for calculating number of matches and total match time
+require_once 'Classes/ClassCalculations.php';
 // Includes Several code functions
 include_once('includes/functions.php');
 //Includes Restrict access code function
@@ -38,24 +44,22 @@ include_once("includes/news_sponsors_nav.php");?>
     <tr>
       <td><strong>T&auml;vlingsklass</strong></td>
           <td><strong>Antal t&auml;vlande</strong></td>
+          <td><strong>Totalt antal matcher</strong></td>
           <td><strong>Totalt ber&auml;knad tid (min)</strong></td>
       </tr>
-      <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { ?>
+      <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
+            $max_matches = new ClassCalculations;
+            $max_matches->limit_roundrobin = $row_rsRegistrations['comp_limit_roundrobin'];
+            $max_matches->registrations = $row_rsRegistrations['COUNT(class_id)'];
+            $max_matches->repechage = $row_rsRegistrations['class_repechage'];
+
+            $total_match_time = new ClassCalculations;
+            $total_match_time->class_match_time = $row_rsRegistrations['class_match_time'];?>
         <tr>
-          <td nowrap="nowrap"><?php echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
+          <td nowrap="nowrap"><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
           <td nowrap="nowrap"><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
-          <td nowrap="nowrap">
-<?php 
-if ($row_rsRegistrations['class_discipline'] == "Kata") {
-$time_class = 3;
-}
-if (($row_rsRegistrations['class_discipline'] == "Kumite") && ($row_rsRegistrations['class_category'] == "Barn")) {
-$time_class = 4;
-}
-if (($row_rsRegistrations['class_discipline'] == "Kumite") && ($row_rsRegistrations['class_category'] <> "Barn")) {
-$time_class = 5;
-}
-echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
+          <td nowrap="nowrap"><?php echo $max_matches->class_max_matches(); ?></td>
+          <td nowrap="nowrap"><?php echo $max_matches->class_max_matches()*$total_match_time->class_total_time(); ?></td>
         </tr>
       <?php }  ?>        
     </table>
@@ -65,11 +69,11 @@ echo (($row_rsRegistrations['COUNT(class_id)']-1) * $time_class); ?></td>
     <p>&nbsp;</p>
 </div>
 </div>
-<?php include("includes/footer.php");?>
+<?php 
+//Kill statement
+$stmt_rsRegistrations->closeCursor();
+include("includes/footer.php");
+?>
 </body>
 </html>
-<?php
-//Kill statements and DB connection
-$stmt_rsRegistrations->closeCursor();
-$DBconnection = null;
-?>
+
