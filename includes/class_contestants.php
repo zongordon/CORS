@@ -1,4 +1,7 @@
-<?php
+<?php 
+//Added drop list instead of text field for results
+//Added code to use new class (Classes/AgeCalc.php) and to select valid classes
+
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
 
@@ -97,10 +100,11 @@ $stmt_rsClassGender->closeCursor();
         require('Connections/DBconnection.php');           
         // Select the contestants and their information for the selected class
         $query3 = "SELECT a.club_name, re.reg_id, re.contestant_result, re.contestant_height, re.contestant_startnumber, "
-                . "co.contestant_name, co.contestant_team, co.contestant_gender, co.contestant_team_member_1, co.contestant_team_member_2,"
-                . "co.contestant_team_member_3, co.contestant_team_member_4,co.contestant_team_member_5,cl.class_id FROM registration AS "
-                . "re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a "
-                . "USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) "
+                . "co.contestant_name, co.contestant_team, co.contestant_gender, co.contestant_birth, co.contestant_birth_max,"
+                . "co.contestant_team_member_1, co.contestant_team_member_2,co.contestant_team_member_3, co.contestant_team_member_4,"
+                . "co.contestant_team_member_5,cl.class_id FROM registration AS re INNER JOIN classes AS cl USING (class_id) "
+                . "INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) "
+                . "INNER JOIN clubregistration AS clu USING (club_reg_id) "
                 . "WHERE cl.class_id = :class_id ORDER BY club_startorder, reg_id";
         $stmt_rsRegistrations = $DBconnection->prepare($query3);
         $stmt_rsRegistrations->execute(array(':class_id' => $colname_rsClass));
@@ -109,6 +113,7 @@ $stmt_rsClassGender->closeCursor();
     catch(PDOException $ex) {
         echo "An Error occured: ".$ex->getMessage();
     }              
+
     //Catch anything wrong with query
     try {
         // Select data for the selected class
@@ -165,7 +170,7 @@ echo ' | '.$row_rsClass['class_weight_length'];
             $team_member5 = $row_rsRegistrations['contestant_team_member_5'];
             //Catch anything wrong with query
             try {
-            //Select Class gender for selected class
+            //Select contestant name for team members
             require('Connections/DBconnection.php');           
             $query6 = "SELECT contestant_name FROM contestants WHERE contestant_id = $team_member1 || contestant_id = $team_member2 ||"
             . "contestant_id = $team_member3 || contestant_id = $team_member4 || contestant_id = $team_member5 ORDER BY contestant_name";            
@@ -181,19 +186,37 @@ echo ' | '.$row_rsClass['class_weight_length'];
 <td>
 <select name="class" id="class">
 <?php
-    //Catch anything wrong with query
+    //Calculate the contestant's age at te date of the competition
+    $calculate_age = new AgeCalc;
+    $calculate_age->comp_start_date = $comp_start_date;
+    $calculate_age->contestant_birth = $row_rsRegistrations['contestant_birth'];
+    $calculate_age->contestant_birth_max = $row_rsRegistrations['contestant_birth_max'];
+    $calculate_age->contestant_team = $row_rsRegistrations['contestant_team'];
+    $calculate_age->contestant_gender = $row_rsRegistrations['contestant_gender'];
+
+     //Catch anything wrong with query
     try {
-        // Select all classes for the current competition
-        $query5 = "SELECT cl.class_id, cl.comp_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category,"
-                . "cl.class_weight_length, cl.class_age FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id "
-                . "WHERE co.comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, "
-                . "cl.class_gender_category";
-        $stmt_rsClasses = $DBconnection->query($query5);
-    }   
-    catch(PDOException $ex) {
-        echo "An Error occured: ".$ex->getMessage();
-    }               
-while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) {  
+    //Select classes applicable for the contestant'S age and gender
+    require('Connections/DBconnection.php');               
+    $query_rsClassData = 
+            "SELECT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, "
+            . "cl.class_gender_category, cl.class_weight_length, cl.class_age "
+            . "FROM classes AS cl JOIN competition AS co ON cl.comp_id = co.comp_id "
+            . "WHERE "
+            . "comp_current = 1 && cl.class_team = :contestant_team && cl.class_gender = :contestant_gender && "
+            . "SUBSTRING(cl.class_age, 1, 2) = :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) = :contestant_age_max "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam && cl.class_gender = :contestantgender && "
+            . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
+            . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
+    $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
+    $stmt_rsClassData->execute(array(':contestant_gender'=>$calculate_age->contestant_gender, ':contestant_team'=>$calculate_age->contestant_team,
+        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), ':contestantgender'=>$calculate_age->contestant_gender,
+        ':contestantteam'=>$calculate_age->contestant_team, ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),));
+    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);      
+    } catch(PDOException $ex) {
+        echo "An Error occured with queryX: ".$ex->getMessage();
+      }
+foreach($row_rsClassData as $row_rsClasses) {
 ?>
 <option value="<?php echo $row_rsClasses['class_id']?>"<?php if (!(strcmp($row_rsClasses['class_id'], $colname_rsClass))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClasses['class_discipline'].' | '.$row_rsClasses['class_gender_category'].' | '.$row_rsClasses['class_weight_length'].' | '.$row_rsClasses['class_age'].' &aring;r'?></option> 
 <?php
@@ -214,13 +237,19 @@ while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) {
         echo $row_rsRegistrations['contestant_name'];  
       }?>    
 </td>
-<td>
-    <label><input name="contestant_height" type="text" id="contestant_height" value="<?php if ($row_rsRegistrations['contestant_height'] < 1){ echo ''; } else { echo $row_rsRegistrations['contestant_height'];} ?>" size="1" maxlength="3" /></label>
-<td>
-    <label><input name="contestant_result" type="id" id="contestant_result" value="<?php  if ($row_rsRegistrations['contestant_result'] < 1){ echo ''; } else { echo $row_rsRegistrations['contestant_result'];} ?>" size="1" /></label>
+<td><label>
+<input name="contestant_height" type="text" id="contestant_height" value="<?php if ($row_rsRegistrations['contestant_height'] < 1){ echo ''; } else { echo $row_rsRegistrations['contestant_height'];} ?>" size="1" maxlength="3" />
+</label>cm
 </td>
+<td><label>
+<select name="contestant_result" id="contestant_result">
+<option value="0"<?php if ($row_rsRegistrations['contestant_result'] === NULL || $row_rsRegistrations['contestant_result'] === 0) {echo "selected=\"selected\"";} ?>>Oplacerad</option>    
+<option value="1"<?php if ($row_rsRegistrations['contestant_result'] === 1) {echo "selected=\"selected\"";} ?>>1:a</option>
+<option value="2"<?php if ($row_rsRegistrations['contestant_result'] === 2) {echo "selected=\"selected\"";} ?>>2:a</option>
+<option value="3"<?php if ($row_rsRegistrations['contestant_result'] === 3) {echo "selected=\"selected\"";} ?>>3:e</option>
+</select>
+</label></td>
 <td>
-    <?php if ($row_rsRegistrations['contestant_result'] == "") { echo ''; }?><?php if ($row_rsRegistrations['contestant_result'] <> "") { echo ':a'; } ?>
 </td>
 <td>
     <label><input type="submit" name="update_reg" id="update_reg" value="Spara" /></label>
@@ -243,7 +272,7 @@ while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) {
 </table>
 <?php 
 //Kill statement
-$stmt_rsClasses->closeCursor();
+//$stmt_rsClasses->closeCursor();
     } else { ?>
   <table width="80%" border="1">
     <tr>

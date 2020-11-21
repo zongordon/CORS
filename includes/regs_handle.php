@@ -1,7 +1,4 @@
-<?php 
-//Added code to prevent error message "Notice: Trying to access array offset on value of type bool..." with empty recordset, introduced by PHP 7.4
-//Changed from "text" validation for $insert_contestant_name and $insert_contestant_gender
-//Changed to show Coach field only when club is selected to prevent SQL error if data entered before selecction
+<?php //Added code to use new class (Classes/AgeCalc.php) and changed code to select valid classes
 
 //Catch anything wrong with query
 try {
@@ -661,45 +658,17 @@ else {
           <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
         </tr>
 <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { 
-    $contestant_birth = $row_rsContestants['contestant_birth'];
-    $contestant_birth_max = $row_rsContestants['contestant_birth_max'];
-    $contestant_team = $row_rsContestants['contestant_team'];
-    $contestant_gender = $row_rsContestants['contestant_gender'];
-    //Different settings if team or individual contestant
-    if($contestant_team === 1){
-        //Calculate the min and max age of the team at the date of the competition
-        $date1 = new DateTime($comp_start_date);
-        $date2 = new DateTime($contestant_birth);
-        $date3 = new DateTime($contestant_birth_max);
-        $diff_high = $date2->diff($date1);
-        $diff_low = $date3->diff($date1);
-        $contestant_age_max = $diff_high->y;
-        $contestant_age_min = $diff_low->y;
-    }else{    
-        //Calculate the age of the contestant at the date of the competition
-        $date1 = new DateTime($comp_start_date);
-        $date2 = new DateTime($row_rsContestants['contestant_birth']);
-        $diff = $date2->diff($date1);
-        $contestant_age_min = $diff->y;
-        $contestant_age_max = $contestant_age_min;
-    }
-        //If age > 18, set to 18 to match with classes
-        if($contestant_age_max >18){
-            $contestant_age_max = 18;
-        }
-        if($contestant_age_min >18){
-            $contestant_age_min = 18;
-        }
-        //If age < 10, add a "0" to be able to match with classes
-        if($contestant_age_max <10){
-            $contestant_age_max = '0'.$contestant_age_max;
-        }
-        if($contestant_age_min <10){
-            $contestant_age_min = '0'.$contestant_age_min;
-        }
-    //Catch anything wrong with query
+    //Calculate the contestant's age at te date of the competition
+    $calculate_age = new AgeCalc;
+    $calculate_age->comp_start_date = $comp_start_date;
+    $calculate_age->contestant_birth = $row_rsContestants['contestant_birth'];
+    $calculate_age->contestant_birth_max = $row_rsContestants['contestant_birth_max'];
+    $calculate_age->contestant_team = $row_rsContestants['contestant_team'];
+    $calculate_age->contestant_gender = $row_rsContestants['contestant_gender'];
+
+     //Catch anything wrong with query
     try {
-// Select classes applicable for the contestant
+    //Select classes applicable for the contestant'S age and gender
     require('Connections/DBconnection.php');               
     $query_rsClassData = 
             "SELECT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, "
@@ -712,13 +681,13 @@ else {
             . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
             . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
     $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
-    $stmt_rsClassData->execute(array(':contestant_gender'=>$contestant_gender, ':contestant_team'=>$contestant_team,
-        ':contestant_age_min'=>$contestant_age_min,':contestant_age_max'=>$contestant_age_max, ':contestantgender'=>$contestant_gender,
-        ':contestantteam'=>$contestant_team, ':contestantage_min'=>$contestant_age_min,':contestantage_max'=>$contestant_age_max,));
-    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);   
+    $stmt_rsClassData->execute(array(':contestant_gender'=>$calculate_age->contestant_gender, ':contestant_team'=>$calculate_age->contestant_team,
+        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), ':contestantgender'=>$calculate_age->contestant_gender,
+        ':contestantteam'=>$calculate_age->contestant_team, ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),));
+    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);      
     } catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
-      }    
+      }
     ?>
           <tr>
             <td><form id="new_registration" name="new_registration" method="POST" action="<?php echo $editFormAction; ?>">

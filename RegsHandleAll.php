@@ -1,5 +1,5 @@
 <?php
-//Added functions to handle teams and moved reusable code to includes/regs_handle.php
+//Added require_one to Classes/AgeCalc.php
 
 ob_start();
 session_start();
@@ -14,6 +14,8 @@ $MM_donotCheckaccess = "false";
 $pagetitle="Registrera t&auml;vlande - admin";
 // require Class for validation of forms
 require_once 'Classes/Validate.php';
+// require Class for calculating contestant's age
+require_once 'Classes/AgeCalc.php';
 // Includes HTML Head
 include_once('includes/header.php');
 //Includes Several code functions
