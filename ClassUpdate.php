@@ -1,5 +1,5 @@
 <?php
-//Made sure that $class_discipline_variant will have the value 2 if kumite is chosen
+//Added class for styling button in css file
 
 ob_start();
 //Access level top administrator
@@ -215,7 +215,7 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
           <tr>
             <td>&nbsp;</td>
             <td><label>
-              <input type="submit" name="new_class" id="new_class" value="Uppdatera" />
+              <input type="submit" name="new_class" class= "button" id="new_class" value="Uppdatera" />
             </label></td>
           </tr>
         </table>

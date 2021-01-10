@@ -1,4 +1,4 @@
-<?php //Removed kill DB as it's included in footer.php
+<?php //Added class for table layout in css file
 
 if (!isset($_SESSION)) {
   session_start();
@@ -52,7 +52,7 @@ if ($totalRows_rsResult > 0) { // Show if recordset not empty ?>
 <h3>Samtliga resultat</h3>
 <p>Nedan finns samtliga resultat vid t&auml;vlingen. &Auml;ndra sorteringen genom att v&auml;lja i listan och klicka p&aring; sortera.</p>
 <form action="<?php echo $editFormAction; ?>" method="GET" enctype="application/x-www-form-urlencoded" name="SelectSorting" id="SelectSorting">
-  <table width="200" border="0">
+  <table width="250" border="0">
     <tr>
       <td valign="middle">Sortering</td>
       <td><label>
@@ -75,7 +75,7 @@ if ($totalRows_rsResult > 0) { // Show if recordset not empty ?>
     </tr>
   </table>
 </form>
-<table width="100%" border="1">
+<table class="wide_tbl" border="1">
   <tr>
     <td><strong>Klubb</strong></td>
     <td><strong>T&auml;vlande</strong></td>

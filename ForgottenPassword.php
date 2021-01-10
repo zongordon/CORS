@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Added class for styling button in css file
 ob_start();
 
 $pagetitle="Gl&ouml;mt ditt l&ouml;senord eller anv&auml;ndarnamnet?";
@@ -73,7 +73,7 @@ if ($output_form === 'yes') {
           <td>E-post</td>
           <td valign="top"><label>
             <input name="contact_email" type="text" id="contact_email" size="35" />
-            <input type="submit" name="Submit" id="Submit" value="Skicka" />
+            <input type="submit" name="Submit" fileclass = "button" id="Submit" value="Skicka" />
           </label></td>
         </tr>
       </table>

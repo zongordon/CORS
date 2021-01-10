@@ -1,9 +1,7 @@
 <?php
-/*Removed code as duplicated in index.php and caused error message in PHP8
-if (!isset($_SESSION)) {
-  session_start();
-}
-*/
+//Added sticky navigation bar plus other adjustments for new dark mode layout
+//Changed code for news links to shorten strings
+//Changed to responsive images for sponsors
 
 require_once('Connections/DBconnection.php');
 
@@ -23,42 +21,44 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
     }
 ?>
 <body>
+<div class="sticky">    
 <div id="masthead">
-    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="90" height="90" hspace="10"></a>
-    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="503" height="90"></a>
-    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="90" height="90" hspace="10"></a>
+    <a href="http://tunacup.karateklubben.com/"><img src="img/Banner.svg" alt="Logo Tuna Karate Cup" width="700"></a>
 </div>
-<div id="globalNav"><a href="/">Hem</a>|<a href="News.php">Nyheter</a>|<a href="Contacts.php">Kontakter</a>|<a href="ClassesList.php">T&auml;vlingsklasser</a>|<a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "|<a href='Draws.php'>Lottning</a>"; } ?>|<a href="Results.php">Resultat</a>|<a href="https://github.com/zongordon/CORS/issues" target="_blank">GitHub Issues</a>|<a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+<div id="globalNav"><a href="http://tunacup.karateklubben.com/">Hem</a><a href="News.php">Nyheter</a><a href="Contacts.php">Kontakter</a><a href="ClassesList.php">T&auml;vlingsklasser</a><a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "<a href='Draws.php'>Lottning</a>"; } ?><a href="Results.php">Resultat</a><a href="https://github.com/zongordon/CORS/issues" target="_blank">GitHub Issues</a><a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
+</div>
 </div>
 <div id="headlines">
   <div id="latestnews">
-      <h3>Senaste Nytt</h3><br/>      
+      <h2>Senaste Nytt</h2>    
 <?php 
 if ($totalRows_rsLatestNews == 0) { // Show if recordset empty ?>
         <h4>Det finns inga nyheter &auml;n!</h4>
 <?php 
 } 
 if ($totalRows_rsLatestNews > 0) { // Show if recordset not empty 
-        while($row_rsLatestNews = $stmt_rsLatestNews->fetch(PDO::FETCH_ASSOC)) {; 
-            $news = $row_rsLatestNews['message_subject']; 
-            if(strlen($news) > 50) { $news = substr($news,0,50)."...";}?>
-        <h4><a href="News.php"><?php echo $news; ?></a></h4>    
-<?php   }
+    while($row_rsLatestNews = $stmt_rsLatestNews->fetch(PDO::FETCH_ASSOC)) {; 
+        $news = $row_rsLatestNews['message_subject']; 
+            if(strlen($news) > 35) { 
+                $news = substr($news,0,35).'...';
+            }
+        echo '<a href="News.php">'.$news.'</a></br/>';               
+    }
 }
 $stmt_rsLatestNews->closeCursor();
 $DBconnection = null;
 ?>
   </div><br/>
   <div id="sponsors">
-      <h3>Huvudsponsorer</h3>
-      <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="150" height="58" border="0" /></a></p>
+      <h2>Huvud-sponsorer</h2>
+      <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="100%" height="100%" border="0" /></a></p>
+      <p><img src="img/sponsors/Dental_Estetik.png" alt="Dental Estetik" width="100%" height="100%" border="0" /></p>
+      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.svg" width="100%" height="100%" border="0" alt="Room4Life"></a></p>      
+<!--Hide code       
       <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
-      <p><img src="img/sponsors/Dental_Estetik.png" alt="Dental Estetik" width="150" height="104" border="0" /></p>
-      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.png" width="150" height="150" border="0" alt="Room4Life"></a></p>      
       <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/EEM.png" width="150" height="106" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
       <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/Etuna_Logistik.png" width="150" height="53" border="0" alt="Eskilstuna Logistik"></a></p>      
       <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/Kfast.png" width="150" height="64" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      
-<!--Hide code       
       <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>      
       <p><a href="http://www.lazyposters.se/" target="_blank"><img src="img/sponsors/lazyposters black red_mini.jpg" width="150" height="17" border="0" alt="Lazy Posters"></a></p>      
       <p><a href="http://www.dynamate-is.se/" target="_blank"><img src="img/DynaMate-IS.gif" width="150" height="33" border="0" alt="DynaMate Industrial Services;"></a></p>      

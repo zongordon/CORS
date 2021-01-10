@@ -1,6 +1,5 @@
 <?php
-//Changed from "text" validation of $update_contestant_name
-//Changed code to solve Warning: Undefined variable $contestant_name when validation triggered error message with PHP 8.0.0.rc1
+//Added class for table layout in css file
 
 // require Class for validation of forms
 require_once 'Classes/Validate.php';
@@ -169,7 +168,7 @@ else {
 if ($output_form === 'yes') { ?>
 <h3>Gör &auml;ndringar på klubbens t&auml;vlande och klicka p&aring; Spara.</h3>
 <form id="update_contestant" name="update_contestant" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="450" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td>T&auml;vlandes namn</td>
           <td><label>
@@ -205,7 +204,7 @@ if ($output_form === 'yes') { ?>
         <input type="hidden" name="contestant_id" id="contestant_id" value="<?php echo $update_contestant_id; ?>" />
           </td>
           <td><label>
-              <input type="submit" name="update_contestant" id="update_contestant" value="Spara" />
+              <input type="submit" name="update_contestant" class= "button" id="update_contestant" value="Spara" />
           </label></td>
         </tr>
       </table>
@@ -300,7 +299,7 @@ if (filter_input(INPUT_POST,"MM_update_team") === "update_team") {
 if ($output_form === 'yes') { ?>
 <h3>&Auml;ndra lagets namn och vilka som ing&aring;r.</h3>    
 <form id="update_team" name="update_team" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="550" border="0">
+      <table class="medium_tbl" border="0">
         <tr>
           <td>Lagets namn</td>
           <td><label>
@@ -406,7 +405,7 @@ if ($output_form === 'yes') { ?>
         <input type="hidden" name="MM_update_team" value="update_team" />
           </td>
           <td><label>
-              <input type="submit" name="update_team" id="update_team" value="Uppdatera lag" />
+              <input type="submit" name="update_team" class= "button" id="update_team" value="Uppdatera lag" />
           </label></td>
         </tr>
       </table>

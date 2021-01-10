@@ -1,6 +1,5 @@
 <?php
-//If admin redirect to accounts list after insert
-//Changed from "text" validation of $club_name and $contact_name
+//Added class for table layout in css file
 
 //Declare and initialise variables
   $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
@@ -101,7 +100,7 @@ if ($output_form === 'yes') { ?>
 <?php }?>    
 <br>Fyll i formul&auml;ret och klicka p&aring; knappen &quot;Nytt konto&quot;. Obs! Alla f&auml;lt &auml;r obligatoriska att fylla i och minst fem tecken i textf&auml;lten!</p>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" id="new_account" name="new_account">      
-      <table width="400" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td>Klubbens namn</td>
           <td><label>
@@ -166,7 +165,7 @@ Nej</label></td>
         <tr>
           <td>&nbsp;</td>
           <td><label>
-            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
+            <input type="submit" name="new_account" class= "button" id="new_account" value="Nytt konto" />
           </label></td>
         </tr>
      </table>
@@ -195,7 +194,7 @@ Nej</label></td>
             <input name="access_level" type="hidden" id="access_level" value="0" />
             <input name="confirmed" type="hidden" id="confirmed" value="0" /></td>
           <td><label>
-            <input type="submit" name="new_account" id="new_account" value="Nytt konto" />
+            <input type="submit" name="new_account" class= "button" id="new_account" value="Nytt konto" />
           </label></td>
         </tr>    
       </table>

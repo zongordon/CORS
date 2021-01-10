@@ -1,6 +1,5 @@
 ﻿<?php 
-//Changed embedded video from linked Facebook video to Youtube
-//Changed to google maps link instead of Facebook link
+//Changed to more responsive function for embedded video 
 
 ob_start();
 
@@ -24,7 +23,7 @@ include_once("includes/news_sponsors_nav.php");
     Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
     L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
-<iframe width="640" height="360" src="https://www.youtube.com/embed/pl9HgW5pgTQ?rel=0&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    
+<iframe width="60%" height="360" src="https://www.youtube.com/embed/pl9HgW5pgTQ?rel=0&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>    
   <div class="story">
     <h2>Tid och plats</h2>
     <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">

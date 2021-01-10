@@ -1,4 +1,6 @@
 <?php
+//Added class for table layout in css file
+//Added class for styling button in css file
 
 if (!isset($_SESSION)) {
   session_start();
@@ -54,7 +56,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
         <p>V&auml;l klubb och klicka p&aring; V&auml;lj f&ouml;r att se de t&auml;vlingsstegar som ber&ouml;r den klubben!</p>
       <form id="SelectClub" name="SelectClub" method="POST" action="<?php echo $editFormAction; ?>">
-        <table width="200" border="0">
+        <table width=30% border="0">
           <tr>
             <td valign="middle">Klubb:</td>
             <td><label>
@@ -73,7 +75,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
 } ?>
               </select>
             </label></td>
-            <td><input type="submit" name="submit" id="submit" value="V&auml;lj" /></td>
+            <td><input type="submit" name="submit" class = "button" id="submit" value="V&auml;lj" /></td>
           </tr>
         </table>
       </form>
@@ -83,7 +85,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
 <?php } ?>
 <?php if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
     <p>Klicka p&aring; l&auml;nkarna till t&auml;vlingsstegarna och v&auml;lj utskrift fr&aring;n sk&auml;rm eller PDF!</p>
-    <table width="100%" border="1">
+    <table class="wide_tbl" border="1">
       <tr>
         <td><strong>Disciplin</strong></td>
         <td><strong>K&ouml;nskategori</strong></td>
