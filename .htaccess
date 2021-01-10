@@ -1,8 +1,0 @@
-# Make sure to use httponly for session cookies
-<IfModule php5_module>
-    php_flag session.cookie_httponly on
-</IfModule>
-
-# keep the URLs clean:
-# if someone asks for index.php- rewrite the URL without it
-RewriteRule ^(.*?)/?index\.php$ $1 [NC,R=301,L]

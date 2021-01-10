@@ -1,6 +1,5 @@
 <?php 
-//Replaced comp_end_date with comp_start_time in table
-//Truncated $row_rsCompetitions['comp_start_time'] to 5 characters
+//Added class for styling button in css file
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -145,7 +144,7 @@ catch(PDOException $ex) {
           <td>&nbsp;</td>
           <td>&nbsp;</td>
           <td>Uppdatera aktiv t&auml;vling:</td>          
-          <td><input name="CompUpdate" type="submit" id="CompUpdate" value="Spara" /></td>
+          <td><input name="CompUpdate" type="submit" class = "button" id="CompUpdate" value="Spara" /></td>
         </tr>
     </table>
       <input type="hidden" name="MM_update" value="CompForm" />      

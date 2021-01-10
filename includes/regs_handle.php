@@ -1,4 +1,6 @@
-<?php //Added code to use new class (Classes/AgeCalc.php) and changed code to select valid classes
+<?php 
+//Prevents attempt to create session variable and indicate selected club before club is selected by admin
+//Added classes for table layout in css file
 
 //Catch anything wrong with query
 try {
@@ -12,9 +14,11 @@ $totalRows_rsSelectedClub = $stmt_rsSelectedClub->rowCount();
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }    
-
+    
+if ($colname_rsSelectedClub <> "") {//Prevents attempt to create session variable before club is selected by admin
 //Creating Session variable for the selected club
 $_SESSION['MM_Account'] = $row_rsSelectedClub['account_id'];
+}
 
 //Catch anything wrong with query
 try {
@@ -70,12 +74,12 @@ if ($MM_authorizedUsers === "1") {
 if ($MM_authorizedUsers === "1"){ ?>
 <h3>1. V&auml;lj klubb</h3>
 <p>
-<?php if (empty($_SESSION['MM_Account'])) {//Show if no club is selected
+<?php if ($colname_rsSelectedClub === "") {//Show if no club is selected
         echo "<strong>Ingen klubb &auml;r vald &auml;n! </strong>";    
       } ?>
 V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
 <form id="SelectClub" name="SelectClub" method="post" action="<?php echo $editFormAction; ?>">
-  <table width="200" border="0">
+  <table class="narrow_tbl" border="0">
     <tr>
       <td valign="top">Klubb</td>
       <td><label>
@@ -84,7 +88,7 @@ V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
 foreach($row_rsAccounts as $row_rsAccount) {  
 ?>
           <option value="<?php echo $row_rsAccount['account_id']?>"
-       <?php if (!(strcmp($row_rsAccount['account_id'], $_SESSION['MM_Account']))) {
+       <?php if (($colname_rsSelectedClub <> "") && !(strcmp($row_rsAccount['account_id'], $_SESSION['MM_Account']))) {
                 echo "selected=\"selected\"";
              } ?>>
       <?php echo $row_rsAccount['club_name']?>
@@ -93,7 +97,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
 } ;?>
         </select>
       </label></td>
-      <td><input type="submit" name="submit" id="submit" value="V&auml;lj klubb" /></td>
+      <td><input type="submit" name="submit" class= "button" id="submit" value="V&auml;lj klubb" /></td>
     </tr>
   </table>
 </form>
@@ -184,7 +188,7 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
     <form id="update_club_reg" name="update_club_reg" method="POST" action="<?php echo $editFormAction; ?>"> 
 <?php
 	}?>                       
-     <table width="400" border="0">
+     <table class="narrow_tbl" border="0">
       <tr>
         <td valign="top">Coacher</td>
         <td><label>
@@ -196,12 +200,12 @@ $totalRows_rsClubReg = $stmt_rsClubReg->rowCount();
           <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>" />
           <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubReg['club_reg_id']; ?>" />        </td>
         <td><label>
-	<?php if ($totalRows_rsClubReg == 0) { // Show if recordset empty ?>   
-          <input type="submit" name="new_club_reg" id="new_club_reg" value="Spara" />
+	<?php if ($totalRows_rsClubReg === 0) { // Show if recordset empty ?>   
+          <input type="submit" name="new_club_reg" class= "button" id="new_club_reg" value="Spara" />
           <input type="hidden" name="MM_insert_clubregistration" value="new_club_reg" />
 	<?php } ?> 
 	  	<?php if ($totalRows_rsClubReg <> 0) { // Show if recordset NOT empty ?>
-          <input type="submit" name="update_club_reg" id="update_club_reg" value="Uppdatera" /></label>
+          <input type="submit" name="update_club_reg" class= "button" id="update_club_reg" value="Uppdatera" /></label>
           <input type="hidden" name="MM_update_clubregistration" value="update_club_reg" /> 
 		<?php } ?>         
         </label></td>
@@ -268,7 +272,7 @@ if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
 }
 ?>
 <form id="new_contestant" name="new_contestant" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="450" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td>T&auml;vlandes namn</td>
           <td><label>
@@ -298,7 +302,7 @@ if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
         <input type="hidden" name="account_id" id="account_id" value="<?php echo $_SESSION['MM_Account']; ?>" />
           </td>
           <td><label>
-              <input type="submit" name="new_contestant" id="new_contestant" value="Ny t&auml;vlande" />
+              <input type="submit" name="new_contestant" class= "button" id="new_contestant" value="Ny t&auml;vlande" />
           </label></td>
         </tr>
       </table>
@@ -419,7 +423,7 @@ if (filter_input(INPUT_POST,"MM_insert_team") === "new_team") {
 }        
 ?> 
 <form id="new_team" name="new_team" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="550" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td>Lagets namn</td>
           <td><label>
@@ -510,7 +514,7 @@ if (filter_input(INPUT_POST,"MM_insert_team") === "new_team") {
         <input type="hidden" name="account_id" id="account_id" value="<?php echo $_SESSION['MM_Account']; ?>" />
           </td>
           <td><label>
-              <input type="submit" name="new_team" id="new_team" value="Nytt lag" />
+              <input type="submit" name="new_team" class= "button" id="new_team" value="Nytt lag" />
           </label></td>
         </tr>
       </table>
@@ -653,12 +657,12 @@ else {
 <?php
       } ?>           
 </p>
-      <table width="850" border="1">
+      <table class="wide_tbl" border="1">
         <tr>
           <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
         </tr>
 <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { 
-    //Calculate the contestant's age at te date of the competition
+    //Calculate the contestant's age at the date of the competition
     $calculate_age = new AgeCalc;
     $calculate_age->comp_start_date = $comp_start_date;
     $calculate_age->contestant_birth = $row_rsContestants['contestant_birth'];
@@ -732,7 +736,7 @@ else {
     } ?>
                   </select></label></td>
                   <td><label>
-                    <input type="submit" name="new_registration" id="new_registration" value="Anm&auml;l till klass" />
+                    <input type="submit" name="new_registration" class= "button" id="new_registration" value="Anm&auml;l till klass" />
                   </label></td>
                   <td nowrap="nowrap">
                     <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantUpdate_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantUpdate';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a> |                    
@@ -773,7 +777,7 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
             if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
     <h3><a name="registration_delete" id="registration_delete"></a><?php if ($MM_authorizedUsers === "0") { echo '4';} else {echo '5';} ?>. Ta bort anm&auml;lningar</h3>
     <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan.</p>
-      <table width="850" border="1">
+      <table class="medium_tbl" border="1">
         <tr>
           <td><strong>Startnr.</strong></td>
           <td><strong>T&auml;vlande</strong></td>

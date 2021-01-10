@@ -1,5 +1,5 @@
 <?php
-//Changed code to prevent Warning: Trying to access array offset on value of type null in PHP 8.0.0.rc1
+//Added class for table layout in css file
 try {
 require('Connections/DBconnection.php');            
 //Select all data regarding the account
@@ -109,7 +109,7 @@ if (filter_input(INPUT_POST, 'MM_update') == 'AccountForm') {
 if ($output_form === 'yes') { ;?>
         <p><h3>&Auml;ndra &ouml;nskade v&auml;rden och klicka p&aring; &quot;Spara&quot; f&ouml;r att spara &auml;ndringen p&aring; kontot.</h3></p> 
     <form id="AccountForm" name="AccountForm" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="200" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td valign="baseline" nowrap="nowrap">Klubbens namn</td>
           <td><label>
@@ -184,7 +184,7 @@ Nej</label></td>
 <?php }//If Admin->adapt form ?>        
         <tr>
           <td align="right" valign="baseline" nowrap="nowrap"><input type="hidden" name="MM_update" value="AccountForm" /><input name="account_id" type="hidden" id="account_id" value="<?php echo $account_id; ?>" /></td>
-          <td><input name="AccountUpdate" type="submit" id="AccountUpdate" value="Spara" /></td>
+          <td><input name="AccountUpdate" type="submit" class= "button" id="AccountUpdate" value="Spara" /></td>
         </tr>
       </table>
     </form>

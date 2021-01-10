@@ -1,5 +1,5 @@
 <?php 
-//Added class_team and class_discipline_variant
+//Added class for styling button in css file
 
 ob_start();
 //Access level top administrator
@@ -132,7 +132,7 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
       </label></td>
       <td>
       <input type="hidden" name="MM_CopyClasses" value="copy_classes" />
-      <input type="submit" name="copy_classes" id="copy_classes" value="Kopiera" />
+      <input type="submit" name="copy_classes" class= "button" id="copy_classes" value="Kopiera" />
       </td>
     </tr>
     </table>

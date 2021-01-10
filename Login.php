@@ -127,7 +127,7 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
           </tr>
           <tr>
             <td><img src="Captcha.php" /></td>
-            <td><input type="submit" name="LoginButton" id="LoginButton" value="Logga in" /></td>
+            <td><input type="submit" name="LoginButton" class = "button" id="LoginButton" value="Logga in" /></td>
           </tr>
         </table>
     </form>

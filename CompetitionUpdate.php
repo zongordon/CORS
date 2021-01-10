@@ -1,5 +1,5 @@
 <?php
-//Changed code to prevent Warning: Trying to access array offset on value of type null in PHP 8.0.0.rc1
+//Added class for styling button in css file
 
 ob_start();
 
@@ -179,7 +179,7 @@ if ($output_form == 'yes') {
         <tr>
           <td>&nbsp;</td>
           <td>&nbsp;</td>
-          <td><input name="CompUpdate" type="submit" id="CompUpdate" value="Spara"/></td>
+          <td><input name="CompUpdate" type="submit" class = "button" id="CompUpdate" value="Spara"/></td>
         </tr>
       </table>
       <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>"/>

@@ -1,6 +1,6 @@
 <?php
-//Added validation class with multiple validation features and removed most of existing validation code
-//Removed some obsolete div tags to change layout
+//Added class for table layout in css file
+//Added class for styling button in css file
 ob_start();
 
 //Access level top administrator
@@ -176,7 +176,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
 ?>
         </div>
 <form id="new_message" name="new_message" method="POST" action="<?php echo $editFormAction; ?>">
-      <table width="500" border="0">
+      <table class="narrow_tbl" border="0">
         <tr>
           <td>Meddelandets titel</td>
           <td><label>
@@ -219,7 +219,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
           <td><input type="hidden" name="MM_insert_message" value="new_message" />
               <input type="hidden" name="comp_id" value="<?php echo $row_rsCompActive['comp_id']; ?>" />
           <td><label>
-              <input type="submit" name="new_message" id="new_message" value="Nytt meddelande" />
+              <input type="submit" name="new_message" class = "button" id="new_message" value="Nytt meddelande" />
           </label></td>
         </tr>
       </table>
@@ -228,7 +228,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
 if ($totalRows_rsMessages > 0) { // Show if recordset not empty ?>
 	<h3><a name="message_delete" id="message_delete"></a>Ta bort meddelanden</h3>
 	<p>Om n&aring;got har blivit fel kan du ta bort meddelandet.</p>
-      <table width="100%" border="1">
+      <table class="wide_tbl" border="1">
         <tr>
           <td><strong>Titel</strong></td>
           <td><strong>Meddelande</strong></td>

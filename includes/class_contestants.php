@@ -1,6 +1,5 @@
 <?php 
-//Added drop list instead of text field for results
-//Added code to use new class (Classes/AgeCalc.php) and to select valid classes
+//Added class for table layout in css file
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -155,7 +154,7 @@ echo ' | '.$row_rsClass['class_weight_length'];
 ?>
 </h3>
 <?php if ($MM_authorizedUsers === "1") { ?>
-<table width ="100%" border="1">
+<table class="medium_tbl" border="1">
 <tr><td>
     <strong>T&auml;vlingsklass - Klubb - T&auml;vlande - L&auml;ngd (eventuellt) - Placering - Spara - Ta bort anm&auml;lan</strong>
 </td></tr>
@@ -252,7 +251,7 @@ foreach($row_rsClassData as $row_rsClasses) {
 <td>
 </td>
 <td>
-    <label><input type="submit" name="update_reg" id="update_reg" value="Spara" /></label>
+    <label><input type="submit" name="update_reg" class= "button" id="update_reg" value="Spara" /></label>
 </td>
 <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
 <input type="hidden" name="MM_update" value="update_reg" />
@@ -260,7 +259,7 @@ foreach($row_rsClassData as $row_rsClasses) {
 </form></td>
 <form action="<?php echo $editFormAction; ?>" method="POST" enctype="application/x-www-form-urlencoded" name="delete_reg" id="delete_reg">
     <td>
-        <label><input type="submit" name="delete_reg" id="delete_reg" value="Ta bort" /></label>
+        <label><input type="submit" name="delete_reg" class= "button" id="delete_reg" value="Ta bort" /></label>
     </td>
     <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
     <input type="hidden" name="MM_delete" value="delete_reg" />
@@ -274,7 +273,7 @@ foreach($row_rsClassData as $row_rsClasses) {
 //Kill statement
 //$stmt_rsClasses->closeCursor();
     } else { ?>
-  <table width="80%" border="1">
+  <table class="medium_tbl" border="1">
     <tr>
       <td><strong>Startnr.</strong></td>        
       <td><strong>Klubb</strong></td>

@@ -1,5 +1,6 @@
 <?php
-//Added code for showing team classes
+//Added class for styling button in css file
+//Added class for table layout in css file
 
 if (!isset($_SESSION)) {
   session_start();
@@ -55,7 +56,7 @@ if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
 <p>Nedan finns samtliga nuvarande anm&auml;lningar till t&auml;vlingen. &Auml;ndra sorteringen genom att v&auml;lja i listan och klicka p&aring; sortera.</p>
 <!-- Sort the table by name of the club, competition class or contestant name!-->
 <form action="<?php echo $editFormAction; ?>" method="GET" enctype="application/x-www-form-urlencoded" name="SelectSorting" id="SelectSorting">
-  <table width="200" border="0">
+  <table width="250" border="0">
     <tr>
       <td valign="middle">Sortering</td>
       <td><label>
@@ -65,11 +66,11 @@ if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
       <option value="contestant_name, club_name"<?php if (!(strcmp($sorting, "contestant_name, club_name"))) {echo "selected=\"selected\"";} ?>>T&auml;vlande</option>
         </select>
       </label></td>
-      <td><input type="submit" name="submit" id="submit" value="Sortera" /></td>
+      <td><input type="submit" name="submit" class = "button" id="submit" value="Sortera" /></td>
     </tr>
   </table>
 </form>
-<table width="100%" border="1">
+<table class="wide_tbl" border="1">
   <tr>
     <td><strong>Startnr.</strong></td>      
     <td><strong>Klubb</strong></td>

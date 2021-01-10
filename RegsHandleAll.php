@@ -1,5 +1,5 @@
 <?php
-//Added require_one to Classes/AgeCalc.php
+//Changed from <div class="content" for correct layout
 
 ob_start();
 session_start();
@@ -28,7 +28,7 @@ include_once('includes/restrict_access.php');?>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div class="content">  
+<div id="content">  
      <div class="feature">
 <?php 
 //Handle input from form

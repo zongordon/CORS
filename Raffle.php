@@ -1,5 +1,5 @@
 <?php 
-//Removed kill DB as it's included in footer.php
+//Added class for styling button in css file
 ob_start();
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -95,7 +95,7 @@ else {
         <td><label>
           <input name="club_startorder" type="text" id="club_startorder" value="<?php echo $row_rsClubRegs['club_startorder']; ?>" size="2" maxlength="2" />
           </label></td>
-        <td><input type="submit" name="Spara" id="Spara" value="Spara" />
+        <td><input type="submit" name="Spara" class = "button" id="Spara" value="Spara" />
           <input name="club_reg_id" type="hidden" id="club_reg_id" value="<?php echo $row_rsClubRegs['club_reg_id']; ?>" /></td>
         </tr>
     <input type="hidden" name="MM_update" value="UpdateRaffle"/>
@@ -122,7 +122,7 @@ $row_rsRaffle = $stmt_rsRaffle->fetch(PDO::FETCH_ASSOC);
             <option value="0" <?php if (!(strcmp("0", $row_rsRaffle['comp_raffled']))) {echo "selected=\"selected\"";} ?>>Lottning inte klar</option>
             <option value="1" <?php if (!(strcmp("1", $row_rsRaffle['comp_raffled']))) {echo "selected=\"selected\"";} ?>>Lottning klar</option>
           </label></td>
-        <td><input type="submit" name="Spara" id="Spara" value="Spara" />
+        <td><input type="submit" name="Spara" class = "button" id="Spara" value="Spara" />
           <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $row_rsRaffle['comp_id']; ?>" /></td>
       </tr>
     <input type="hidden" name="MM_RaffleDone" value="RaffleDone"/>
