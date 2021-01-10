@@ -1,5 +1,5 @@
 <?php
-//Changed validation from "text" for $comp_arranger
+//Added class for button styling in css file
 
 ob_start();
 
@@ -142,7 +142,7 @@ $comp_name = '';$comp_start_time = '';$comp_start_date = '';$comp_end_reg_date =
           <tr>
             <td>&nbsp;</td>
             <td><label>
-              <input type="submit" name="new_competition" id="new_competition" value="Ny t&auml;vling" />
+              <input type="submit" name="new_competition" class= "button" id="new_competition" value="Ny t&auml;vling" />
             </label></td>
           </tr>
         </table>

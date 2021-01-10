@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Added classes for table layout in css file
 
 if (!isset($_SESSION)) {
   session_start();
@@ -45,7 +45,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php }       
       if ($totalRows_rsNews > 0) { // Show if recordset not empty ?>
         <h3>Nyheter</h3><br/>
-        <table width="100%">
+        <table class="wide_tbl" border="0">
 <?php   while($row_rsNews = $stmt_rsNews->fetch(PDO::FETCH_ASSOC)) {;?>
           <tr>
               <td valign ="top"><strong><?php echo $row_rsNews['message_subject']; ?></strong></td>

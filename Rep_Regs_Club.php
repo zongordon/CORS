@@ -1,5 +1,5 @@
 <?php 
-//Added to view teams and changed sorting 
+//Added class for styling button in css file
 
 if (!isset($_SESSION)) {
   session_start();
@@ -107,7 +107,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
 } ?>
               </select>
             </label></td>
-            <td><input type="submit" name="submit" id="submit" value="V&auml;lj" /></td>
+            <td><input type="submit" name="submit" class = "button" id="submit" value="V&auml;lj" /></td>
           </tr>
         </table>
       </form>

@@ -2,110 +2,155 @@
 /* 3col_leftNav.css                             */
 /* Use with template 3col_leftNav.html          */
 /***********************************************//*
-Added max-width for img, embed, object, video = 100 %
-Changed .story and .feature from font-size = 80 %
+Changed to dark mode and more responsiveness
+Added normalisation of browser behaviours
 
+/*************** Normalise browser behavious *********/
+/**
+ * 1. Change the font styles in all browsers.
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+
+button,
+input { /* 1 */
+  overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+  text-transform: none;
+}
+
+/**
+ * Correct the inability to style clickable types in iOS and Safari.
+ */
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+}                                               
+                                                 
 /***********************************************/
 /* HTML tag styles                             */
 /***********************************************/ 
 
 html{
-	background-color:#CCC;
+    background-color:#000000;
+    font-size: calc(9px + (22 - 9) * ((100vw - 300px) / (1600 - 300)));      
 }
 
 body{
-	font-family: Arial, Helvetica, sans-serif;
-	color: #333333;
-	line-height: 1.166;
-/*	margin: 0px;*/
-	margin: auto;
-	background-color:#FFF;
-	padding: 0px;
-	width: 90%;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fafafa;
+    line-height: 1.166;
+    margin: auto;
+    background-color:#000000;
+    padding: 0%;
+    width: 100%;
 }
 
 a{
-	color: #006699;
-	text-decoration: none;
+    color: #b6dafa;
+    text-decoration: none;
+    word-wrap: break-word;	
 }
 
 a:link{
-	color: #006699;
-	text-decoration: none;
-}
-
-a:visited{
-	color: #006699;
-	text-decoration: none;
+    color: #b6dafa;
+    text-decoration: none;
 }
 
 a:hover{
-	color: #006699;
-	text-decoration: underline;
+    color: #f6891f;
+    text-decoration: underline;
 }
 
 h1{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 120%;
- color: #000000;
- margin: 0px;
- padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 120%;
+    color: #fafafa;
+    margin: 0%;
+    padding: 0%;
 }
 
 h2{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 114%;
- color: #333333;
- margin: 0px;
- padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 114%;
+    color: #fafafa;
+    margin: 0%;
+    padding: 0%;
 }
 
 h3{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 100%;
- color: #000000;
- margin: 0px;
- padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    color: #fafafa;
+    margin: 0%;
+    padding: 0%;
 }
 
 h4{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 100%;
- font-weight: normal;
- color: #333333;
- margin: 0px;
- padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: normal;
+    color: #fafafa;
+    margin: 0%;
+    padding: 0%;
 }
 
 h5{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 100%;
- color: #000000;
- margin: 0px;
- padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    color: #fafafa;
+    margin: 0%;
+    padding: 0%;
 }
 
 ul{
- list-style-type: square;
+    list-style-type: square;
 }
 
 ul ul{
- list-style-type: disc;
+    list-style-type: disc;
 }
 
 ul ul ul{
- list-style-type: circle;
+    list-style-type: circle;
 }
 
 label{
- font-family: Arial, Helvetica, sans-serif;
- font-size: 100%;
- font-weight: bold;
- color: #334d55;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    color: #fafafa;
 }
 
 img, embed, object, video {
-  max-width: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 /***********************************************/
@@ -113,58 +158,48 @@ img, embed, object, video {
 /***********************************************/
 
 #masthead{
-	padding: 10px 0px 10px 0px;
-	border-bottom: 1px solid #cccccc;
-/*	border-top: 1px solid #cccccc; 
-	border-right: 1px solid #cccccc;        
-	width: 100%;        
-        margin: auto;
-*/        
+    width: 95%;        
+    margin-left: 5%;
+    padding: 0.3% 0% 0.3% 0%;
 }
 
 #headlines{
-        float:right;
-	width: 20%;
-/*        background-color: #FFF;*/
-	border-bottom: 1px solid #cccccc;
-	border-left: 1px solid #cccccc;
-	margin: 0px;
-	padding: 10px 5px 20px 10px;
-
+    float:right;
+    width: 11%;
+    border-right: 1px solid #f6891f;
+    border-bottom: 1px solid #f6891f;
+    border-left: 1px solid #f6891f;
+    margin-right: 5%;
+    padding: 0.3%;
+/*    word-wrap: break-word;*/
 }
 
 #content{
-	float: left;
-        width: 75%;
-        padding: 0px 0px 5px 10px;
-/*      border-top: 1px solid #cccccc; 
-	border-right: 1px solid #cccccc;        
-	border-bottom: 1px solid #cccccc;        
-        border-left: 1px solid #cccccc;
-        background-color: #FFF;
-*/      
+    float: left;
+    width: 78%;
+    margin-left: 5%;      
 }
 
 /***********************************************/
 /* Components                                  */
 /***********************************************/
 
-#siteName{
-	margin: 0;
-	padding: 0 0 0 10px;
+.sticky {/*makes the navigation stick to the top when scrolling*/
+    background-color: #000000;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;    
+    border-bottom: 1px solid #f6891f;
 }
-
 
 /************* #globalNav styles **************/
 
 #globalNav{
-padding: 5px 0px 5px 10px;
-border-bottom: 1px solid #cccccc;
-color: #cccccc;
-/*
-border-top: 1px solid #cccccc; 
-border-right: 1px solid #cccccc;        
-border-left: 1px solid #cccccc;*/
+    width: 95%;        
+    margin-left: 5%;
+    padding: 0.3% 0% 0.3% 0%;    
+    color: #ffffff;
 }
 
 #globalNav img{
@@ -172,152 +207,230 @@ border-left: 1px solid #cccccc;*/
 }
 
 #globalNav a {
-	font-size: 90%;
-	padding: 0 4px 0 4px;
+    font-size: 90%;
+    color: #ffffff;
+    padding: 0% 0% 0% 1%;
+}
+
+#globalNav a:hover{
+    color: #F6891F;
+    text-decoration: underline;
+}
+
+/************** #headlines styles **************/
+
+#headlines a{
+    font-size: 85%;
+}
+#latestnews h2{
+    color:#FF0000
 }
 
 /************* #localNav styles **************/
 
-
-
 #localNav{
-
-        padding: 0px 0px 5px 10px;
-        color: #cccccc;
-        width: 100%; /*
-        border-top: 1px solid #cccccc;
-        border-right: 1px solid #cccccc;        
-        border-bottom: 1px solid #cccccc;        
-        border-left: 1px solid #cccccc;
-        background-color: #FFFFFF;
-        margin-left: 5%;
-        width: 68%;
-        background-color: #D5D3D3; 
-        */
+    width: 75%;        
+    margin-left: 5%;
+    padding: 0.3% 0% 0.3% 0%;    
+    color: #b6dafa;
 }
 
-
-
 #localNav a {
-	font-size: 90%;
-	padding: 0px 4px 0px 4px;
+    font-size: 90%;
+    padding: 0.5% 0.5% 0.5% 0.5%;
 }
 
 /*************** #pageName styles **************/
 
 #pageName{
-	margin: 0px;
-	padding: 5px 0px 5px 10px;/*
-        border-top: 1px solid #cccccc;
-        border-right: 1px solid #cccccc;        
-        border-bottom: 1px solid #cccccc;        
-        border-left: 1px solid #cccccc;*/
+    width: 95%;        
+    margin-left: 5%;
+    padding: 0.5% 0% 0.5% 0%;
 }
 
 /************** .error styles *****************/
 
 .error h3{
 
-	padding: 10px 10px 10px 0px;
-
-	text-align: left;
-
-	color: #FF0000;
-
-	font-size: 100%;	
-
+    padding: 1% 1% 1% 0%;
+    text-align: left;
+    color: #FF0000;
+    font-size: 100%;	
 }
-
 
 /************** .feature styles ***************/
 
 .feature{
-	padding: 0px 0px 10px 10px;
-	font-size: 90%;
+    padding: 0% 0% 0.3% 0%;
+    font-size: 90%;
 }
 
 .feature h3{
-	padding: 30px 0px 5px 0px;
-	text-align: left;
+    padding: 30px 0px 5px 0px;
+    text-align: left;
 }
 
 .feature img{
-	float: left;
-	padding: 10px 10px 0px 0px;
+    float: left;
+    padding: 10px 10px 0px 0px;
 }
-
 
 /************** .story styles *****************/
 
 .story{
-	clear: both;
-	padding: 10px 0px 0px 10px;
-	font-size: 90%;
-	border-top-style: none;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-left-style: none;
+    clear: both;
+    padding: 10px 0px 0px 10px;
+    font-size: 90%;
+    border-top-style: none;
+    border-right-style: none;
+    border-bottom-style: none;
+    border-left-style: none;
 }
 
 .story p{
-	padding: 0px 0px 10px 0px;
+    padding: 0px 0px 10px 0px;
 }
+
+/************** form styles *****************/
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+input[type=text] {
+    background-color: #000000;
+    color: #fafafa;
+    padding: 0.3%;
+    border: 1px solid #fafafa;
+}
+input[type=password] {
+    background-color: #000000;
+    color: #fafafa;
+    padding: 0.3%;    
+    border: 1px solid #fafafa;
+}
+.button {
+    display:inline-block;
+    border: 0.1rem solid #fafafa;
+    border-radius: 0.1rem;
+    background: #b6dafa;
+    color: #000000;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-sizing: border-box;
+    text-decoration: none;
+    padding: 0.1rem 0.3rem;
+    margin: 0.1rem;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: #000000;
+    color: #f6891f;
+}
+/*
+.button:hover{
+ color:#000000;
+ background-color:#FFFFFF;
+}*/
+select {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 0.3%;    
+    border-radius:3px;
+}
+/************** .narrow_tbl styles *****************/
+.narrow_tbl  {
+    width: 40%;
+    border: 1px;    
+    border-collapse: collapse;
+    text-align: left;
+}
+.narrow_tbl th,td{
+    padding: 0.3%;
+}
+
+.narrow_tbl textarea {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+/************** .medium_tbl styles *****************/
+.medium_tbl{
+    width: 70%;
+    border: 1px;    
+    border-collapse: collapse;
+    text-align: left;
+}
+.medium_tbl th,td{
+    padding: 0.3%;
+}
+
+/************** .wide_tbl styles *****************/
+.wide_tbl {
+    width: 100%;
+    border: 1px;
+    border-collapse: collapse;
+    text-align: left;
+}
+.wide_tbl th,td {
+    padding: 0.3%;
+}
+
 /************** .result_tbl styles *****************/
 .result_tbl  {
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-left-style: solid;
-	empty-cells: show;
-	table-layout: auto;
-	visibility: visible;
-	text-align: left;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    empty-cells: show;
+    table-layout: auto;
+    visibility: visible;
+    text-align: left;
 }
 /************** .tbl_picture styles *****************/
 .tbl_picture {
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-top-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-left-style: solid;
-	empty-cells: show;
-	table-layout: fixed;
-	visibility: visible;
-	text-align: left;
-	font-size: 10px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    empty-cells: show;
+    table-layout: fixed;
+    visibility: visible;
+    text-align: left;
+    font-size: 10px;
 }
 /************* #siteInfo styles ***************/
 
 #siteInfo{
-	clear: both;
+    clear: both;
 /*	border: 1px solid #cccccc;*/
-	font-size: 75%;
-	color: #cccccc;
-	padding: 10px 10px 10px 10px;
+    font-size: 75%;
+    color: #cccccc;
+    padding: 0.5% 0.5% 0.5% 5%;
 }
 
 #siteInfo img{
-	padding: 4px 4px 4px 10px;
-	vertical-align: middle;
+    padding: 4px 4px 4px 10px;
+    vertical-align: middle;
 }
 
 
 /************* #search styles ***************/
 
 #search{
-	sborder: 1px solid #cccccc;
-	clear: both;
-	font-size: 75%;
-	padding: 10px 10px 10px 10px;
-	color: #000000;
-	width: 20%;
+    sborder: 1px solid #cccccc;
+    clear: both;
+    font-size: 75%;
+    padding: 10px 10px 10px 10px;
+    color: #000000;
+    width: 20%;
 }
 
 
@@ -326,12 +439,9 @@ border-left: 1px solid #cccccc;*/
 	width: 29%;
 }
 
-}
-
 /*#VideoSearch{
 	float: left;
 	width: 29%;
-}
 }
 
 /*#WebSearch{
@@ -352,68 +462,52 @@ border-left: 1px solid #cccccc;*/
 /*********** #sectionLinks styles ***********/
 
 #sectionLinks{
-	position: relative;
-	margin: 0px;
-	padding: 0px;
-	border-bottom: 1px solid #FFFFFF;
-	font-size: 90%;
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    border-bottom: 1px solid #FFFFFF;
+    font-size: 90%;
 }
 
 #sectionLinks h3{
-	padding: 10px 0px 2px 10px;
+    padding: 10px 0px 2px 10px;
 }
 
 #sectionLinks a {
-	display: block;
-	border-top: 1px solid #FFFFFF;
-	padding: 2px 0px 2px 10px;
+    display: block;
+    border-top: 1px solid #FFFFFF;
+    padding: 2px 0px 2px 10px;
 }
 
 #sectionLinks a:hover{
-	background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 
 /*********** .relatedLinks styles ***********/
 
 .relatedLinks{
-	position: relative;
-	margin: 0px;
-	padding: 0px 0px 10px 10px;
-	font-size: 90%;
+    position: relative;
+    margin: 0px;
+    padding: 0px 0px 10px 10px;
+    font-size: 90%;
 }
 
 .relatedLinks h3{
-	padding: 10px 0px 2px 0px;
+    padding: 10px 0px 2px 0px;
 }
 
 .relatedLinks a:link,
 .relatedLinks a:visited {
-	display: block; 
+    display: block; 
 }
 
 /************** #advert styles **************/
 
 #advert{
-	padding: 30px 0px 10px;
+    padding: 30px 0px 10px;
 }
 
 #advert img{
-	display: block;
-}
-
-
-/************** #headlines styles **************/
-
-
-#headlines p{
-	padding: 5px 0px 5px 0px;
-	font-size: 80%;
-}
-#latestnews h3{
-	color:#FF0000
-}
-#latestnews h4{
-        padding: 5px 0px 0px 0px;
-	font-size: 90%;
+    display: block;
 }

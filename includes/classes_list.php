@@ -1,5 +1,5 @@
 <?php 
-//Set initial sorting (ORDER BY) and change if new sort order is selected in dropdown list
+//Added classes for table layout in css file
 $sorting = "class_team, class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
 if (filter_input(INPUT_GET, 'sorting')) {
 $sorting = filter_input(INPUT_GET, 'sorting');
@@ -28,7 +28,7 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
     <p>Se startlistan &ouml;ver t&auml;vlande genom att klicka p&aring; l&auml;nken.<br> <strong>Obs! T&auml;vlingsstegarna visas p&aring; separat sida efter sista anm&auml;lningsdagen och d&aring; lottningen &auml;r gjord!</strong></p>
     <?php }?>
 <form action="<?php echo $editFormAction; ?>" method="GET" enctype="application/x-www-form-urlencoded" name="SelectSorting" id="SelectSorting">
-  <table width="200" border="0">
+  <table width="270" border="0">
     <tr>
       <td valign="middle">Sortering</td>
       <td><label>
@@ -38,11 +38,11 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
       <option value="class_age, class_team, class_discipline, class_gender, class_weight_length, class_gender_category"<?php if (!(strcmp($sorting, "class_age, class_team, class_discipline, class_gender, class_weight_length, class_gender_category"))) {echo "selected=\"selected\"";} ?>>Klassens &aring;lder</option>
 </select>
       </label></td>
-      <td><input type="submit" name="submit" id="submit" value="Sortera" /></td>
+      <td><input type="submit" name="submit" class= "button" id="submit" value="Sortera" /></td>
     </tr>
   </table>
 </form>
-    <table width="100%" border="1">
+    <table class="wide_tbl" border="1">
       <tr>
         <td><strong>Typ av klass</strong></td>
         <td><strong>Disciplin</strong></td>

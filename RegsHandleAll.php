@@ -1,5 +1,5 @@
 <?php
-//Added functions to handle teams and moved reusable code to includes/regs_handle.php
+//Changed from <div class="content" for correct layout
 
 ob_start();
 session_start();
@@ -14,6 +14,8 @@ $MM_donotCheckaccess = "false";
 $pagetitle="Registrera t&auml;vlande - admin";
 // require Class for validation of forms
 require_once 'Classes/Validate.php';
+// require Class for calculating contestant's age
+require_once 'Classes/AgeCalc.php';
 // Includes HTML Head
 include_once('includes/header.php');
 //Includes Several code functions
@@ -26,7 +28,7 @@ include_once('includes/restrict_access.php');?>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
-<div class="content">  
+<div id="content">  
      <div class="feature">
 <?php 
 //Handle input from form
