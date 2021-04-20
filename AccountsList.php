@@ -1,5 +1,5 @@
 <?php
-//Changed the check boxes to disabled
+//Replaced width="100%" with class="wide_tbl" and removed  nowrap="nowrap"
 
 //Access level admin
 $MM_authorizedUsers = "1";
@@ -20,10 +20,10 @@ catch(PDOException $ex) {
 $pagetitle="Lista anv&auml;ndarkonton - admin";
 // Includes several code functions
 include_once('includes/functions.php');
-// Includes HTML Head
-include_once('includes/header.php');
 //Includes Restrict access code function
 include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
 include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
@@ -41,7 +41,7 @@ include_once("includes/news_sponsors_nav.php");?>
   <p>Det finns inga konton att visa!</p>
 <?php   } // Show if recordset empty 
 if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
-  <table width="100%" border="1">
+  <table class="wide_tbl" border="1">
     <tr>
       <td><strong>Klubbnamn</strong></td>
       <td><strong>Kontakt</strong></td>

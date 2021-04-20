@@ -1,4 +1,4 @@
-<?php //Added to select and display contestant_birth too
+<?php //Replace width="40%" with class="wide_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -34,7 +34,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <h3>T&auml;vlande per klubb</h3>
 <p>Rapporten visar t&auml;vlande per klubb (aktiva konton), vare sig anm&auml;lda till en t&auml;vling eller inte.</p>
-<table width="40%" border="1">
+<table class="wide_tbl" border="1">
     <tr>
           <td><strong>Klubb</strong></td>
           <td><strong>E-post kontakt</strong></td>
@@ -43,10 +43,10 @@ include_once("includes/news_sponsors_nav.php");?>
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['contact_email']; ?></td>        
-        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_birth']; ?></td>
+        <td><?php echo $row_rsContestants['club_name']; ?></td>
+        <td><?php echo $row_rsContestants['contact_email']; ?></td>        
+        <td><?php echo $row_rsContestants['contestant_name']; ?></td>
+        <td><?php echo $row_rsContestants['contestant_birth']; ?></td>
         </tr>
     <?php } ?>
 </table>

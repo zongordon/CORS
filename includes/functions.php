@@ -1,8 +1,9 @@
 <?php
-//Moved header code to separate header.php file
-//Replaced code for finding ip address
-//Turned off function GetSQLValueString()
-//Moved restrict access code to restrict_access.php
+//Removed 
+/*if(!isset($_SESSION)) {
+
+  session_start();
+}*/
 
 //Validate email
 function valid_email($email) {
@@ -14,9 +15,6 @@ function valid_email($email) {
 date_default_timezone_set('Europe/Stockholm');
 $now = date('Y-m-d H:i');
 
-if (!isset($_SESSION)) {
-  session_start();
-}
 /*
 function getUserIP(){
     $client  = @$_SERVER['HTTP_CLIENT_IP'];

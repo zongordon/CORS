@@ -1,4 +1,4 @@
-<?php //Removed kill DB as it's included in footer.php
+<?php //Replace width="40%" with class="wide_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -34,7 +34,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <h3>Anm&auml;lda till n&aring;gon klass per klubb</h3>
 <p>Rapporten visar vilka anm&auml;lda per klubb (som anm&auml;lts till n&aring;gon t&auml;vlingsdisciplin) vid n&aring;gon t&auml;vling.</p>
-<table width="40%" border="1">
+<table class="wide_tbl" border="1">
     <tr>
           <td><strong>T&auml;vling</strong></td>        
           <td><strong>Klubb</strong></td>
@@ -43,10 +43,10 @@ include_once("includes/news_sponsors_nav.php");?>
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['comp_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['contestant_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['class_discipline']; ?></td>
+        <td><?php echo $row_rsContestants['comp_name']; ?></td>
+        <td><?php echo $row_rsContestants['club_name']; ?></td>
+        <td><?php echo $row_rsContestants['contestant_name']; ?></td>
+        <td><?php echo $row_rsContestants['class_discipline']; ?></td>
         </tr>
     <?php } ?>
 </table>

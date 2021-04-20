@@ -1,9 +1,12 @@
 <?php
-//Changed page title from "Anv&auml;ndarkonton"
+/*Removed iniation of session:
+if (!isset($_SESSION)) {
+  session_start();
+}*/
+ob_start();
 if (!isset($_SESSION)) {
   session_start();
 }
-
 // *** Restrict Access To Page: Grant or deny access to this page
 function isAuthorized($strUsers, $strGroups, $AccountId, $UserGroup) { 
   // For security, start by assuming the visitor is NOT authorized. 
@@ -70,3 +73,4 @@ if (!((isset($_SESSION['MM_AccountId'])) && (isAuthorized("",$MM_authorizedUsers
   header("Location: ". $MM_restrictGoTo); 
   exit;
 }
+ob_end_flush(); 

@@ -1,4 +1,5 @@
-<?php //Added class for table layout in css file
+<?php
+//Changed path for rotate.php and rotating images
 
 if (!isset($_SESSION)) {
   session_start();
@@ -40,7 +41,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>
 <div id="content">    
-    <div class="feature"><img height="199" width="300" alt="" src="img/rotating/rotate.php" /> 
+    <div class="feature"><img height="199" width="300" alt="" src="includes/rotate.php" /> 
 <h3>Resultat</h3> 
         <p>H&auml;r finns alla t&auml;vlingsresultat fr&aring;n t&auml;vlingen!</p> 
   </div>        

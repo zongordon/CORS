@@ -1,5 +1,5 @@
 <?php 
-//Added class for table layout in css file
+//Added link to previous age if no contestants exist
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -127,6 +127,7 @@ $stmt_rsClassGender->closeCursor();
     }                   
 if ($totalRows_rsRegistrations == 0) { // Show if recordset empty ?>
 <h3>Det finns ingen t&auml;vlande i klassen!</h3>
+<p><a href="ClassesList.php">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
 <?php if ($MM_authorizedUsers === "1") { ?>  
 <p><a href="ClassesList.php">Tillbaka till T&auml;vlingsklasser</a></p>
 <?php 
