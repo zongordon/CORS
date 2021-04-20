@@ -72,7 +72,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <?php } // Show if recordset empty 
 if ($totalRows_rsCompetitions > 0) { // Show if recordset not empty ?>
   <form id="CompForm" name="CompForm" method="POST" action=""> 
-    <table width="100%" border="1">
+    <table class="wide_tbl" border="1">
     <tr>
       <td><strong>T&auml;vling</strong></td>
       <td nowrap="nowrap"><strong>Start-datum</strong></td>

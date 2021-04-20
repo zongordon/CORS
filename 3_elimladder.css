@@ -4,7 +4,7 @@
 
 /***********************************************/
 
-
+/*Changed position down for #apDiv1 to #apDiv16 and right #apDiv9 to #apDiv16*/
 
 /***********************************************/
 
@@ -270,7 +270,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 100px;
+	top: 104px;
 }
 
 #apDiv2 {
@@ -279,7 +279,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 160px;
+	top: 164px;
 }
 
 #apDiv3 {
@@ -288,7 +288,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 220px;
+	top: 224px;
 }
 
 #apDiv4 {
@@ -297,7 +297,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 280px;
+	top: 284px;
 }
 
 #apDiv5 {
@@ -306,7 +306,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 340px;
+	top: 344px;
 }
 
 #apDiv6 {
@@ -315,7 +315,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 400px;
+	top: 404px;
 }
 
 #apDiv7 {
@@ -324,7 +324,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 460px;
+	top: 464px;
 }
 
 #apDiv8 {
@@ -333,7 +333,7 @@ label{
 	height:43px;
 	z-index:1;
 	left: 0px;
-	top: 520px;
+	top: 524px;
 }
 
 #apDiv9 {
@@ -341,8 +341,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 100px;
+	left: 862px;
+	top: 104px;
 }
 
 #apDiv10 {
@@ -350,8 +350,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 160px;
+	left: 862px;
+	top: 164px;
 }
 
 #apDiv11 {
@@ -359,8 +359,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 220px;
+	left: 862px;
+	top: 224px;
 }
 
 #apDiv12 {
@@ -368,8 +368,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 280px;
+	left: 862px;
+	top: 284px;
 }
 
 #apDiv13 {
@@ -377,8 +377,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 340px;
+	left: 862px;
+	top: 344px;
 }
 
 #apDiv14 {
@@ -386,8 +386,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 400px;
+	left: 862px;
+	top: 404px;
 }
 
 #apDiv15 {
@@ -395,8 +395,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 460px;
+	left: 862px;
+	top: 464px;
 }
 
 #apDiv16 {
@@ -404,8 +404,8 @@ label{
 	width:250px;
 	height:43px;
 	z-index:1;
-	left: 860px;
-	top: 520px;
+	left: 862px;
+	top: 524px;
 }
 
 #apDivOmg2_1 {
@@ -666,7 +666,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 950px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:53px;
         background-image: url("img/sponsors/EEM_small.png");
@@ -676,7 +676,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 980px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:53px;
         background-image: url("img/sponsors/EEM_small.png");
@@ -687,7 +687,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 850px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:52px;
         background-image: url("img/sponsors/Dental_Estetik_small.png");
@@ -697,7 +697,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 880px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:52px;
         background-image: url("img/sponsors/Dental_Estetik_small.png");
@@ -708,7 +708,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 100px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:27px;
         background-image: url("img/sponsors/Etuna_Logistik_small.png");
@@ -719,7 +719,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 100px;
-	top: 590px;
+	top: 594px;
 	width:75px;
 	height:27px;
         background-image: url("img/sponsors/Etuna_Logistik_small.png");
@@ -730,7 +730,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 10px;
-	top: 560px;
+	top: 564px;
 	width:75px;
 	height:32px;
         background-image: url("img/sponsors/Kfast_small.png");
@@ -741,7 +741,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 10px;
-	top: 590px;
+	top: 594px;
 	width:75px;
 	height:32px;
         background-image: url("img/sponsors/Kfast_small.png");

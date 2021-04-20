@@ -1,5 +1,5 @@
 <?php 
-//Added to view teams, changed sorting and called class to calculate number of matches and total match time
+//Replace width="80%" with class="wide_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -40,7 +40,7 @@ include_once("includes/news_sponsors_nav.php");?>
   <div class="feature">
 <h3>Antal anm&auml;lningar och tids&aring;tg&aringng per t&auml;vlingsklass</h3>
 <p>Rapporten visar hur m&aring;nga anm&auml;lningar som gjorts till aktuell t&auml;vling per t&auml;vlingsklass och ber&auml;knad tids&aring;tg&aringng f&ouml;r klassen.</p>
-<table width="80%" border="1">
+<table Replace class="wide_tbl" border="1">
     <tr>
       <td><strong>T&auml;vlingsklass</strong></td>
           <td><strong>Antal t&auml;vlande</strong></td>
@@ -56,10 +56,10 @@ include_once("includes/news_sponsors_nav.php");?>
             $total_match_time = new ClassCalculations;
             $total_match_time->class_match_time = $row_rsRegistrations['class_match_time'];?>
         <tr>
-          <td nowrap="nowrap"><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
-          <td nowrap="nowrap"><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
-          <td nowrap="nowrap"><?php echo $max_matches->class_max_matches(); ?></td>
-          <td nowrap="nowrap"><?php echo $max_matches->class_max_matches()*$total_match_time->class_total_time(); ?></td>
+          <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
+          <td><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
+          <td><?php echo $max_matches->class_max_matches(); ?></td>
+          <td><?php echo $max_matches->class_max_matches()*$total_match_time->class_total_time(); ?></td>
         </tr>
       <?php }  ?>        
     </table>

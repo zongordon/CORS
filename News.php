@@ -1,5 +1,5 @@
 <?php
-//Added classes for table layout in css file
+//Changed path for rotate.php and rotating images
 
 if (!isset($_SESSION)) {
   session_start();
@@ -9,7 +9,7 @@ $editFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 if (filter_input(INPUT_SERVER,'QUERY_STRING')) {
 $editFormAction .= "?" . htmlentities(filter_input(INPUT_SERVER,'QUERY_STRING'));
 }
-//Catch anything wrong with query
+//Changed code for rotating images
 try {
 require_once('Connections/DBconnection.php');    
 // Select all messages and comp_id for the current competition
@@ -32,7 +32,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include_once("includes/navigation.php"); ?></div>    
 <div id="content">
-  <div class="feature"><img height="199" width="300" alt="" src="img/rotating/rotate.php" />
+  <div class="feature"><img height="199" width="300" alt="" src="includes/rotate.php" /> 
   <h3>Nyheter</h3>
       <p>H&auml;r l&auml;ggs senaste nytt upp f&ouml;r er information!</p>
       <p>H&aring;ll till godo!  </p>
@@ -53,7 +53,7 @@ include_once("includes/news_sponsors_nav.php");?>
           </tr>   
           <tr>            
             <td valign ="top"><?php echo $row_rsNews['message']; ?></td>
-            <td nowrap="nowrap" valign ="top"><?php echo $row_rsNews['message_timestamp']; ?></td>
+            <td valign ="top"><?php echo $row_rsNews['message_timestamp']; ?></td>
           </tr>
 <?php   } ; ?>
       </table>

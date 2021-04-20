@@ -1,5 +1,5 @@
 <?php
-//Removed kill DB as it's included in footer.php
+//Replace width="100%" with class=wide_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -35,7 +35,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <h3>Kostnad och antal anm&auml;lningar per klubb</h3>
 <p>Rapporten visar hur m&aring;nga anm&auml;lningar (kata och/eller kumite) som gjorts till aktuell t&auml;vling och den sammanlagda kostnaden per klubb.</p>
-<table width="100%" border="1">
+<table class="wide_tbl" border="1">
     <tr>
           <td><strong>Klubb</strong></td>
           <td><strong>Antal&nbsp;anm&auml;lningar</strong></td>
@@ -45,10 +45,10 @@ include_once("includes/news_sponsors_nav.php");?>
     <?php while($row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC)) { 
  ?>
       <tr>
-        <td nowrap="nowrap"><?php echo $row_rsCost['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsCost['COUNT(reg_id)']; ?></td>
+        <td><?php echo $row_rsCost['club_name']; ?></td>
+        <td><?php echo $row_rsCost['COUNT(reg_id)']; ?></td>
         <td><?php echo $row_rsCost['coach_names']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsCost['SUM(class_fee)'].' kr'; ?></td>
+        <td><?php echo $row_rsCost['SUM(class_fee)'].' kr'; ?></td>
       </tr>
     <?php } ?>
 </table>

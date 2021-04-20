@@ -11,17 +11,14 @@ $pagetitle="T&auml;vling";
 include_once('includes/header.php');?>
 <!-- start page -->
 <div id="masthead">
-    <a href="/"><img src="img/Banner_L.svg" alt="Left Logo" width="98" height="90" hspace="10"></a>
-    <a href="/"><img src="img/Banner_M.png" alt="Middle Logo" width="553" height="90"></a>
-    <a href="/"><img src="img/Banner_R.svg" alt="Right Logo" width="91" height="90" hspace="10"></a>
+    <a href="/"><img src="img/Banner.svg" alt="Tuna Karate Cup Logo" width="700" height="90"></a>
 </div>
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <div id="content">
   <div class="feature">
-    <img src="img/DSC_0069.jpg" alt="" width="300" height="253" />
-    <h1>&nbsp;</h1>
-    <h1>Ny t&auml;vling planeras under 2019!</h1>
-    <p>Vi har ans&ouml;kt om att f&aring; anordna v&aring;r t&auml;vling 18 maj.</p>
+    <h1>Ny t&auml;vling planeras under 2021!</h1>
+    <p>Vi har ans&ouml;kt om att f&aring; anordna v&aring;r t&auml;vling 22 maj och &aring;terkommer med mer information inom kort.</p>
+    <iframe width="60%" height="315" src="https://www.youtube.com/embed/pl9HgW5pgTQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   </div>
   <div class="story"></div>
 </div>

@@ -1,5 +1,6 @@
 <?php
 //Added class for table layout in css file
+//Replaced width="100%" with class="wide_tbl" 
 
 //Declare and initialise variables
   $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
@@ -207,7 +208,7 @@ Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" targ
 <h3>Registrerade konton</h3>
 <?php if ($totalRows_rsAccounts > 0) { ?>    
       <p>Detta &auml;r konton som redan finns registrerade.</p>
-  <table width="100%" border="1" cellpadding="2">
+  <table class="wide_tbl" border="1" cellpadding="2">
     <tr>
       <td nowrap="nowrap"><strong>Klubbnamn</strong></td>
       <td nowrap="nowrap"><strong>Kontaktnamn</strong></td>

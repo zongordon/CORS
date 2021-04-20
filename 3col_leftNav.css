@@ -2,8 +2,7 @@
 /* 3col_leftNav.css                             */
 /* Use with template 3col_leftNav.html          */
 /***********************************************//*
-Changed to dark mode and more responsiveness
-Added normalisation of browser behaviours
+Changed orange color to #F8891F from #F6891F
 
 /*************** Normalise browser behavious *********/
 /**
@@ -84,7 +83,7 @@ a:link{
 }
 
 a:hover{
-    color: #f6891f;
+    color: #F8891F;
     text-decoration: underline;
 }
 
@@ -166,9 +165,9 @@ img, embed, object, video {
 #headlines{
     float:right;
     width: 11%;
-    border-right: 1px solid #f6891f;
-    border-bottom: 1px solid #f6891f;
-    border-left: 1px solid #f6891f;
+    border-right: 1px solid #F8891F;
+    border-bottom: 1px solid #F8891F;
+    border-left: 1px solid #F8891F;
     margin-right: 5%;
     padding: 0.3%;
 /*    word-wrap: break-word;*/
@@ -190,7 +189,7 @@ img, embed, object, video {
     position: sticky;
     top: 0;
     z-index: 1;    
-    border-bottom: 1px solid #f6891f;
+    border-bottom: 1px solid #F8891F;
 }
 
 /************* #globalNav styles **************/
@@ -213,7 +212,7 @@ img, embed, object, video {
 }
 
 #globalNav a:hover{
-    color: #F6891F;
+    color: #F8891F;
     text-decoration: underline;
 }
 
@@ -324,7 +323,7 @@ input[type=password] {
 }
 .button:hover {
     background-color: #000000;
-    color: #f6891f;
+    color: #F8891F;
 }
 /*
 .button:hover{
@@ -370,10 +369,99 @@ select {
     border: 1px;
     border-collapse: collapse;
     text-align: left;
+    font-size: 80%;
 }
 .wide_tbl th,td {
     padding: 0.3%;
 }
+/* Zebra striping */
+.wide_tbl tr:nth-of-type(even) { 
+  background: #424242; 
+}
+.wide_tbl th { 
+  background: #424242; 
+  color: #fafafa; 
+}
+.wide_tbl td, th { 
+  padding: 0.3%; 
+  border: 1px solid #fafafa; 
+  text-align: left; 
+}
+/************** .wide_adm_tbl styles *****************/
+.wide_adm_tbl {
+    width: 100%;
+    border: 1px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 80%;
+}
+.wide_adm_tbl th,td {
+    padding: 0.3%;
+}
+/* Zebra striping */
+.wide_adm_tbl tr:nth-of-type(even) { 
+  background: #424242; 
+}
+.wide_adm_tbl th { 
+  background: #424242; 
+  color: #fafafa; 
+}
+.wide_adm_tbl td, th { 
+  padding: 0.3%; 
+  border: 1px solid #fafafa; 
+  text-align: left; 
+}
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+/* Set font size for small screen widths  */
+    table, thead, tbody, th, td, tr { 
+    font-size: 95%;
+/*    word-wrap: break-word;*/
+    }
+}
+/*@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	/* Force table to not be like tables anymore */
+/*	.wide_adm_tbl table, thead, tbody, th, td, tr { 
+		display: block; 
+                font-size: 110%;
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+/*	.wide_adm_tbl thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	.wide_adm_tbl tr { 
+            border: 1px solid #fafafa; 
+        }
+            
+	.wide_adm_tbl td { 
+		/* Behave  like a "row" */
+/*		border: none;
+/*		border-bottom: 1px solid #fafafa; */
+/*		position: relative;
+		padding-left: 1%; 
+	}
+	
+	.wide_adm_tbl td:before { 
+		/* Now like a table header */
+/*		position: absolute;
+		/* Top/left values mimic padding */
+/*		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+	}
+/*}*/
+
 
 /************** .result_tbl styles *****************/
 .result_tbl  {

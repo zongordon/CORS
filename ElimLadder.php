@@ -1,6 +1,5 @@
 <?php 
-// Changed code to show correct protocols for classes with teams, round robin, kata point system or default
-// Added code to handle contestants or not, preventing error message "Notice: Trying to access array offset on value of type bool...", introduced by PHP 7.4: ElimLadder.php
+// Changed code from limiting the string to 34 characters
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -49,8 +48,8 @@ $startnumber = $row_rsClassContestants['contestant_startnumber'];
 $name = $row_rsClassContestants['contestant_name']; 
 $club = $row_rsClassContestants['club_name']; 
 $str = $name.', '.$club;
-        //Limit the string to 34 characters
-        if( strlen( $str ) > 34 ){ $str = substr( $str, 0, 34 ) . "..";}
+        //Limit the string to 37 characters
+        if( strlen( $str ) > 37 ){ $str = substr( $str, 0, 37 ) . "..";}
 $contestantsArray[] = $str; 
 $startnumbersArray[] = $startnumber;
 }
