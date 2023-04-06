@@ -2,7 +2,7 @@
 /* 3col_leftNav.css                             */
 /* Use with template 3col_leftNav.html          */
 /***********************************************//*
-Changed orange color to #F8891F from #F6891F
+Changed .medium_tbl width: from 70% to 100%;
 
 /*************** Normalise browser behavious *********/
 /**
@@ -354,10 +354,11 @@ select {
 }
 /************** .medium_tbl styles *****************/
 .medium_tbl{
-    width: 70%;
+    width: 100%;
     border: 1px;    
     border-collapse: collapse;
     text-align: left;
+    table-layout: fixed;
 }
 .medium_tbl th,td{
     padding: 0.3%;
@@ -375,7 +376,7 @@ select {
     padding: 0.3%;
 }
 /* Zebra striping */
-.wide_tbl tr:nth-of-type(even) { 
+.wide_tbl tr:nth-of-type(odd) { 
   background: #424242; 
 }
 .wide_tbl th { 
@@ -384,9 +385,34 @@ select {
 }
 .wide_tbl td, th { 
   padding: 0.3%; 
-  border: 1px solid #fafafa; 
+  /*border: 1px solid #fafafa; */
   text-align: left; 
 }
+.w_5 {
+  width: 5%;
+}
+.w_10 {
+  width: 10%;
+}
+.w_15 {
+  width: 15%;
+}
+.w_20 {
+  width: 20%;
+}
+.w_25 {
+  width: 25%;
+}
+.w_30 {
+  width: 30%;
+}
+.w_35 {
+  width: 35%;
+}
+.w_40 {
+  width: 40%;
+}
+
 /************** .wide_adm_tbl styles *****************/
 .wide_adm_tbl {
     width: 100%;

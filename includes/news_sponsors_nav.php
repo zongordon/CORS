@@ -1,5 +1,5 @@
 <?php
-//Changed from http://tunacup.karateklubben.com/
+//Changed sponsors 
 
 require_once('Connections/DBconnection.php');
 
@@ -38,9 +38,9 @@ if ($totalRows_rsLatestNews > 0) { // Show if recordset not empty
     while($row_rsLatestNews = $stmt_rsLatestNews->fetch(PDO::FETCH_ASSOC)) {; 
         $news = $row_rsLatestNews['message_subject']; 
             if(strlen($news) > 35) { 
-                $news = substr($news,0,35).'...';
+                $news = substr($news,0,40).'...';
             }
-        echo '<a href="News.php">'.$news.'</a></br/>';               
+        echo '- <a href="News.php">'.$news.'</a></br/>';               
     }
 }
 $stmt_rsLatestNews->closeCursor();
@@ -51,9 +51,18 @@ $DBconnection = null;
       <h2>Huvud-sponsorer</h2>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="100%" height="100%" border="0" /></a></p>
       <p><img src="img/sponsors/Dental_Estetik_small.svg" alt="Dental Estetik" width="100%" height="100%" border="0" /></p>
-      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.svg" width="100%" height="100%" border="0" alt="Room4Life"></a></p>      
-<!--Hide code       
-      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>            
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_vit.svg" alt="Sparbanksstiftelsen Rekarne" width="100%" height="100%" border="0" /></a></p>
+      <h3>Övriga sponsorer</h3>      
+      <p><a href="https://www.stigasports.com/sv" target="_blank"><img src="img/sponsors/Stiga.png" width="150" height="37" border="0" alt="Stiga Sports"></a></p>            
+      <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/eskilstuna-logistik-logotyp-vit.svg" width="100%" height="100%" border="0" alt="Eskilstuna Logistik"></a></p>      
+      <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/kfast-logo-vit.svg" width="100%" height="100%" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      
+      <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/eem-logo-vit.svg" width="100%" height="100%" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
+<!--Hide code  
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_nav.png" width="150" height="37" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>                  
+      <p><a href="https://www.sparbankenrekarne.se/" target="_blank"><img src="img/sponsors/sparbanken-rekarne.svg" alt="Sparbanken Rekarne" width="100%" height="100%" border="0" /></a></p>      
+      <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>            
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/1spbsrekarne_mynt.png" width="241" height="55" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>                  
+      <p><a href="http://www.room4life.se/" target="_blank"><img src="img/sponsors/Room4life.svg" width="100%" height="100%" border="0" alt="Room4Life"></a></p>           
       <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/EEM.png" width="150" height="106" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
       <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/Etuna_Logistik.png" width="150" height="53" border="0" alt="Eskilstuna Logistik"></a></p>      
       <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/Kfast.png" width="150" height="64" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      

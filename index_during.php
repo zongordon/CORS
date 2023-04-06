@@ -1,5 +1,5 @@
 ﻿<?php 
-//Changed to more responsive function for embedded video 
+//Changed imformation and corrected links
 
 ob_start();
 
@@ -20,14 +20,14 @@ include_once("includes/news_sponsors_nav.php");
   <div class="feature">
     <h1>V&auml;lkomna till <?php echo $comp_name;?>!</h1>
     <p>En barn- och ungdomst&auml;vling f&ouml;r samtliga karatestilar och som anordnas av <?php echo $comp_arranger;?>.<br>
-    Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a><br>
+    Medtag giltigt t&auml;vlingskort (fr&aring;n 14 &aring;r) d&aring; de inte finns att inf&ouml;rskaffa p&aring; plats! L&auml;nk till Karatef&ouml;rbundets sida: <a href="https://www.karatesweden.se/tavla-i-karate/tavlingslicens/" target=_blank>l&auml;nk</a><br>
     L&auml;nk till <a href="pdf/Inbjudan.pdf" target="_blank">inbjudan</a>, som pdf!</p>
   </div>
 <iframe width="60%" height="315" src="https://www.youtube.com/embed/pl9HgW5pgTQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   <div class="story">
     <h2>Tid och plats</h2>
     <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">
-    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A1-hallen med uppv&auml;rmning i A2-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
+    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i C-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
     Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
     <h2>Anm&auml;lning av t&auml;vlande</h2>
     <p>Anm&auml;lan g&ouml;rs h&auml;r p&aring; <strong>t&auml;vlingssajten</strong> av klubbledare/coach genom att f&ouml;rst skapa ett klubbkonto 
@@ -48,19 +48,18 @@ include_once("includes/news_sponsors_nav.php");
     <h2>Regler mm.</h2>
     <ul>
       <li>WKF t&auml;vlingsregler samt karatesektionens regeltill&auml;gg f&ouml;r barn och ungdom (7 &ndash; 13 &aring;r) - <a href="http://www.swekarate.se/tavling/reglerdokument/" target=_blank>l&auml;nk</a></li>
-      <li>Obligatorisk coachlicens g&auml;ller f&ouml;r samtliga som ska coacha under t&auml;vlingen - <a href="http://skfcoach.se/" target=_blank>Coachlicensverktyget</a></li>
-      <li>Konsekvensbeslut vid ol&auml;mplig coachning av barn - <a href="http://www.swekarate.se/globalassets/svenska-karateforbundet-tavling/tavling/info--dokument/konsekvensbeslut-vid-olamplig-coachning_barn_v2.pdf" target=_blank>l&auml;nk</a></li>
+      <li>Obligatorisk coachlicens g&auml;ller f&ouml;r samtliga som ska coacha under t&auml;vlingen - <a href="https://www.karatesweden.se/tavla-i-karate/for-coacher/coachlicens/" target=_blank>Coachlicens</a></li>
       <li>Alla evenemang i Svenska Karatef&ouml;rbundets regi skall vara trygga f&ouml;r alla medlemmar och deltagare samt helt fria fr&aring;n alla former av psykiska och fysiska kr&auml;nkningar, verbala trakasserier och maktmissbruk. Om n&aring;gon skulle beh&ouml;va rapportera en h&auml;ndelse eller f&aring; ytterligare information ang&aring;ende F&ouml;rbundets skyddshanteringssystem v.g. kontakta Ove Viggedal, f&ouml;rbundets huvudskyddsombud i dessa fr&aring;gor. Maila ditt &auml;rende till <a href="mailto:safety@swekarate.se." title="Skyddad adress">safety@swekarate.se.</a></li>
       <li>Kadetter och juniorer har inga krav p&aring; shitei kata, men ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
       <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
-      <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter och juniorer (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="http://iof2.idrottonline.se/SvenskaKarateforbundet/Tavling/Tavlingslicens/" target=_blank>l&auml;nk</a></li>
+      <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter och juniorer (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="https://www.karatesweden.se/tavla-i-karate/tavlingslicens/" target=_blank>l&auml;nk</a></li>
       <li>&Aring;terkval g&auml;ller f&ouml;r alla klasser</li>
       <li>Round Robin (alla m&ouml;ter alla) vid f&auml;rre &auml;n fem i klassen</li>
       <li>Duo kata (tv&aring; t&auml;vlande samtidigt) upp till 12 &aring;r</li>
       <li>Vi f&ouml;rbeh&aring;ller oss r&auml;tten att &auml;ndra t&auml;vlingsklasserna vid f&ouml;r f&aring; deltagare</li>
     </ul>
     <h2>Boende i Eskilstuna</h2>
-    <p>Kontakta turistbyr&aring;n f&ouml;r information om boende: <a href="https://eskilstuna.nu/om-oss/eskilstuna-tourist-information/" target="_blank">Turistbyr&aring;n i Eskilstuna</a>!</p>
+    <p>Kontakta turistbyr&aring;n f&ouml;r information om boende: <a href="https://visiteskilstuna.se" target="_blank">Turistbyr&aring;n i Eskilstuna</a>!</p>
 </div>
 </div>
 <?php 

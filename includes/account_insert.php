@@ -1,6 +1,9 @@
 <?php
-//Added class for table layout in css file
-//Replaced width="100%" with class="wide_tbl" 
+//Added session_start(); to set $_SESSION['captcha'] and confirmation if the email was sent or not
+
+if (!isset($_SESSION)) {
+  session_start();
+}    
 
 //Declare and initialise variables
   $user_name='';$user_password='';$confirm_user_password = '';$confirmed='';$contact_name='';$email='';$contact_phone='';$club_name='';$active='';$access_level='';
@@ -191,7 +194,8 @@ Nej</label></td>
           <td><input name="captcha" type="text" id="captcha" size="25" /></td>
         </tr>
         <tr>
-          <td><img src="Captcha.php" /><input name="active" type="hidden" id="active" value="1" />
+          <td><img src="Captcha.php" />
+            <input name="active" type="hidden" id="active" value="1" />
             <input name="access_level" type="hidden" id="access_level" value="0" />
             <input name="confirmed" type="hidden" id="confirmed" value="0" /></td>
           <td><label>
@@ -231,7 +235,7 @@ Läs mer om hur vi arbetar med <a href="http://karateklubben.com/GDPR.html" targ
 $stmt_rsAccounts->closeCursor();      
       }//If not admin->add captcha        
 } 
-//Send the account information to the users email address and save it
+//Send the account information to the club contact and Competition Admin and save it
 else if ($output_form === 'no') {
         //Email to Club Contact                
         $headers = "From: $comp_name <$comp_email>\r\n" .
@@ -255,7 +259,7 @@ else if ($output_form === 'no') {
         $msg = "Hej $contact_name,\n$text";
         
         // Send email to club contact
-        mail($email, $subject, $msg, $headers);                
+        $retval = mail($email, $subject, $msg, $headers);                
 if($MM_authorizedUsers <> "1"){//If not admin->send email to competition admin    
         //Email to Competition Admin    
         $headers = "From: $comp_name <$comp_email>\r\n" .
@@ -274,9 +278,14 @@ if($MM_authorizedUsers <> "1"){//If not admin->send email to competition admin
 	"\n";
         $msg_adm = "Nytt konto registrerat!\n$text_adm";
 
-        // Send email to Competition Admin
-        mail($adm_email, $subject_adm, $msg_adm, $headers);                    
-    echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';        
+        // Send email to competition admin
+         mail($adm_email, $subject_adm, $msg_adm, $headers);                    
+         if( $retval == true ) {
+            echo "E-post kunde skickas...";
+            echo '<br />' . $contact_name . ',<br />Tack f&ouml;r att du har skaffat ett konto p&aring; '.$comp_name.'!<br />Dina uppgifter skickades till: '. $email .'. Logga in och g&ouml;r dina anm&auml;lningar.';        
+         }else {
+            echo "Dina uppgifter sparades, men e-post kunde inte skickas...";
+         }
 }
        //Catch anything wrong with query
             try {
