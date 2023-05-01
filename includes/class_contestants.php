@@ -1,5 +1,5 @@
 <?php 
-//Added link to previous age if no contestants exist
+//Changed and added css classes controlling table layout for better appearance
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -156,11 +156,18 @@ echo ' | '.$row_rsClass['class_weight_length'];
 </h3>
 <?php if ($MM_authorizedUsers === "1") { ?>
 <table class="medium_tbl" border="1">
-<tr><td>
-    <strong>T&auml;vlingsklass - Klubb - T&auml;vlande - L&auml;ngd (eventuellt) - Placering - Spara - Ta bort anm&auml;lan</strong>
-</td></tr>
-<tr><td>
-<table width ="100%" >
+<tr>
+  <th class="w_20">T&auml;vlingsklass</th>
+  <th class="w_20">Klubb</th>
+  <th class="w_20">T&auml;vlande</th>
+  <th class="w_10">L&auml;ngd (eventuellt)</th>
+  <th class="w_10">Placering</th>
+  <th class="w_10">Spara</th>
+  <th class="w_10">Ta bort anm&auml;lan</th>
+</tr>
+<tr>
+    <td colspan="7">
+<table class="wide_tbl" border ="0">
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
         if ($row_rsRegistrations['contestant_team'] === 1){
             $team_member1 = $row_rsRegistrations['contestant_team_member_1'];
@@ -183,7 +190,7 @@ echo ' | '.$row_rsClass['class_weight_length'];
 ?>
 <tr>
 <form action="<?php echo $editFormAction; ?>" method="POST" enctype="application/x-www-form-urlencoded" name="update_reg" id="update_reg">
-<td>
+<td class="w_20">
 <select name="class" id="class">
 <?php
     //Calculate the contestant's age at te date of the competition
@@ -224,10 +231,10 @@ foreach($row_rsClassData as $row_rsClasses) {
 ?>
 </select></label>
 </td>
-<td>
+<td class="w_20">
 <?php echo $row_rsRegistrations['club_name']; ?>
 </td>
-<td>
+<td class="w_20">
 <?php if ($row_rsRegistrations['contestant_team'] === 1){ 
         echo $row_rsRegistrations['contestant_name'].':';
         while ($row_rsTeamMembers = $stmt_rsTeamMembers->fetch(PDO::FETCH_ASSOC)){ 
@@ -237,11 +244,11 @@ foreach($row_rsClassData as $row_rsClasses) {
         echo $row_rsRegistrations['contestant_name'];  
       }?>    
 </td>
-<td><label>
+<td class="w_10"><label>
 <input name="contestant_height" type="text" id="contestant_height" value="<?php if ($row_rsRegistrations['contestant_height'] < 1){ echo ''; } else { echo $row_rsRegistrations['contestant_height'];} ?>" size="1" maxlength="3" />
 </label>cm
 </td>
-<td><label>
+<td class="w_10"><label>
 <select name="contestant_result" id="contestant_result">
 <option value="0"<?php if ($row_rsRegistrations['contestant_result'] === NULL || $row_rsRegistrations['contestant_result'] === 0) {echo "selected=\"selected\"";} ?>>Oplacerad</option>    
 <option value="1"<?php if ($row_rsRegistrations['contestant_result'] === 1) {echo "selected=\"selected\"";} ?>>1:a</option>
@@ -249,22 +256,19 @@ foreach($row_rsClassData as $row_rsClasses) {
 <option value="3"<?php if ($row_rsRegistrations['contestant_result'] === 3) {echo "selected=\"selected\"";} ?>>3:e</option>
 </select>
 </label></td>
-<td>
-</td>
-<td>
+<td class="w_10">
     <label><input type="submit" name="update_reg" class= "button" id="update_reg" value="Spara" /></label>
-</td>
 <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
 <input type="hidden" name="MM_update" value="update_reg" />
 <input type="hidden" name="contestant_gender" id="contestant_gender" value="<?php echo $row_rsRegistrations['contestant_gender']; ?>" />
 </form></td>
+<td class="w_10">
 <form action="<?php echo $editFormAction; ?>" method="POST" enctype="application/x-www-form-urlencoded" name="delete_reg" id="delete_reg">
-    <td>
         <label><input type="submit" name="delete_reg" class= "button" id="delete_reg" value="Ta bort" /></label>
-    </td>
     <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
     <input type="hidden" name="MM_delete" value="delete_reg" />
 </form>
+</td>
 </tr>
 <?php } ?>
 </table>

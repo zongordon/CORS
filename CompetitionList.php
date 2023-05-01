@@ -1,5 +1,5 @@
 <?php 
-//Added class for styling button in css file
+////Replaced "<td>" in header with "<th>"
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -74,17 +74,17 @@ if ($totalRows_rsCompetitions > 0) { // Show if recordset not empty ?>
   <form id="CompForm" name="CompForm" method="POST" action=""> 
     <table class="wide_tbl" border="1">
     <tr>
-      <td><strong>T&auml;vling</strong></td>
-      <td nowrap="nowrap"><strong>Start-datum</strong></td>
-      <td><strong>Start-tid</strong></td>
-      <td><strong>Sista anm&auml;lnings-datum</strong></td>
-      <td><strong>Max antal anm&auml;lningar</strong></td>
-      <td><strong>Antal anm&auml;lningar</strong></td>      
-      <td><strong>Antal t&auml;vlings-klasser</strong></td>
-      <td><strong>Aktiv</strong></td>
-      <td><strong>Kopiera klasser</strong></td>
-      <td><strong>&Auml;ndra</strong></td>
-      <td nowrap="nowrap"><strong>Ta bort</strong></td>
+      <th>T&auml;vling</th>
+      <th>Start-datum</th>
+      <th>Start-tid</th>
+      <th>Sista anm&auml;lnings-datum</th>
+      <th>Max antal anm&auml;lningar</th>
+      <th>Antal anm&auml;lningar</th>      
+      <th>Antal t&auml;vlings-klasser</th>
+      <th>Aktiv</th>
+      <th>Kopiera klasser</th>
+      <th nowrap="nowrap">&Auml;ndra</th>
+      <th>Ta bort</th>
     </tr>
 <?php while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) { 
  $colname_rsCompId = $row_rsCompetitions['comp_id'];

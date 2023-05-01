@@ -1,5 +1,5 @@
 <?php 
-//Added information about and link to GDPR policy
+//Removed one redundant session_start();
 
  ob_start();
 
@@ -21,11 +21,6 @@ include_once("includes/news_sponsors_nav.php");?>
         <div class="error">
 <?php
 // *** Validate request to login to this site.
-/**/
-if (!isset($_SESSION)) {
-  session_start();
-} 
-
 $loginFormAction = filter_input(INPUT_SERVER,'PHP_SELF');
 $_SESSION['PrevUrl'] = filter_input(INPUT_SERVER,'accesscheck');
 
