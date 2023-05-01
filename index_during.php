@@ -27,7 +27,7 @@ include_once("includes/news_sponsors_nav.php");
   <div class="story">
     <h2>Tid och plats</h2>
     <p>L&ouml;rdagen <?php echo $comp_start_date?> kl. <?php echo $comp_start_time?> i <a href="https://goo.gl/maps/dVgh2L6uZo3nXUDD6" title="Stiga Sports Arena" target="_blank">
-    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i C-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
+    Stiga Sports Arena</a> i Eskilstuna, Arenatorget 1. <strong>T&auml;vlingen h&aring;lls i A-hallen (A1) och uppv&auml;rmning i A2-hallen.</strong><br /><!--L&auml;nk till <strong>planeringen per tatami (matta): </strong><a href="pdf/Tidsplanering.pdf" title="Planering per tatami" target="_blank">h&auml;r</a><br /> --> 
     Eniro-l&auml;nk till Stiga Sports Arena i Eskilstuna:&nbsp;<a href="https://her.is/2DecWNs" target="_blank">h&auml;r</a></p>
     <h2>Anm&auml;lning av t&auml;vlande</h2>
     <p>Anm&auml;lan g&ouml;rs h&auml;r p&aring; <strong>t&auml;vlingssajten</strong> av klubbledare/coach genom att f&ouml;rst skapa ett klubbkonto 
