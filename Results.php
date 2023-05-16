@@ -1,5 +1,5 @@
 <?php
-//Changed path for rotate.php and rotating images
+//Corrected bug that prevented from displaying teams' resulta
 
 if (!isset($_SESSION)) {
   session_start();
@@ -19,7 +19,7 @@ if (filter_input(INPUT_GET,'sorting')) {
 try {
 require_once('Connections/DBconnection.php');     
 // Select the results for the current competition
-$query = "SELECT com.comp_current, com.comp_id, a.club_name, re.reg_id, re.contestant_result, co.contestant_name, re.contestant_height, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN clubregistration AS clu USING (club_reg_id) INNER JOIN account AS a USING (account_id) INNER JOIN competition AS com USING (comp_id) INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) WHERE com.comp_current = 1 AND re.contestant_result > 0 ORDER BY $sorting";
+$query = "SELECT com.comp_current, com.comp_id, a.club_name, re.reg_id, re.contestant_result, co.contestant_name, re.contestant_height, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN clubregistration AS clu USING (club_reg_id) INNER JOIN account AS a USING (account_id) INNER JOIN competition AS com USING (comp_id) INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) WHERE com.comp_current = 1 AND re.contestant_result > 0 ORDER BY $sorting";
 $stmt_rsResult = $DBconnection->query($query);
 $totalRows_rsResult = $stmt_rsResult->rowCount();
 }   catch(PDOException $ex) {
@@ -90,7 +90,7 @@ if ($totalRows_rsResult > 0) { // Show if recordset not empty ?>
       <td><?php echo $row_rsResult['club_name']; ?></td>
       <td><?php echo $row_rsResult['contestant_name']; ?></td>
       <td align="center"><?php echo $row_rsResult['contestant_result'].':a'; ?></td>
-<td><?php echo $row_rsResult['class_discipline'].' | '.$row_rsResult['class_gender_category'].' | '.$row_rsResult['class_category'].' | '; 
+      <td><?php if($row_rsResult['class_team'] === 1){echo'Lag - ';} echo $row_rsResult['class_discipline'].' | '.$row_rsResult['class_gender_category'].' | '.$row_rsResult['class_category'].' | '; 
       if ($row_rsResult['class_age'] == "") { 
           echo "";          
       } 

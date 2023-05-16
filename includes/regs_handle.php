@@ -1,7 +1,5 @@
 <?php 
-//Changed and added css classes for table layout for better appearance
-//Adjuested code selecting the whole age span of the classes and adding 'Mix' classes which previously prevented from register to some classes
-//Removed registration button of no classes are available
+//Removed buttons to register contestants when maximum number of registrations are met or exceeded
 
 //Catch anything wrong with query
 try {
@@ -651,7 +649,7 @@ else {
     </strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". 
     G&ouml;r &auml;ndringar eller ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; n&aring;gon av l&auml;nkarna.
 <?php //Show if the maximum number of registrations is reached
-      if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
+      if ($row_rsCurrRegs['max_regs'] >= $comp_max_regs) { ?>
         <div class="error">
             <h3>Maximala antalet anm&auml;lningar (<?php echo $comp_max_regs ?> st.)<?php if ($MM_authorizedUsers === "0") {echo ' &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.';}else{ echo ' &auml;r uppn&aring;tt. &Auml;ndra inst&auml;llningar under "T&auml;vlingar" f&ouml;r att andra ska kunna g&ouml;ra till&auml;gg online!';} ?></h3>
         </div>
@@ -759,7 +757,10 @@ else {
 </select></label></td>
                   <td class="w_10">
                   <?php if($totalRows_rsClassData == ''){
-                            echo 'Inga passande klasser!';} else {?>
+                            echo 'Inga passande klasser!';} 
+                        elseif ($row_rsCurrRegs['max_regs'] >= $comp_max_regs) {
+                            echo 'Max antal!';} 
+                        else {?>
                             <input type="submit" name="new_registration" class= "button" id="new_registration" value="Anm&auml;l till klass" />
                   <?php }?>               
                   </td>
@@ -803,7 +804,7 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
     }
     
             if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
-    <h3><a name="registration_delete" id="registration_delete"></a><?php if ($MM_authorizedUsers === "0") { echo '4';} else {echo '5';} ?>. Ta bort anm&auml;lningar</h3>
+    <h3><a name="registration_delete" id="registration_delete"></a><?php if ($MM_authorizedUsers === "0") { echo '4';} else {echo '5';} ?>. Genomförda anm&auml;lningar</h3>
     <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan.</p>
       <table class="wide_tbl" border="1">
         <tr>

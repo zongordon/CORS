@@ -1,5 +1,5 @@
 <?php 
-//Changed and added css classes controlling table layout for better appearance
+//Corrected bug that prevented displaying teams' for selection of class
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -193,14 +193,14 @@ echo ' | '.$row_rsClass['class_weight_length'];
 <td class="w_20">
 <select name="class" id="class">
 <?php
-    //Calculate the contestant's age at te date of the competition
+    //Calculate the contestant's age at the date of the competition
     $calculate_age = new AgeCalc;
     $calculate_age->comp_start_date = $comp_start_date;
     $calculate_age->contestant_birth = $row_rsRegistrations['contestant_birth'];
     $calculate_age->contestant_birth_max = $row_rsRegistrations['contestant_birth_max'];
     $calculate_age->contestant_team = $row_rsRegistrations['contestant_team'];
     $calculate_age->contestant_gender = $row_rsRegistrations['contestant_gender'];
-
+    $calculate_age->contestant_gender_mix = 'Mix';
      //Catch anything wrong with query
     try {
     //Select classes applicable for the contestant'S age and gender
@@ -213,19 +213,29 @@ echo ' | '.$row_rsClass['class_weight_length'];
             . "comp_current = 1 && cl.class_team = :contestant_team && cl.class_gender = :contestant_gender && "
             . "SUBSTRING(cl.class_age, 1, 2) = :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) = :contestant_age_max "
             . "|| comp_current = 1 && cl.class_team = :contestantteam && cl.class_gender = :contestantgender && "
-            . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) >= :contestantage_max "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam_ && cl.class_gender = :contestant_gender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) = :contestantagemin && SUBSTRING(cl.class_age, 1, 2) = :contestantagemax "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam__ && cl.class_gender = :contestantgender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantagemin_ && SUBSTRING(cl.class_age, 4, 2) >= :contestantagemax_ "
             . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
     $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
-    $stmt_rsClassData->execute(array(':contestant_gender'=>$calculate_age->contestant_gender, ':contestant_team'=>$calculate_age->contestant_team,
-        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), ':contestantgender'=>$calculate_age->contestant_gender,
-        ':contestantteam'=>$calculate_age->contestant_team, ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),));
+   $stmt_rsClassData->execute(array(
+        ':contestant_team'=>$calculate_age->contestant_team,':contestant_gender'=>$calculate_age->contestant_gender, 
+        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), 
+        ':contestantteam'=>$calculate_age->contestant_team,':contestantgender'=>$calculate_age->contestant_gender, 
+        ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam_'=>$calculate_age->contestant_team,':contestant_gender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam__'=>$calculate_age->contestant_team,':contestantgender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin_'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax_'=>$calculate_age->calculate_age('contestant_age_max'),));
     $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);      
     } catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
       }
 foreach($row_rsClassData as $row_rsClasses) {
 ?>
-<option value="<?php echo $row_rsClasses['class_id']?>"<?php if (!(strcmp($row_rsClasses['class_id'], $colname_rsClass))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClasses['class_discipline'].' | '.$row_rsClasses['class_gender_category'].' | '.$row_rsClasses['class_weight_length'].' | '.$row_rsClasses['class_age'].' &aring;r'?></option> 
+<option value="<?php echo $row_rsClasses['class_id']?>"<?php if (!(strcmp($row_rsClasses['class_id'], $colname_rsClass))) {echo "selected=\"selected\"";} ?>><?php if($row_rsClasses['class_team'] === 1){echo'Lag - ';} echo $row_rsClasses['class_discipline'].' | '.$row_rsClasses['class_gender_category'].' | '.$row_rsClasses['class_weight_length'].' | '.$row_rsClasses['class_age'].' &aring;r'?></option> 
 <?php
 } 
 ?>
@@ -280,10 +290,10 @@ foreach($row_rsClassData as $row_rsClasses) {
     } else { ?>
   <table class="medium_tbl" border="1">
     <tr>
-      <td><strong>Startnr.</strong></td>        
-      <td><strong>Klubb</strong></td>
-      <td><strong>T&auml;vlande</strong></td>
-      <td><strong>L&auml;ngd (eventuellt)</strong></td>
+      <th>Startnr.</th>        
+      <th>Klubb</th>
+      <th>T&auml;vlande</th>
+      <th>L&auml;ngd (eventuellt)</th>
       </tr>
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
         if ($row_rsRegistrations['contestant_team'] === 1){

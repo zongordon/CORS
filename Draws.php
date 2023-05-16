@@ -1,6 +1,5 @@
 <?php
-//Added class for table layout in css file
-//Added class for styling button in css file
+//Corrected bug that prevented from displaying teams' draws
 
 if (!isset($_SESSION)) {
   session_start();
@@ -17,11 +16,11 @@ try {
 // Select class data from selected account and current competition
 require('Connections/DBconnection.php');
 if ($colname_rsSelectedClub === "all") {
-$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
 } 
 else {    
-$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->prepare($query_rsRegistrations);
 $stmt_rsRegistrations->execute(array(':account_id'=>$colname_rsSelectedClub));
 }
@@ -96,7 +95,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
       </tr>
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) {?>
         <tr>
-          <td><?php echo $row_rsRegistrations['class_discipline']; ?></td>
+          <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline']; ?></td>
           <td><?php echo $row_rsRegistrations['class_gender_category']; ?></td>
           <td><?php echo $row_rsRegistrations['class_category']; ?></td>
           <td><?php echo $row_rsRegistrations['class_age']; ?></td>

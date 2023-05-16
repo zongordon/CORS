@@ -50,6 +50,7 @@ $DBconnection = null;
   <div id="sponsors">
       <h2>Huvud-sponsorer</h2>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="100%" height="100%" border="0" /></a></p>
+      <p><a href="https://www.athleticmerch.com/" target="_blank"><img src="img/sponsors/athletic-merch.svg" alt="Athletic Merch" width="100%" height="100%" border="0" /></a></p>
       <p><img src="img/sponsors/Dental_Estetik_small.svg" alt="Dental Estetik" width="100%" height="100%" border="0" /></p>
       <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_vit.svg" alt="Sparbanksstiftelsen Rekarne" width="100%" height="100%" border="0" /></a></p>
       <h3>Övriga sponsorer</h3>      
