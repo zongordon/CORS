@@ -1,5 +1,5 @@
 <?php 
-// Changed code from limiting the string to 34 characters
+// Changed code to support individual as well as class individual clubb draws and still display old setup of draws (
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -8,7 +8,11 @@ $colname_rsClassData = filter_input(INPUT_GET,'class_id');
 try {
 //SELECT data för the competition class
 require('Connections/DBconnection.php');         
-$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, com.comp_limit_roundrobin, cl.class_team, cl.class_category, cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1";
+$queryClass = "SELECT com.comp_name, com.comp_arranger, com.comp_start_date, com.comp_limit_roundrobin, cl.class_team, cl.class_category, "
+        . "cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age "
+        . "FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) "
+        . "WHERE cl.class_id = :class_id AND comp_current = 1";
 $stmt_rsClass = $DBconnection->prepare($queryClass);
 $stmt_rsClass->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -20,7 +24,11 @@ catch(PDOException $ex) {
 try {
 //SELECT contestant data för the competition class
 require('Connections/DBconnection.php');         
-$query = "SELECT a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND comp_current = 1 ORDER BY club_startorder, reg_id";
+$query = "SELECT a.club_name, re.reg_id, re.contestant_startnumber, re.contestant_height, co.contestant_name, cl.class_category, cl.class_discipline,"
+        . "cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, clu.club_startorder "
+        . "FROM competition AS com, registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) "
+        . "WHERE cl.class_id = :class_id AND comp_current = 1 ORDER BY clu.club_startorder, re.club_start_order, re.start_order;";
 $stmt_rsClassContestants = $DBconnection->prepare($query);
 $stmt_rsClassContestants->execute(array(':class_id'=>$colname_rsClassData));
 $totalRows_rsClassContestants = $stmt_rsClassContestants->rowCount();
@@ -31,7 +39,10 @@ catch(PDOException $ex) {
 //Catch anything wrong with query
 try {
 //SELECT result data for the class
-$query_Result = "SELECT a.club_name, co.contestant_name, clu.club_startorder, cl.class_id, re.contestant_result FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) WHERE cl.class_id = :class_id AND contestant_result <> 0 ORDER BY contestant_result";
+$query_Result = "SELECT a.club_name, co.contestant_name, clu.club_startorder, cl.class_id, re.contestant_result "
+        . "FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN account AS a USING (account_id) INNER JOIN clubregistration AS clu USING (club_reg_id) "
+        . "WHERE cl.class_id = :class_id AND contestant_result <> 0 ORDER BY contestant_result";
 $stmt_rsResult = $DBconnection->prepare($query_Result);
 $stmt_rsResult->execute(array(':class_id'=>$colname_rsClassData));
 $row_rsResult = $stmt_rsResult->fetch(PDO::FETCH_ASSOC);
