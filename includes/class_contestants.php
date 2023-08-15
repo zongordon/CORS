@@ -1,5 +1,5 @@
 <?php 
-//Added class for table layout in css file
+//Corrected bug that prevented displaying teams' for selection of class
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -127,6 +127,7 @@ $stmt_rsClassGender->closeCursor();
     }                   
 if ($totalRows_rsRegistrations == 0) { // Show if recordset empty ?>
 <h3>Det finns ingen t&auml;vlande i klassen!</h3>
+<p><a href="ClassesList.php">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
 <?php if ($MM_authorizedUsers === "1") { ?>  
 <p><a href="ClassesList.php">Tillbaka till T&auml;vlingsklasser</a></p>
 <?php 
@@ -155,11 +156,18 @@ echo ' | '.$row_rsClass['class_weight_length'];
 </h3>
 <?php if ($MM_authorizedUsers === "1") { ?>
 <table class="medium_tbl" border="1">
-<tr><td>
-    <strong>T&auml;vlingsklass - Klubb - T&auml;vlande - L&auml;ngd (eventuellt) - Placering - Spara - Ta bort anm&auml;lan</strong>
-</td></tr>
-<tr><td>
-<table width ="100%" >
+<tr>
+  <th class="w_20">T&auml;vlingsklass</th>
+  <th class="w_20">Klubb</th>
+  <th class="w_20">T&auml;vlande</th>
+  <th class="w_10">L&auml;ngd (eventuellt)</th>
+  <th class="w_10">Placering</th>
+  <th class="w_10">Spara</th>
+  <th class="w_10">Ta bort anm&auml;lan</th>
+</tr>
+<tr>
+    <td colspan="7">
+<table class="wide_tbl" border ="0">
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
         if ($row_rsRegistrations['contestant_team'] === 1){
             $team_member1 = $row_rsRegistrations['contestant_team_member_1'];
@@ -182,17 +190,17 @@ echo ' | '.$row_rsClass['class_weight_length'];
 ?>
 <tr>
 <form action="<?php echo $editFormAction; ?>" method="POST" enctype="application/x-www-form-urlencoded" name="update_reg" id="update_reg">
-<td>
+<td class="w_20">
 <select name="class" id="class">
 <?php
-    //Calculate the contestant's age at te date of the competition
+    //Calculate the contestant's age at the date of the competition
     $calculate_age = new AgeCalc;
     $calculate_age->comp_start_date = $comp_start_date;
     $calculate_age->contestant_birth = $row_rsRegistrations['contestant_birth'];
     $calculate_age->contestant_birth_max = $row_rsRegistrations['contestant_birth_max'];
     $calculate_age->contestant_team = $row_rsRegistrations['contestant_team'];
     $calculate_age->contestant_gender = $row_rsRegistrations['contestant_gender'];
-
+    $calculate_age->contestant_gender_mix = 'Mix';
      //Catch anything wrong with query
     try {
     //Select classes applicable for the contestant'S age and gender
@@ -205,28 +213,38 @@ echo ' | '.$row_rsClass['class_weight_length'];
             . "comp_current = 1 && cl.class_team = :contestant_team && cl.class_gender = :contestant_gender && "
             . "SUBSTRING(cl.class_age, 1, 2) = :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) = :contestant_age_max "
             . "|| comp_current = 1 && cl.class_team = :contestantteam && cl.class_gender = :contestantgender && "
-            . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) >= :contestantage_max "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam_ && cl.class_gender = :contestant_gender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) = :contestantagemin && SUBSTRING(cl.class_age, 1, 2) = :contestantagemax "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam__ && cl.class_gender = :contestantgender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantagemin_ && SUBSTRING(cl.class_age, 4, 2) >= :contestantagemax_ "
             . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
     $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
-    $stmt_rsClassData->execute(array(':contestant_gender'=>$calculate_age->contestant_gender, ':contestant_team'=>$calculate_age->contestant_team,
-        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), ':contestantgender'=>$calculate_age->contestant_gender,
-        ':contestantteam'=>$calculate_age->contestant_team, ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),));
+   $stmt_rsClassData->execute(array(
+        ':contestant_team'=>$calculate_age->contestant_team,':contestant_gender'=>$calculate_age->contestant_gender, 
+        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), 
+        ':contestantteam'=>$calculate_age->contestant_team,':contestantgender'=>$calculate_age->contestant_gender, 
+        ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam_'=>$calculate_age->contestant_team,':contestant_gender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam__'=>$calculate_age->contestant_team,':contestantgender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin_'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax_'=>$calculate_age->calculate_age('contestant_age_max'),));
     $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);      
     } catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
       }
 foreach($row_rsClassData as $row_rsClasses) {
 ?>
-<option value="<?php echo $row_rsClasses['class_id']?>"<?php if (!(strcmp($row_rsClasses['class_id'], $colname_rsClass))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClasses['class_discipline'].' | '.$row_rsClasses['class_gender_category'].' | '.$row_rsClasses['class_weight_length'].' | '.$row_rsClasses['class_age'].' &aring;r'?></option> 
+<option value="<?php echo $row_rsClasses['class_id']?>"<?php if (!(strcmp($row_rsClasses['class_id'], $colname_rsClass))) {echo "selected=\"selected\"";} ?>><?php if($row_rsClasses['class_team'] === 1){echo'Lag - ';} echo $row_rsClasses['class_discipline'].' | '.$row_rsClasses['class_gender_category'].' | '.$row_rsClasses['class_weight_length'].' | '.$row_rsClasses['class_age'].' &aring;r'?></option> 
 <?php
 } 
 ?>
 </select></label>
 </td>
-<td>
+<td class="w_20">
 <?php echo $row_rsRegistrations['club_name']; ?>
 </td>
-<td>
+<td class="w_20">
 <?php if ($row_rsRegistrations['contestant_team'] === 1){ 
         echo $row_rsRegistrations['contestant_name'].':';
         while ($row_rsTeamMembers = $stmt_rsTeamMembers->fetch(PDO::FETCH_ASSOC)){ 
@@ -236,11 +254,11 @@ foreach($row_rsClassData as $row_rsClasses) {
         echo $row_rsRegistrations['contestant_name'];  
       }?>    
 </td>
-<td><label>
+<td class="w_10"><label>
 <input name="contestant_height" type="text" id="contestant_height" value="<?php if ($row_rsRegistrations['contestant_height'] < 1){ echo ''; } else { echo $row_rsRegistrations['contestant_height'];} ?>" size="1" maxlength="3" />
 </label>cm
 </td>
-<td><label>
+<td class="w_10"><label>
 <select name="contestant_result" id="contestant_result">
 <option value="0"<?php if ($row_rsRegistrations['contestant_result'] === NULL || $row_rsRegistrations['contestant_result'] === 0) {echo "selected=\"selected\"";} ?>>Oplacerad</option>    
 <option value="1"<?php if ($row_rsRegistrations['contestant_result'] === 1) {echo "selected=\"selected\"";} ?>>1:a</option>
@@ -248,22 +266,19 @@ foreach($row_rsClassData as $row_rsClasses) {
 <option value="3"<?php if ($row_rsRegistrations['contestant_result'] === 3) {echo "selected=\"selected\"";} ?>>3:e</option>
 </select>
 </label></td>
-<td>
-</td>
-<td>
+<td class="w_10">
     <label><input type="submit" name="update_reg" class= "button" id="update_reg" value="Spara" /></label>
-</td>
 <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
 <input type="hidden" name="MM_update" value="update_reg" />
 <input type="hidden" name="contestant_gender" id="contestant_gender" value="<?php echo $row_rsRegistrations['contestant_gender']; ?>" />
 </form></td>
+<td class="w_10">
 <form action="<?php echo $editFormAction; ?>" method="POST" enctype="application/x-www-form-urlencoded" name="delete_reg" id="delete_reg">
-    <td>
         <label><input type="submit" name="delete_reg" class= "button" id="delete_reg" value="Ta bort" /></label>
-    </td>
     <input name="reg_id" type="hidden" id="reg_id" value="<?php echo $row_rsRegistrations['reg_id']; ?>" />
     <input type="hidden" name="MM_delete" value="delete_reg" />
 </form>
+</td>
 </tr>
 <?php } ?>
 </table>
@@ -275,10 +290,10 @@ foreach($row_rsClassData as $row_rsClasses) {
     } else { ?>
   <table class="medium_tbl" border="1">
     <tr>
-      <td><strong>Startnr.</strong></td>        
-      <td><strong>Klubb</strong></td>
-      <td><strong>T&auml;vlande</strong></td>
-      <td><strong>L&auml;ngd (eventuellt)</strong></td>
+      <th>Startnr.</th>        
+      <th>Klubb</th>
+      <th>T&auml;vlande</th>
+      <th>L&auml;ngd (eventuellt)</th>
       </tr>
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) { 
         if ($row_rsRegistrations['contestant_team'] === 1){

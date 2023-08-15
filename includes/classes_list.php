@@ -1,5 +1,6 @@
 <?php 
 //Added classes for table layout in css file
+//Replaced width="100%" with class="wide_tbl"
 $sorting = "class_team, class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
 if (filter_input(INPUT_GET, 'sorting')) {
 $sorting = filter_input(INPUT_GET, 'sorting');
@@ -43,22 +44,24 @@ if ($totalRows_rsClasses > 0) { // Show if recordset not empty ?>
   </table>
 </form>
     <table class="wide_tbl" border="1">
+      <thead>
       <tr>
-        <td><strong>Typ av klass</strong></td>
-        <td><strong>Disciplin</strong></td>
-        <td><strong>Kata-system</strong></td>
-        <td><strong>K&ouml;ns-kategori</strong></td>
-        <td><strong>Kategori</strong></td>
-        <td><strong>&Aring;lder</strong></td>
-        <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
-        <td><strong>Startlista</strong></td>
+        <th>Typ av klass</th>
+        <th>Disciplin</th>
+        <th>Kata-system</th>
+        <th>K&ouml;ns-kategori</th>
+        <th>Kategori</th>
+        <th>&Aring;lder</th>
+        <th>Vikt- eller l&auml;ngdkategori</th>
+        <th>Startlista</th>
         <?php if ($MM_authorizedUsers === "1"){ ?>
-        <td><strong>Avgift</strong></td>        
-        <td><strong>T&auml;vlingsstege</strong></td>        
-        <td><strong>&Auml;ndra</strong></td>
-        <td><strong>Ta bort</strong></td>
+        <th>Avgift</th>        
+        <th>T&auml;vlingssteg</th>        
+        <th>&Auml;ndra</th>
+        <th>Ta bort</th>
         <?php }?>
       </tr>
+      </thead>
 <?php while($row_rsClasses = $stmt_rsClasses->fetch(PDO::FETCH_ASSOC)) { ?>
   <tr>
     <td><?php if($row_rsClasses['class_team'] === 1) { echo 'Lag';} else{ echo 'Individuell';} ?></td>

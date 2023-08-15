@@ -1,5 +1,5 @@
 <?php 
-//Changed SQL from number of registrations to contestants in current competition
+//Replace width="40%" with class="medium_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -37,15 +37,15 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <h3>Antal t&auml;vlande (som &auml;r anm&auml;lda till n&aring;gon klass) per klubb</h3>
 <p>Rapporten visar antal t&auml;vlande (som anm&auml;lts till n&aring;gon t&auml;vlingsklass) vid aktuell t&auml;vling per klubb.</p>
-<table width="40%" border="1">
+<table class="medium_tbl" border="1">
     <tr>
           <td><strong>Klubb</strong></td>
           <td><strong>Antal&nbsp;t&auml;vlande</strong></td>
         </tr>
     <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { ?>
       <tr>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['club_name']; ?></td>
-        <td nowrap="nowrap"><?php echo $row_rsContestants['COUNT(DISTINCT contestant_id)']; ?></td>
+        <td><?php echo $row_rsContestants['club_name']; ?></td>
+        <td><?php echo $row_rsContestants['COUNT(DISTINCT contestant_id)']; ?></td>
         </tr>
     <?php } ?>
 </table>

@@ -1,5 +1,5 @@
 <?php 
-//Added class for styling button in css file
+//Replace width="200" with class="wide_tbl" and removed  nowrap="nowrap"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -89,7 +89,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <p>Rapporten visar vilka anm&auml;lningar som gjorts till aktuell t&auml;vling, vilka coacher som anm&auml;lts och den sammanlagda kostnaden f&ouml;r vald klubb.</p>
 <p>V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
       <form id="SelectClub" name="SelectClub" method="POST" action="<?php echo $editFormAction; ?>">
-        <table width="200" border="0">
+        <table Replace class="narrow_tbl" border="0">
           <tr>
             <td valign="middle">Klubb</td>
             <td><label>
@@ -115,7 +115,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
     <p>Det finns inget resultat att visa!</p>
   <?php } ?>
   <?php if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>  
-      <table width="80%" border="1">
+      <table class="wide_tbl" border="1">
         <tr>
           <td><strong>Klubb</strong></td>
           <td><strong>T&auml;vlande</strong></td>

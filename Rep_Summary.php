@@ -1,5 +1,5 @@
 <?php 
-//Changed explanations of reports
+//Changed from table width="320"
 
 if (!isset($_SESSION)) {
   session_start();
@@ -158,7 +158,7 @@ include_once("includes/news_sponsors_nav.php");?>
     <div class="feature">
 <h3>Summeringsrapport</h3>
 <p> H&auml;r &auml;r en summering av utvalda data. Nedan finns l&auml;nkar till andra rapporter.</p>
-<table width="320">
+<table width="50%">
   <tr>
     <td>Antal klubbar med anm&auml;lda deltagare:</td>
     <td><?php echo $row_rsAccounts['total'];?></td>

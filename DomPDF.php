@@ -31,7 +31,7 @@ define("HTTP_PATH_ROOT", isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : 
 $my_path = HTTP_PATH_ROOT;
 
 //Load file and get content from file
-$file = 'http://'.$my_path.'/ElimLadder.php?class_id='.$class_id;
+$file = 'https://'.$my_path.'/ElimLadder.php?class_id='.$class_id;
 
 $html = file_get_contents($file);
 

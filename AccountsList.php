@@ -1,5 +1,5 @@
 <?php
-//Changed the check boxes to disabled
+//Replaced "<td>" in header with "<th>"
 
 //Access level admin
 $MM_authorizedUsers = "1";
@@ -20,10 +20,10 @@ catch(PDOException $ex) {
 $pagetitle="Lista anv&auml;ndarkonton - admin";
 // Includes several code functions
 include_once('includes/functions.php');
-// Includes HTML Head
-include_once('includes/header.php');
 //Includes Restrict access code function
 include_once('includes/restrict_access.php');
+// Includes HTML Head
+include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
 include_once("includes/news_sponsors_nav.php");?> 
 <!-- start page -->
@@ -41,16 +41,16 @@ include_once("includes/news_sponsors_nav.php");?>
   <p>Det finns inga konton att visa!</p>
 <?php   } // Show if recordset empty 
 if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
-  <table width="100%" border="1">
+  <table class="wide_tbl" border="1">
     <tr>
-      <td><strong>Klubbnamn</strong></td>
-      <td><strong>Kontakt</strong></td>
-      <td><strong>Anv&auml;ndarnamn</strong></td>
-      <td><strong>E-post</strong></td>
-      <td><strong>Telefon</strong></td>
-      <td><strong>Aktivt</strong></td>
-      <td><strong>&Auml;ndra</strong></td>
-      <td><strong>Ta bort</strong></td>
+      <th>Klubbnamn</th>
+      <th>Kontakt</th>
+      <th>Anv&auml;ndarnamn</th>
+      <th>E-post</th>
+      <th>Telefon</th>
+      <th>Aktivt</th>
+      <th>&Auml;ndra</th>
+      <th>Ta bort</th>
     </tr>
     <?php while($row_rsAccounts = $stmt_rsAccounts->fetch(PDO::FETCH_ASSOC)) {;?>
     <tr>
@@ -64,7 +64,7 @@ if ($totalRows_rsAccounts > 0) { // Show if recordset not empty ?>
             <input name="active" type="checkbox" disabled="disabled" id="active" value="Aktiv" <?php if (!(strcmp($row_rsAccounts['active'],1))) {echo "checked=\"checked\"";} ?> />
           </label>
         </form></td>
-      <td><a href="AccountUpdate.php?account_id=<?php echo $row_rsAccounts['account_id']; ?>">&Auml;ndra</a></td>
+      <td nowrap="nowrap"><a href="AccountUpdate.php?account_id=<?php echo $row_rsAccounts['account_id']; ?>">&Auml;ndra</a></td>
       <td><a href="#" onclick="return deleteAccount('<?php echo $row_rsAccounts['account_id']; ?>')">Ta bort</a></td>
     </tr>
     <?php }?>

@@ -1,6 +1,5 @@
 <?php
-//Added class for table layout in css file
-//Added class for styling button in css file
+//Added sending email to comp admin
 ob_start();
 
 //Access level top administrator
@@ -166,7 +165,11 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
         
             // Send email to club contact
             mail($contact_email, '=?utf-8?B?'.base64_encode($message_subject).'?=', $msg, $headers);                
-            }                   
+            }
+
+            // Send email to Competition Admin, for information
+            $msg_adm = "Detta meddelande har skickats ut med e-post till $totalRows_rsClubEmails mejladresser:\n$message";           
+            mail($comp_email, '=?utf-8?B?'.base64_encode($message_subject).'?=', $msg_adm, $headers);    
         }
             $insertGoTo = "MessagesHandle.php#new_message";
             header(sprintf("Location: %s", $insertGoTo));  	
@@ -178,19 +181,19 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
 <form id="new_message" name="new_message" method="POST" action="<?php echo $editFormAction; ?>">
       <table class="narrow_tbl" border="0">
         <tr>
-          <td>Meddelandets titel</td>
+          <td>Titel:</td>
           <td><label>
               <input name="message_subject" type="text" id="message_subject" size="50" value="<?php echo $insert_message_subject; ?>"/>
           </label></td>
         </tr>
         <tr>
-          <td>Meddelande</td>
+          <td valign="top">Meddelande:<br>(E-post:<br>"Hej nn,...")</td>
           <td valign="top"><label>
             <textarea name="message" id="message" value="<?php echo $insert_message; ?>" cols="40" rows="5"></textarea>
           </label></td>
         </tr>
         <tr>
-            <td valign ="top">S&auml;tt att spara/skicka meddelandet:</td>
+            <td valign ="top">Spara/skicka meddelandet:</td>
           <td valign="top">
               <label>
               <input type="radio" name="message_how" id="message_how" value="SiteOnly" <?php if ($insert_message_how == "SiteOnly"){ echo "checked='checked'"; }?>/>
@@ -204,7 +207,7 @@ if (filter_input(INPUT_POST,"MM_insert_message") === "new_message") {
           </td>
         </tr>
         <tr>
-            <td valign ="top">S&auml;tt att spara/skicka meddelandet:</td>
+            <td valign ="top">Skicka till:</td>
           <td valign="top">
             <label>
               <input type="radio" name="message_to" id="message_to" value="CurrentComp" <?php if ($insert_message_to == "CurrentComp"){ echo "checked='checked'";} ?>/>

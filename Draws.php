@@ -1,6 +1,5 @@
 <?php
-//Added class for table layout in css file
-//Added class for styling button in css file
+//Corrected bug that gave error message because missing selection of club (no selection done when opening the page)
 
 if (!isset($_SESSION)) {
   session_start();
@@ -14,14 +13,22 @@ if (filter_input(INPUT_POST,'account_id')) {
 
 //Catch anything wrong with query
 try {
-// Select class data from selected account and current competition
+// Select class data from all or selected account and current competition
 require('Connections/DBconnection.php');
 if ($colname_rsSelectedClub === "all") {
-$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, "
+        . "cl.class_gender_category, cl.class_weight_length, cl.class_age "
+        . "FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) "
+        . "WHERE comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->query($query_rsRegistrations);
 } 
 else {    
-$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
+$query_rsRegistrations = "SELECT DISTINCT cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_gender, "
+        . "cl.class_gender_category, cl.class_weight_length, cl.class_age "
+        . "FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
+        . "INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) "
+        . "WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length";
 $stmt_rsRegistrations = $DBconnection->prepare($query_rsRegistrations);
 $stmt_rsRegistrations->execute(array(':account_id'=>$colname_rsSelectedClub));
 }
@@ -34,7 +41,9 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
 try {
 // Select information regarding active accounts
 require('Connections/DBconnection.php');           
-$query_rsAccounts = "SELECT DISTINCT account_id, club_name FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY club_name ASC";
+$query_rsAccounts = "SELECT DISTINCT account_id, club_name FROM registration AS re INNER JOIN classes AS cl USING (class_id) "
+        . "INNER JOIN contestants AS co USING (contestant_id) INNER JOIN competition as com USING (comp_id) "
+        . "INNER JOIN account as a USING (account_id) WHERE comp_current = 1 ORDER BY club_name ASC";
 $stmt_rsAccounts = $DBconnection->query($query_rsAccounts);
 $row_rsAccounts = $stmt_rsAccounts->fetchAll(PDO::FETCH_ASSOC); 
 }   catch(PDOException $ex) {
@@ -66,9 +75,12 @@ include_once("includes/news_sponsors_nav.php");?>
 foreach($row_rsAccounts as $row_rsAccount) {  
 ?>
                 <option value="<?php echo $row_rsAccount['account_id']?>"
-            <?php if (!(strcmp($row_rsAccount['account_id'], filter_input(INPUT_POST,'account_id')))) {
-                    echo "selected=\"selected\""; 
-                  } ?>>
+            <?php
+            if (filter_input(INPUT_POST,'account_id') <> ''){
+                if (!(strcmp($row_rsAccount['account_id'], filter_input(INPUT_POST,'account_id')))) {
+                echo "selected=\"selected\""; 
+                } 
+            }?>>
                 <?php echo $row_rsAccount['club_name']?>
                 </option>
 <?php
@@ -96,7 +108,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
       </tr>
 <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)) {?>
         <tr>
-          <td><?php echo $row_rsRegistrations['class_discipline']; ?></td>
+          <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline']; ?></td>
           <td><?php echo $row_rsRegistrations['class_gender_category']; ?></td>
           <td><?php echo $row_rsRegistrations['class_category']; ?></td>
           <td><?php echo $row_rsRegistrations['class_age']; ?></td>

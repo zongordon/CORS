@@ -106,7 +106,7 @@
 */
 
 
-	$folder = '.';
+	$folder = '../img/rotating/';
 
 
 /*	

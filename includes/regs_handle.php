@@ -1,6 +1,5 @@
 <?php 
-//Prevents attempt to create session variable and indicate selected club before club is selected by admin
-//Added classes for table layout in css file
+//Removed buttons to register contestants when maximum number of registrations are met or exceeded
 
 //Catch anything wrong with query
 try {
@@ -650,7 +649,7 @@ else {
     </strong> D&aring; kan vi ta beslut om eventuell uppdelning av klassen i "korta" och "l&aring;nga". 
     G&ouml;r &auml;ndringar eller ta bort t&auml;vlande helt och h&aring;llet genom att klicka p&aring; n&aring;gon av l&auml;nkarna.
 <?php //Show if the maximum number of registrations is reached
-      if ($row_rsCurrRegs['max_regs'] === $comp_max_regs) { ?>
+      if ($row_rsCurrRegs['max_regs'] >= $comp_max_regs) { ?>
         <div class="error">
             <h3>Maximala antalet anm&auml;lningar (<?php echo $comp_max_regs ?> st.)<?php if ($MM_authorizedUsers === "0") {echo ' &auml;r uppn&aring;tt och inga till&auml;gg g&aring;r att g&ouml;ra online! Kontakta t&auml;vlingsledningen vid akuta behov.';}else{ echo ' &auml;r uppn&aring;tt. &Auml;ndra inst&auml;llningar under "T&auml;vlingar" f&ouml;r att andra ska kunna g&ouml;ra till&auml;gg online!';} ?></h3>
         </div>
@@ -659,8 +658,18 @@ else {
 </p>
       <table class="wide_tbl" border="1">
         <tr>
-          <td><strong>T&auml;vlande - F&ouml;delsedatum - K&ouml;n - L&auml;ngd (eventuellt) - T&auml;vlingsklass</strong></td>
+          <th class="w_20">T&auml;vlande</th>
+          <th class="w_10">F&ouml;delsedatum</th> 
+          <th class="w_10">K&ouml;n</th>
+          <th class="w_10">L&auml;ngd (eventuellt)</th>
+          <th class="w_30">T&auml;vlingsklass</th>
+          <th class="w_10">Anm&auml;l</th>
+          <th class="w_5">&Auml;ndra</th>
+          <th class="w_5">Ta bort</th>    
         </tr>
+        <tr>
+          <td colspan="8">
+      <table class="medium_tbl" border="0">              
 <?php while($row_rsContestants = $stmt_rsContestants->fetch(PDO::FETCH_ASSOC)) { 
     //Calculate the contestant's age at the date of the competition
     $calculate_age = new AgeCalc;
@@ -669,7 +678,7 @@ else {
     $calculate_age->contestant_birth_max = $row_rsContestants['contestant_birth_max'];
     $calculate_age->contestant_team = $row_rsContestants['contestant_team'];
     $calculate_age->contestant_gender = $row_rsContestants['contestant_gender'];
-
+    $calculate_age->contestant_gender_mix = 'Mix';
      //Catch anything wrong with query
     try {
     //Select classes applicable for the contestant'S age and gender
@@ -682,35 +691,46 @@ else {
             . "comp_current = 1 && cl.class_team = :contestant_team && cl.class_gender = :contestant_gender && "
             . "SUBSTRING(cl.class_age, 1, 2) = :contestant_age_min && SUBSTRING(cl.class_age, 1, 2) = :contestant_age_max "
             . "|| comp_current = 1 && cl.class_team = :contestantteam && cl.class_gender = :contestantgender && "
-            . "SUBSTRING(cl.class_age, 4, 2) >= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) <= :contestantage_max "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantage_min && SUBSTRING(cl.class_age, 4, 2) >= :contestantage_max "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam_ && cl.class_gender = :contestant_gender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) = :contestantagemin && SUBSTRING(cl.class_age, 1, 2) = :contestantagemax "
+            . "|| comp_current = 1 && cl.class_team = :contestantteam__ && cl.class_gender = :contestantgender_mix && "
+            . "SUBSTRING(cl.class_age, 1, 2) <= :contestantagemin_ && SUBSTRING(cl.class_age, 4, 2) >= :contestantagemax_ "
             . "ORDER BY cl.class_discipline, cl.class_gender, cl.class_age, cl.class_weight_length, cl.class_gender_category"; 
     $stmt_rsClassData = $DBconnection->prepare($query_rsClassData);
-    $stmt_rsClassData->execute(array(':contestant_gender'=>$calculate_age->contestant_gender, ':contestant_team'=>$calculate_age->contestant_team,
-        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), ':contestantgender'=>$calculate_age->contestant_gender,
-        ':contestantteam'=>$calculate_age->contestant_team, ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),));
-    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);      
+    $stmt_rsClassData->execute(array(
+        ':contestant_team'=>$calculate_age->contestant_team,':contestant_gender'=>$calculate_age->contestant_gender, 
+        ':contestant_age_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestant_age_max'=>$calculate_age->calculate_age('contestant_age_max'), 
+        ':contestantteam'=>$calculate_age->contestant_team,':contestantgender'=>$calculate_age->contestant_gender, 
+        ':contestantage_min'=>$calculate_age->calculate_age('contestant_age_min'),':contestantage_max'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam_'=>$calculate_age->contestant_team,':contestant_gender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax'=>$calculate_age->calculate_age('contestant_age_max'),
+        ':contestantteam__'=>$calculate_age->contestant_team,':contestantgender_mix'=>$calculate_age->contestant_gender_mix, 
+        ':contestantagemin_'=>$calculate_age->calculate_age('contestant_age_min'),':contestantagemax_'=>$calculate_age->calculate_age('contestant_age_max'),));
+    $row_rsClassData = $stmt_rsClassData->fetchAll(PDO::FETCH_ASSOC);    
+    $totalRows_rsClassData = $stmt_rsClassData->rowCount();   
     } catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
-      }
+    }
     ?>
           <tr>
             <td><form id="new_registration" name="new_registration" method="POST" action="<?php echo $editFormAction; ?>">
-              <table>
+              <table class = "medium_tbl" border="0">
                 <tr>
-                  <td><label>
+                  <td class="w_20"><label>
                     <input type="text" name="contestant_name" id="contestant_name" value="<?php if($row_rsContestants['contestant_team'] === 1){echo'Lag - ';} echo $row_rsContestants['contestant_name']; ?>" size="20"/>
                   </label></td>
-                  <td><label>
+                  <td class="w_10"><label>
                     <input name="contestant_birth" type="text" id="contestant_birth" value="<?php if($row_rsContestants['contestant_team'] === 1){echo'';}else{echo $row_rsContestants['contestant_birth'];} ?>" size="8" maxlength="10"/>
                   </label></td>
-                  <td><label>
+                  <td class="w_10"><label>
                     <input name="contestant_gender" type="text" id="contestant_gender" value="<?php echo $row_rsContestants['contestant_gender']; ?>" size="4"/>
                   </label></td>
-                  <td><label>
+                  <td class="w_10"><label>
                     <input name="contestant_height" type="text" id="contestant_height" size="1" maxlength="3" />
-                  </label></td>
-                  <td nowrap="nowrap">
-                  <label><select name="class_id" id="class_id">
+                      </label></td>
+                  <td class="w_30" nowrap="nowrap">
+<label><select name="class_id" id="class_id">                               
 <?php
     foreach($row_rsClassData as $row_rsClasses) {
 ?>
@@ -734,14 +754,20 @@ else {
     $stmt_rsClassData->closeCursor();
     $stmt_rsCurrRegs->closeCursor();
     } ?>
-                  </select></label></td>
-                  <td><label>
-                    <input type="submit" name="new_registration" class= "button" id="new_registration" value="Anm&auml;l till klass" />
-                  </label></td>
-                  <td nowrap="nowrap">
-                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantUpdate_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantUpdate';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a> |                    
+</select></label></td>
+                  <td class="w_10">
+                  <?php if($totalRows_rsClassData == ''){
+                            echo 'Inga passande klasser!';} 
+                        elseif ($row_rsCurrRegs['max_regs'] >= $comp_max_regs) {
+                            echo 'Max antal!';} 
+                        else {?>
+                            <input type="submit" name="new_registration" class= "button" id="new_registration" value="Anm&auml;l till klass" />
+                  <?php }?>               
+                  </td>
+                  <td class="w_5" nowrap="nowrap" style="text-align:right;">
+                    <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantUpdate_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantUpdate';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">&Auml;ndra</a>                    
                   </td>  
-                  <td nowrap="nowrap">
+                  <td class="w_5" nowrap="nowrap" style="text-align:right;">
                     <a href="<?php if ($MM_authorizedUsers === "0") { echo 'ContestantDelete_reg';} elseif ($MM_authorizedUsers === "1") {echo 'ContestantDelete';} ?>.php?contestant_id=<?php echo $row_rsContestants['contestant_id']; ?>">Ta bort</a>                    
                   </td>
                   </tr>
@@ -754,6 +780,9 @@ else {
             </form></td>
           </tr>
 <?php } ?>
+      </table>
+          </td>
+          </tr>          
       </table>
 <?php 
 //Catch anything wrong with query
@@ -775,16 +804,16 @@ $totalRows_rsRegistrations = $stmt_rsRegistrations->rowCount();
     }
     
             if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>
-    <h3><a name="registration_delete" id="registration_delete"></a><?php if ($MM_authorizedUsers === "0") { echo '4';} else {echo '5';} ?>. Ta bort anm&auml;lningar</h3>
+    <h3><a name="registration_delete" id="registration_delete"></a><?php if ($MM_authorizedUsers === "0") { echo '4';} else {echo '5';} ?>. Genomförda anm&auml;lningar</h3>
     <p>Om n&aring;got har blivit fel kan du ta bort anm&auml;lan.</p>
-      <table class="medium_tbl" border="1">
+      <table class="wide_tbl" border="1">
         <tr>
-          <td><strong>Startnr.</strong></td>
-          <td><strong>T&auml;vlande</strong></td>
-          <td><strong>F&ouml;delsedatum</strong></td>
-          <td><strong>L&auml;ngd (eventuellt)</strong></td>
-          <td><strong>T&auml;vlingsklass</strong></td>
-          <td><strong>Ta bort anm&auml;lan</strong></td>          
+          <th>Startnr.</th>
+          <th>T&auml;vlande</th>
+          <th>F&ouml;delsedatum</th>
+          <th>L&auml;ngd (eventuellt)</th>
+          <th>T&auml;vlingsklass</th>
+          <th>Ta bort anm&auml;lan</th>          
         </tr>
         <?php while($row_rsRegistrations = $stmt_rsRegistrations->fetch(PDO::FETCH_ASSOC)){ ?>
           <tr>
