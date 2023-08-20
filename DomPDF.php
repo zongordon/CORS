@@ -1,6 +1,6 @@
 <?php 
-//Added code to provide streaming pdf (ob_start() ) and setting proper timezone
-/* DOMPDF 0.8.3
+//Upgraded from DOMPDF 0.8.3 to 2.0.3, changed site independent code and made the PDF rendering work again
+/* DOMPDF 2.0.3
  * https://github.com/dompdf/dompdf
  * *
  */
@@ -13,7 +13,7 @@ error_reporting(E_ALL); // set error display to all
 date_default_timezone_set("Europe/Stockholm");
 
 // include autoloader
-require_once '../dompdf/autoload.inc.php';
+require_once __DIR__ .'/dompdf/vendor/autoload.php';
 // reference the Dompdf namespace
 use Dompdf\Dompdf;
 
@@ -25,14 +25,11 @@ $dompdf->set_option('enable_css_float', true);
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->set_option('enable_remote', true);
 
-//Site independant code to get the file to render
-define("LOCAL_PATH_ROOT", $_SERVER["DOCUMENT_ROOT"]);
-define("HTTP_PATH_ROOT", isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : (isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : '_UNKNOWN_'));
-$my_path = HTTP_PATH_ROOT;
+//Site independent code to get the file to render
+$my_path = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : (isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : '_UNKNOWN_');
 
 //Load file and get content from file
 $file = 'https://'.$my_path.'/ElimLadder.php?class_id='.$class_id;
-
 $html = file_get_contents($file);
 
 //Load html and render PDF

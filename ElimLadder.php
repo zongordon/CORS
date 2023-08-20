@@ -1,5 +1,11 @@
 <?php 
-// Changed code to support individual as well as class individual clubb draws and still display old setup of draws (
+// Changed code to support individual as well as class individual clubb draws and still display old setup of draws
+// DomPDF stopped rendering PDFs with proper css styling: changed code to set site independent absolute path to css file depending on environment
+
+//Display all triggered errors
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 //Fetch the class id from previous page
 $colname_rsClassData = filter_input(INPUT_GET,'class_id');
@@ -98,6 +104,13 @@ $class_weight_length = '';
 $pagedescription = '';
 $pagekeywords="karate, wado, självförsvar, kampsport, budo, karateklubb, sverige, idrott, sport, kamp";    
 } //If there are no class contestants
+
+//Site independent absolute path code 
+$my_path = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : (isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : '_UNKNOWN_');
+
+//Site independent CSS file path
+$cssPath = '';
+$cssPath = 'https://'.$my_path.'/3_elimladder.css';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
@@ -108,7 +121,7 @@ $pagekeywords="karate, wado, självförsvar, kampsport, budo, karateklubb, sveri
 
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="print.css" type="text/css" media="print" /> 
-<link rel="stylesheet" href="3_elimladder.css" type="text/css" media="screen"/>
+<link rel="stylesheet" href="<?= $cssPath ?>" type="text/css" media="screen"/>
 </head>
 <body>
 <div id="masthead">
