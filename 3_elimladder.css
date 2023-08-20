@@ -1,4 +1,4 @@
-
+/* Changed sponsor pics and layout of them
 /***********************************************/
 /* 3_elimladder.css                             */
 
@@ -645,7 +645,7 @@ label{
 	position:absolute;
 	z-index:1;
 	left: 665px;
-	top: 30px;
+	top: 35px;
 	width:241px;
 	height:55px;
         background-image: url("img/sponsors/1spbsrekarne_mynt.png");
@@ -665,7 +665,7 @@ label{
 #apSponsorPic3 {
 	position:absolute;
 	z-index:1;
-	left: 950px;
+	left: 1000px;
 	top: 564px;
 	width:75px;
 	height:53px;
@@ -675,7 +675,7 @@ label{
 #apSponsorPic3KataPoint {
 	position:absolute;
 	z-index:1;
-	left: 980px;
+	left: 1000px;
 	top: 564px;
 	width:75px;
 	height:53px;
@@ -686,28 +686,28 @@ label{
 #apSponsorPic4 {
 	position:absolute;
 	z-index:1;
-	left: 850px;
+	left: 900px;
 	top: 564px;
 	width:75px;
-	height:52px;
-        background-image: url("img/sponsors/Dental_Estetik_small.png");
+	height:53px;
+        background-image: url("img/sponsors/athletic-merch_small.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic4KataPoint {
 	position:absolute;
 	z-index:1;
-	left: 880px;
+	left: 900px;
 	top: 564px;
 	width:75px;
-	height:52px;
-        background-image: url("img/sponsors/Dental_Estetik_small.png");
+	height:53px;
+        background-image: url("img/sponsors/athletic-merch_small.png");
         background-repeat: no-repeat;
 }
 
 #apSponsorPic5 {
 	position:absolute;
 	z-index:1;
-	left: 100px;
+	left: 150px;
 	top: 564px;
 	width:75px;
 	height:27px;
@@ -718,7 +718,7 @@ label{
 #apSponsorPic5KataPoint {
 	position:absolute;
 	z-index:1;
-	left: 100px;
+	left: 150px;
 	top: 594px;
 	width:75px;
 	height:27px;
@@ -731,7 +731,7 @@ label{
 	z-index:1;
 	left: 10px;
 	top: 564px;
-	width:75px;
+	width:102px;
 	height:32px;
         background-image: url("img/sponsors/Kfast_small.png");
         background-repeat: no-repeat;
@@ -742,7 +742,7 @@ label{
 	z-index:1;
 	left: 10px;
 	top: 594px;
-	width:75px;
+	width:102px;
 	height:32px;
         background-image: url("img/sponsors/Kfast_small.png");
         background-repeat: no-repeat;
