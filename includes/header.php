@@ -1,5 +1,6 @@
 <?php 
-//Adjusted code to fit with Recaptcha
+//Added $comp_start_time and $comp_limit_roundrobin 
+//Truncated $row_rsCurrentComp['comp_start_time'] to 5 characters
 
 //Set timezone
 date_default_timezone_set("Europe/Stockholm");

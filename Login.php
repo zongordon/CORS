@@ -1,5 +1,5 @@
 <?php 
-//Adjusted code to fit with Recaptcha
+//Removed one redundant session_start();
 
  ob_start();
 
@@ -33,7 +33,7 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
   $tryLogin = "yes";
   
     // Verify reCAPTCHA
-    $recaptchaSecretKey = '6LfJIn4UAAAAAHaXGvmlDtX1inWGDJjUFlDSZKOd';
+    $recaptchaSecretKey = 'SecretKey';
     $recaptchaResponse = filter_input(INPUT_POST, 'g-recaptcha-response');  
     $recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
     $recaptchaData = array(
@@ -139,7 +139,7 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
           </tr>
           <tr>
             <td></td>
-            <td><div class="g-recaptcha" data-theme="dark" data-sitekey="6LfJIn4UAAAAAFyZGl2_gdIXjV3QN12j9poMJKgG"></div></td>
+            <td><div class="g-recaptcha" data-theme="dark" data-sitekey="sitekey"></div></td>
           </tr>
           <tr>
             <td></td>
