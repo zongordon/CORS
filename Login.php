@@ -1,5 +1,5 @@
 <?php 
-//Removed one redundant session_start();
+//Adjusted code to fit with Recaptcha
 
  ob_start();
 
@@ -30,24 +30,45 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
   $MM_redirecttoReferrer = true;
   $loginUsername=filter_input(INPUT_POST,trim('user_name'));
   $password=filter_input(INPUT_POST,trim('user_password'));
-  $captcha=filter_input(INPUT_POST,'captcha');
   $tryLogin = "yes";
   
+    // Verify reCAPTCHA
+    $recaptchaSecretKey = '6LfJIn4UAAAAAHaXGvmlDtX1inWGDJjUFlDSZKOd';
+    $recaptchaResponse = filter_input(INPUT_POST, 'g-recaptcha-response');  
+    $recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+    $recaptchaData = array(
+        'secret' => $recaptchaSecretKey,
+        'response' => $recaptchaResponse,
+    );
+    $recaptchaOptions = array(
+    'http' => array(
+        'method' => 'POST',
+        'header' => 'Content-type: application/x-www-form-urlencoded',
+        'content' => http_build_query($recaptchaData),
+        ),
+    );
+    $recaptchaContext = stream_context_create($recaptchaOptions);
+    $recaptchaResult = file_get_contents($recaptchaVerifyUrl, false, $recaptchaContext);
+
+      if ($recaptchaResult === false) {
+        echo "Failed to verify reCAPTCHA.";
+      } else 
+            $recaptchaResult = json_decode($recaptchaResult, true);
+
+      if (!$recaptchaResult['success']) {
+        echo '<h3>Vänligen bekräfta att du inte är en robot!</h3>';
+        $tryLogin = "no";
+      }
       if (empty($loginUsername)) {
       // $loginUsername is blank
-      echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
-      $tryLogin = "no";
+        echo '<h3>Du gl&ouml;mde att fylla i anv&auml;ndarnamn!</h3>';
+        $tryLogin = "no";
       }
       if (empty($password)) {
       // $password is blank
-      echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
-      $tryLogin = "no";
-      }      
-      if ($captcha <> $_SESSION['captcha']){
-      echo '<h3>Du skrev inte in samma teckan som i bilden. Försök igen!</h3>';
-      $tryLogin = "no";
-      }
-      
+        echo '<h3>Du gl&ouml;mde att fylla i l&ouml;senord!</h3>';
+        $tryLogin = "no";
+      }       
   if ($tryLogin == "yes") {	    
     //Catch anything wrong with query 
     try {
@@ -117,11 +138,11 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
             <td><input name="user_password" type="password" id="user_password" size="25" /></td>
           </tr>
           <tr>
-            <td>Skriv in samma tecken som i bilden!</td>
-            <td><input name="captcha" type="text" id="captcha" size="25" /></td>
+            <td></td>
+            <td><div class="g-recaptcha" data-theme="dark" data-sitekey="6LfJIn4UAAAAAFyZGl2_gdIXjV3QN12j9poMJKgG"></div></td>
           </tr>
           <tr>
-            <td><img src="Captcha.php" /></td>
+            <td></td>
             <td><input type="submit" name="LoginButton" class = "button" id="LoginButton" value="Logga in" /></td>
           </tr>
         </table>
