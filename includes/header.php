@@ -46,7 +46,7 @@ $pagekeywords="$pagetitle, $comp_arranger, $comp_name, karate, wado, självförs
 <title><?php echo $pagetitle ?></title>
 <link rel="stylesheet" href="3col_leftNav.css" type="text/css" />
 <script language="JavaScript" type="text/javascript" src="includes/PopUp.js"></script>
-<script src='https://www.google.com/recaptcha/api.js'></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 
