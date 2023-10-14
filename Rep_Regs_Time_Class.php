@@ -1,5 +1,5 @@
 <?php 
-//Replace width="80%" with class="wide_tbl" and removed  nowrap="nowrap"
+//Added class_discipline and class_team as variables to calculate number of matches by ClassCalculations()
 
 if (!isset($_SESSION)) {
   session_start();
@@ -52,11 +52,14 @@ include_once("includes/news_sponsors_nav.php");?>
             $max_matches->limit_roundrobin = $row_rsRegistrations['comp_limit_roundrobin'];
             $max_matches->registrations = $row_rsRegistrations['COUNT(class_id)'];
             $max_matches->repechage = $row_rsRegistrations['class_repechage'];
+            $max_matches->team = $row_rsRegistrations['class_team'];
+            $max_matches->discipline = $row_rsRegistrations['class_discipline'];
 
             $total_match_time = new ClassCalculations;
             $total_match_time->class_match_time = $row_rsRegistrations['class_match_time'];?>
         <tr>
-          <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category'].' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
+          <td><?php if($row_rsRegistrations['class_team'] === 1){echo'Lag - ';} echo $row_rsRegistrations['class_discipline'].' | '.$row_rsRegistrations['class_gender_category']
+                  .' | '.$row_rsRegistrations['class_weight_length'].' | '.$row_rsRegistrations['class_age'].' &aring;r'?></td>
           <td><?php echo $row_rsRegistrations['COUNT(class_id)']; ?></td>
           <td><?php echo $max_matches->class_max_matches(); ?></td>
           <td><?php echo $max_matches->class_max_matches()*$total_match_time->class_total_time(); ?></td>

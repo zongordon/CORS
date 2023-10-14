@@ -1,5 +1,5 @@
 <?php
-//Added class for styling button in css file
+//Removed field for active (comp_current) competition in form
 
 ob_start();
 
@@ -162,27 +162,13 @@ if ($output_form == 'yes') {
             </label></td>
         </tr>        
         <tr>
-          <td align="right" valign="baseline" nowrap="nowrap">Aktiv:</td>
-          <td>&nbsp;</td>
-          <td><label>
-          <input type="checkbox" name="comp_current" id="comp_current" 
-          <?php if (!(strcmp($comp_current,1))) {
-                   //Disable checkbox if competition is current (active)
-                   echo "checked=\"checked\" disabled='disabled'/ />(&auml;ndrar du i listan &ouml;ver t&auml;vlingar)";
-                   echo "<input name='comp_current' type='hidden' value=1 />";
-                }   
-                else {
-                   echo "/>"; 
-                } ?>  
-          </label></td>
-        </tr>
-        <tr>
           <td>&nbsp;</td>
           <td>&nbsp;</td>
           <td><input name="CompUpdate" type="submit" class = "button" id="CompUpdate" value="Spara"/></td>
         </tr>
       </table>
       <input name="comp_id" type="hidden" id="comp_id" value="<?php echo $comp_id; ?>"/>
+      <input name="comp_current" type="hidden" id="comp_current" value="<?php echo $comp_current; ?>"/>
       <input type="hidden" name="MM_update" value="update_competition"/>
     </form>
     <p>&nbsp;</p>

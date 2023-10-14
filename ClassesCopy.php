@@ -1,5 +1,6 @@
 <?php 
-//Added class for styling button in css file
+//Added class_repechage field when copying the class
+//Added layout class = wide_tbl to table
 
 ob_start();
 //Access level top administrator
@@ -18,7 +19,10 @@ if ($colname_rsCompetition <> NULL) {
     try {
         //Select all classes for selected competition and the competition's name
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT com.comp_name, cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, cl.class_fee, cl.class_match_time FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id ORDER BY class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
+        $query1 = "SELECT com.comp_name, cl.class_id, cl.class_team, cl.class_category, cl.class_discipline, cl.class_discipline_variant, cl.class_gender, cl.class_repechage, "
+                . "cl.class_gender_category, cl.class_weight_length, cl.class_age, cl.class_fee, cl.class_match_time "
+                . "FROM classes AS cl INNER JOIN competition AS com USING (comp_id) WHERE comp_id = :comp_id "
+                . "ORDER BY class_team, class_discipline, class_gender, class_age, class_weight_length, class_gender_category";
         $stmt_rsClasses = $DBconnection->prepare($query1);
         $stmt_rsClasses->execute(array(':comp_id' => $colname_rsCompetition));
         $row_rsClasses = $stmt_rsClasses->fetchAll(PDO::FETCH_ASSOC);        
@@ -91,16 +95,17 @@ else {
 if ($output_form === 'yes') {    
 ?>
     <form action="<?php echo $editFormAction; ?>" method="POST" enctype="multipart/form-data" name="copy_classes" id="copy_classes">
-    <table width="100%" border="1">
+    <table class="wide_tbl" border="1">
       <tr>
-        <td><strong>Type</strong></td>
-        <td><strong>Disciplin</strong></td>
-        <td><strong>K&ouml;nskategori</strong></td>
-        <td><strong>Kategori</strong></td>
-        <td><strong>&Aring;lder</strong></td>
-        <td><strong>Vikt- eller l&auml;ngdkategori</strong></td>
-        <td><strong>Matchtid</strong></td>
-        <td><strong>Kopiera</strong></td>
+        <th>Type</th>
+        <th>Disciplin</th>
+        <th>K&ouml;nskategori</th>
+        <th>Kategori</th>
+        <th>&Aring;lder</th>
+        <th>Vikt- eller l&auml;ngdkategori</th>
+        <th>Matchtid</th>
+        <th>&Aring;terkval</th>
+        <th>Kopiera</th>
       </tr>
 <?php //reset ($row_rsClasses);
       foreach($row_rsClasses As $row_rsClass) { ?>
@@ -109,9 +114,10 @@ if ($output_form === 'yes') {
           <td><?php echo $row_rsClass['class_discipline']; ?></td>
           <td><?php echo $row_rsClass['class_gender_category']; ?></td>
           <td><?php echo $row_rsClass['class_category']; ?></td>
-          <td><?php echo $row_rsClass['class_age']; ?></td>
+          <td><?php echo '<nobr>'.$row_rsClass['class_age']; ?></td>
           <td><?php echo $row_rsClass['class_weight_length']; ?></td>
           <td><?php echo $row_rsClass['class_match_time']; ?></td>
+          <td><?php if (!(strcmp($row_rsClass['class_repechage'],0))) {echo 'Nej';}else echo 'Ja'?></td>
           <td><label>
         <input name="copy_class[]" type="checkbox" id="copy_class[]" value="<?php echo $row_rsClass['class_id'];?>" checked />
               </label>
@@ -150,9 +156,10 @@ while($row_rsOtherCompetitions = $stmt_rsOtherCompetitions->fetch(PDO::FETCH_ASS
             try {
             //INSERT new class in the database    
             require('Connections/DBconnection.php');
-            $insertSQL = "INSERT INTO classes (comp_id, class_team, class_category, class_discipline, class_discipline_variant ,class_gender_category, class_gender, class_weight_length, class_age, class_fee, class_match_time)
-            SELECT :comp_id AS comp_id, class_team, class_category, class_discipline, class_discipline_variant, class_gender_category, class_gender, class_weight_length, class_age, class_fee, class_match_time  
-            FROM classes WHERE class_id = :class_id";
+            $insertSQL = "INSERT INTO classes (comp_id, class_team, class_category, class_discipline, class_discipline_variant ,class_gender_category, class_repechage, 
+                class_gender, class_weight_length, class_age, class_fee, class_match_time)
+            SELECT :comp_id AS comp_id, class_team, class_category, class_discipline, class_discipline_variant, class_gender_category, class_repechage, class_gender, 
+            class_weight_length, class_age, class_fee, class_match_time FROM classes WHERE class_id = :class_id";
             $stmt = $DBconnection->prepare($insertSQL);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
             $stmt->bindValue(':class_id', $class_id, PDO::PARAM_INT);

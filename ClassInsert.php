@@ -1,5 +1,5 @@
 <?php
-//Added class for styling button in css file
+//Added class_repechage field in form when inserting the class
 
 ob_start();
 //Access level top administrator
@@ -31,7 +31,8 @@ include_once('includes/restrict_access.php');?>
         <div class="error">     
 <?php
 //Declare and initialise variables
-$class_team ='';$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';$class_age = '';$class_fee = '';$class_match_time = '';
+$class_team ='';$class_category = '';$class_discipline = '';$class_discipline_variant = '';$class_gender = '';$class_gender_category = '';$class_weight_length = '';
+$class_age = '';$class_fee = '';$class_match_time = '';$class_repechage = '';
 // Insert new class if button is clicked and all fields are validated to be correct
  if (filter_input(INPUT_POST,'MM_insert') && filter_input(INPUT_POST,'MM_insert') == 'new_class') {
     $comp_id = filter_input(INPUT_POST,'comp_id');         
@@ -41,6 +42,7 @@ $class_team ='';$class_category = '';$class_discipline = '';$class_discipline_va
     $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
     $class_gender = filter_input(INPUT_POST,'class_gender');         
     $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
+    $class_repechage = filter_input(INPUT_POST,'class_repechage');
     if (filter_input(INPUT_POST, trim('class_weight_length')) === '') { 
         $class_weight_length = '-';            
     } 
@@ -194,6 +196,15 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             </label></td>
           </tr>
           <tr>
+            <td>&Aring;terkval</td>
+            <td><label>
+              <select name="class_gender_category" id="class_gender_category">
+                <option value=0 <?php if (!(strcmp(0, $class_repechage))) {echo "selected=\"selected\"";} ?>>Nej</option>
+                <option value=1 <?php if (!(strcmp(1, $class_repechage))) {echo "selected=\"selected\"";} ?>>Ja</option>
+              </select>
+            </label></td>
+          </tr>
+          <tr>
             <td>Vikt- eller l&auml;ngdkategori</td>
             <td><label>
               <input name="class_weight_length" type="text" id="class_weight_length" value="<?php echo $class_weight_length ?>" size="15" />
@@ -227,7 +238,10 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             try {
             //INSERT new class in the database    
             require('Connections/DBconnection.php');             
-            $query1 = "INSERT INTO classes (comp_id, class_team, class_category, class_discipline, class_discipline_variant, class_gender, class_gender_category, class_weight_length, class_age, class_fee, class_match_time) VALUES (:comp_id, :class_team, :class_category, :class_discipline, :class_discipline_variant, :class_gender, :class_gender_category, :class_weight_length, :class_age, :class_fee, :class_match_time)";
+            $query1 = "INSERT INTO classes (comp_id, class_team, class_category, class_discipline, class_discipline_variant, class_gender, class_gender_category, class_repechage,"
+                    . "class_weight_length, class_age, class_fee, class_match_time) "
+                    . "VALUES (:comp_id, :class_team, :class_category, :class_discipline, :class_discipline_variant, :class_gender, :class_gender_category, :class_repechage,"
+                    . ":class_weight_length, :class_age, :class_fee, :class_match_time)";
             $stmt = $DBconnection->prepare($query1);
             $stmt->bindValue(':comp_id', $comp_id, PDO::PARAM_INT);
             $stmt->bindValue(':class_team', $class_team, PDO::PARAM_INT);
@@ -236,6 +250,7 @@ while($row_rsCompetitions = $stmt_rsCompetitions->fetch(PDO::FETCH_ASSOC)) {
             $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);
             $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
             $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
+            $stmt->bindValue(':class_repechage', $class_repechage, PDO::PARAM_INT);
             $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
             $stmt->bindValue(':class_age', $class_age, PDO::PARAM_STR);            
             $stmt->bindValue(':class_fee', $class_fee, PDO::PARAM_INT);
