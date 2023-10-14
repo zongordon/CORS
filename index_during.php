@@ -53,8 +53,8 @@ include_once("includes/news_sponsors_nav.php");
       <li>Kadetter och juniorer ska utf&ouml;ra olika kata i varje omg&aring;ng</li>
       <li>Inga krav p&aring; olika kata f&ouml;r barnklasserna</li>
       <li>T&auml;vlingskort g&auml;ller f&ouml;r kadetter och juniorer (fr&aring;n 14 &aring;r) f&ouml;r b&aring;de kata och kumite.  L&auml;nk till Karatef&ouml;rbundets sida: <a href="https://www.karatesweden.se/tavla-i-karate/tavlingslicens/" target=_blank>l&auml;nk</a></li>
-      <li>Kadetter och juniorer: &aring;terkval och Round Robin (alla m&ouml;ter alla) vid f&auml;rre &auml;n fyra i klassen</li>
-      <li>Duo kata (tv&aring; t&auml;vlande samtidigt) upp till 12 &aring;r</li>
+      <li>Kadetter och juniorer: &aring;terkval och Round Robin (alla m&ouml;ter alla) vid f&auml;rre &auml;n tre i klassen</li>
+      <li>Duo kata (tv&aring; t&auml;vlande samtidigt) upp till 13 &aring;r</li>
       <li>Vi f&ouml;rbeh&aring;ller oss r&auml;tten att &auml;ndra t&auml;vlingsklasserna vid f&ouml;r f&aring; deltagare</li>
     </ul>
     <h2>Boende i Eskilstuna</h2>

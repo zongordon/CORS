@@ -1,5 +1,5 @@
 <?php 
-////Replaced "<td>" in header with "<th>"
+//Added no line break for dates columns and prevented (bug) possibility to delete active or passed competitions
 
 //Access level top administrator
 $MM_authorizedUsers = "1";
@@ -116,21 +116,20 @@ catch(PDOException $ex) {
         ?>
       <tr>
         <td><?php echo $row_rsCompetitions['comp_name']; ?></td>
-        <td><?php echo $row_rsCompetitions['comp_start_date']; ?></td>
+        <td><?php echo '<nobr>'.$row_rsCompetitions['comp_start_date']; ?></td>
         <td><?php echo substr($row_rsCompetitions['comp_start_time'],0,5); ?></td>
-        <td><?php echo $row_rsCompetitions['comp_end_reg_date']; ?></td>
+        <td><?php echo '<nobr>'.$row_rsCompetitions['comp_end_reg_date']; ?></td>
         <td><?php echo $row_rsCompetitions['comp_max_regs']; ?></td>
         <td><?php echo $totalRows_rsRegistrations;?></td>
         <td><?php echo $totalRows_rsClasses;?></td> 
         <td><label>
-        <input <?php if (!(strcmp($row_rsCompetitions['comp_current'],1))) { 
-                        echo "checked=\"checked\"";
-                     } ?> 
+        <input <?php if (!(strcmp($row_rsCompetitions['comp_current'],1))) {echo "checked=\"checked\"";} ?> 
         type="radio" name="new_current_comp_id" value ="<?php echo $row_rsCompetitions['comp_id'];?>" id = "new_current_comp_id_<?php echo $row_rsCompetitions['comp_id'];?>"/>               
         </label></td>
         <td><a href="ClassesCopy.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">Kopiera</a></td>        
         <td><a href="CompetitionUpdate.php?comp_id=<?php echo $row_rsCompetitions['comp_id']; ?>">&Auml;ndra</a></td>
-        <td><a href="#" onclick="return deleteCompetition('<?php echo $row_rsCompetitions['comp_id']; ?>')">Ta bort</a></td>
+        <td><a href="#" onclick="return deleteCompetition('<?php echo $row_rsCompetitions['comp_id']; ?>')">
+            <?php if (!(strcmp($row_rsCompetitions['comp_current'],1)) || $row_rsCompetitions['comp_start_date'] < date("Y-m-d")) {echo "";}else{echo 'Ta bort';} ?></a></td>
       </tr> 
 <?php } ?>
         <tr>

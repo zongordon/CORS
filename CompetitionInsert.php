@@ -1,5 +1,5 @@
 <?php
-//Added class for button styling in css file
+//Fixed bug not setting all other competitions to inactive if inserted will be the active competition
 
 ob_start();
 
@@ -136,8 +136,10 @@ $comp_name = '';$comp_start_time = '';$comp_start_date = '';$comp_end_reg_date =
           <tr>
             <td>Aktiv t&auml;vling</td>
             <td><label>
-            <input name="comp_current" type="checkbox" id="comp_current" value="1" <?php if ($comp_current == 1){ echo 'checked';} elseif ($comp_current == 0) { echo 'unchecked';}?> />
-            </label></td>
+            <input <?php if (!(strcmp($comp_current,1))) {echo "checked=\"checked\"";} ?> type="radio" name="comp_current" value=1 id="comp_current_1" checked=""/>
+            Ja</label><label>      
+            <input <?php if (!(strcmp($comp_current,0))) {echo "checked=\"checked\"";} ?> type="radio" name="comp_current" value=0 id="comp_current_0" />
+            Nej</label></td>                                    
           </tr>          
           <tr>
             <td>&nbsp;</td>
@@ -151,31 +153,32 @@ $comp_name = '';$comp_start_time = '';$comp_start_date = '';$comp_end_reg_date =
     <?php
   	} 
 	//Save the competition information
-else if ($output_form == 'no') {
+else if ($output_form == 'no') {    
 //If button is clicked for insert then insert to columns from data in the form
     if (filter_input(INPUT_POST,'MM_insert') == 'new_comp') {
-    // Set all competitions first to non-current (0) if the new competition shall be current
-    $comp_current = filter_input(INPUT_POST,'comp_current');
-            // Set all competitions first to non-current (0) if this competition will be the active  one ($comp_current == "on")
-            if ($comp_current === "on") {
+            // Set all competitions first to non-current (0) if this competition will be the active one ($comp_current == "1")
+            if ($comp_current == 1) {
                 //Catch anything wrong with query
                 try {
                 // Set all competitions first to non-current (0)   
                 require('Connections/DBconnection.php');
-                $comp_reset = 0;
+                $comp_current = 0;
                 $resetSQL = "UPDATE competition SET comp_current = :comp_current"; 
                 $stmt_rsReset = $DBconnection->prepare($resetSQL);                                 
-                $stmt_rsReset->bindValue(':comp_current', $comp_reset, PDO::PARAM_INT);
+                $stmt_rsReset->bindValue(':comp_current', $comp_current, PDO::PARAM_INT);
                 $stmt_rsReset->execute();
                 }   
                 catch(PDOException $ex) {
-                    echo "An Error occured with query (resetSQL): ".$ex->getMessage();
+                    echo 'An Error occured with query (resetSQL): '.$ex->getMessage();
                 }
                 $comp_current = 1;
-            }    
+            } else {
+                $comp_current = 0;    
+            }
+
     // Insert all competition data  
     require('Connections/DBconnection.php');         
-    $insertSQL = "INSERT INTO competition  (comp_name, comp_start_time, comp_start_date, comp_end_reg_date, comp_arranger, comp_email, "
+    $insertSQL = "INSERT INTO competition (comp_name, comp_start_time, comp_start_date, comp_end_reg_date, comp_arranger, comp_email, "
             . "comp_url, comp_max_regs, comp_limit_roundrobin, comp_current) VALUES (:comp_name, :comp_start_time, :comp_start_date, "
             . ":comp_end_reg_date, :comp_arranger, :comp_email, :comp_url, :comp_max_regs, :comp_limit_roundrobin, :comp_current)";
     $stmt = $DBconnection->prepare($insertSQL);
@@ -198,10 +201,9 @@ else if ($output_form == 'no') {
         }
         header(sprintf("Location: %s", $insertGoTo));
     }
-    //Kill statement
+   //Kill statement
     $stmt->closeCursor();
-}
-?>
+}?>
   </div>
   <div class="story">
     <h3>&nbsp;</h3>

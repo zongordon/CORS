@@ -1,5 +1,5 @@
 <?php
-//Added class for styling button in css file
+//Added class_repechage field in form to update the class
 
 ob_start();
 //Access level top administrator
@@ -45,6 +45,7 @@ $class_team ='';$class_category = '';$class_discipline = '';$class_discipline_va
     $class_discipline_variant = filter_input(INPUT_POST,'class_discipline_variant');         
     $class_gender = filter_input(INPUT_POST,'class_gender');         
     $class_gender_category = filter_input(INPUT_POST,'class_gender_category');
+    $class_repechage = filter_input(INPUT_POST,'class_repechage');
     if (filter_input(INPUT_POST, trim('class_weight_length')) == '') { 
         $class_weight_length = '-';            
     } 
@@ -97,7 +98,9 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
     try {
         //Select Class data for selected class
         require('Connections/DBconnection.php');           
-        $query1 = "SELECT c.class_id, c.comp_id, c.class_team, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, co.comp_name FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
+        $query1 = "SELECT c.class_id, c.comp_id, c.class_team, c.class_category, c.class_discipline, c.class_discipline_variant, c.class_gender, "
+                . "c.class_gender_category, c.class_weight_length, c.class_age, c.class_fee, c.class_match_time, c.class_repechage, co.comp_name "
+                . "FROM classes AS c JOIN competition AS co ON co.comp_id = c.comp_id WHERE class_id = :class_id";
         $stmt_rsClass = $DBconnection->prepare($query1);
         $stmt_rsClass->execute(array(':class_id' => $colname_rsClass));
         $row_rsClass = $stmt_rsClass->fetch(PDO::FETCH_ASSOC);
@@ -115,7 +118,8 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
             <td>T&auml;vling</td>
             <td><label>
 <select name="comp_id" id="comp_id">
-<option value="<?php echo $row_rsClass['comp_id']?>"<?php if (!(strcmp($row_rsClass['comp_id'], $row_rsClass['comp_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['comp_name']?></option>
+<option value="<?php echo $row_rsClass['comp_id']?>"<?php if (!(strcmp($row_rsClass['comp_id'], $row_rsClass['comp_id']))) {
+    echo "selected=\"selected\"";} ?>><?php echo $row_rsClass['comp_name']?></option>
 </select>
             </label></td>
           </tr>
@@ -195,6 +199,15 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
 </label></td>
           </tr>
           <tr>
+              <td>&Aring;terkval</td>
+<td valign="top"><label>
+  <select name="class_repechage" id="class_repechage">
+    <option value=1 <?php if (!(strcmp(1, $row_rsClass['class_repechage']))) {echo "selected=\"selected\"";} ?>>Ja</option>
+    <option value=0 <?php if (!(strcmp(0, $row_rsClass['class_repechage']))) {echo "selected=\"selected\"";} ?>>Nej</option>
+  </select>
+</label></td>
+          </tr>                    
+          <tr>
             <td>Vikt- eller l&auml;ngdkategori</td>
             <td><label>
               <input name="class_weight_length" type="text" id="class_weight_length" value="<?php echo $row_rsClass['class_weight_length']; ?>" size="15" />
@@ -236,6 +249,7 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
                 class_discipline_variant = :class_discipline_variant, 
                 class_gender = :class_gender, 
                 class_gender_category = :class_gender_category, 
+                class_repechage = :class_repechage,
                 class_weight_length = :class_weight_length, 
                 class_age = :class_age, 
                 class_fee = :class_fee,
@@ -249,6 +263,7 @@ echo 'vikt-/l&auml;ngdkategori: '.$class_weight_length.'<br>';
                 $stmt->bindValue(':class_discipline_variant', $class_discipline_variant, PDO::PARAM_INT);
                 $stmt->bindValue(':class_gender', $class_gender, PDO::PARAM_STR);
                 $stmt->bindValue(':class_gender_category', $class_gender_category, PDO::PARAM_STR);
+                $stmt->bindValue(':class_repechage', $class_repechage, PDO::PARAM_INT);
                 $stmt->bindValue(':class_weight_length', $class_weight_length, PDO::PARAM_STR);            
                 $stmt->bindValue(':class_age', $class_age, PDO::PARAM_STR);            
                 $stmt->bindValue(':class_fee', $class_fee, PDO::PARAM_INT);                        

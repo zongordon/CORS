@@ -1,5 +1,5 @@
 <?php 
-//Removed one redundant session_start();
+//Moved Recaptcha secret keys to includes/secret_keys.php
 
  ob_start();
 
@@ -11,7 +11,8 @@ $pagetitle="Logga in";
 // Includes HTML Head
 include_once('includes/header.php');
 //Include top navigation links, News and sponsor sections
-include_once("includes/news_sponsors_nav.php");?> 
+include_once("includes/news_sponsors_nav.php"); 
+include_once("includes/secret_keys.php");?> 
 <!-- start page -->
 <div id="pageName"><h1><?php echo $pagetitle?></h1></div>
 <!-- Include different navigation links depending on authority  -->
@@ -33,7 +34,6 @@ if (filter_input(INPUT_POST,'user_name') && filter_input(INPUT_POST,'user_passwo
   $tryLogin = "yes";
   
     // Verify reCAPTCHA
-    $recaptchaSecretKey = 'SecretKey';
     $recaptchaResponse = filter_input(INPUT_POST, 'g-recaptcha-response');  
     $recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
     $recaptchaData = array(
@@ -139,7 +139,7 @@ Logga in till ditt klubbkonto f&ouml;r att anm&auml;la er eller &auml;ndra er an
           </tr>
           <tr>
             <td></td>
-            <td><div class="g-recaptcha" data-theme="dark" data-sitekey="sitekey"></div></td>
+            <td><div class="g-recaptcha" data-theme="dark" data-sitekey="<?php echo $recaptchaSiteKey?>"></div></td>
           </tr>
           <tr>
             <td></td>
