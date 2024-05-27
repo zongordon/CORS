@@ -1,4 +1,4 @@
-<?php
+<?php //Added "name" in $patterns to allow character "-" when validating names: https://github.com/zongordon/CORS/issues/74
     /**
      * Validation 
      //Corrected and improved text validation for more special characters and to fit PHP 8.0.0
@@ -39,6 +39,7 @@
         public $patterns = array(
             'uri'           => '[A-Za-z0-9-\/_?&=]+',
             'alpha'         => '[\p{L}]+',
+            'name'         => '[\p{L}\s\-]+',
             'words'         => '[\p{L}\s]+',
             'alphanum'      => '[\p{L}0-9\s\-]+',
             'int'           => '[0-9]+',

@@ -12,7 +12,8 @@ $MM_donotCheckaccess = "false";
 try {
 //Select number of registrations and cost for each club in active competition
 require('Connections/DBconnection.php');           
-$query_rsCost = "SELECT club_name, coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
+$query_rsCost = "SELECT club_name, coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) INNER JOIN registration USING(class_id) "
+        . "INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account USING(account_id) WHERE comp_current = 1 GROUP BY account_id ORDER BY club_name";
 $stmt_rsCost = $DBconnection->query($query_rsCost);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();

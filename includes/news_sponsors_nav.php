@@ -1,5 +1,5 @@
 <?php
-//Changed sponsors
+//Removed Eskilstuna Kommunföretag and added Budo & Fitness as sponsors and changed size of banner
 
 require_once('Connections/DBconnection.php');
 
@@ -21,7 +21,7 @@ $totalRows_rsLatestNews = $stmt_rsLatestNews->rowCount();
 <body>
 <div class="sticky">    
 <div id="masthead">
-    <a href="index.php"><img src="img/Banner.svg" alt="Logo Tuna Karate Cup" width="700"></a>
+    <a href="index.php"><img src="img/Banner.svg" alt="Logo Tuna Karate Cup" width="650"></a>
 </div>
 <div id="globalNav"><a href="index.php">Hem</a><a href="News.php">Nyheter</a><a href="Contacts.php">Kontakter</a><a href="ClassesList.php">T&auml;vlingsklasser</a><a href="RegsAll.php">Startlistor</a><?php if ($comp_raffled === 1) { echo "<a href='Draws.php'>Lottning</a>"; } ?><a href="Results.php">Resultat</a><a href="https://github.com/zongordon/CORS/issues" target="_blank">GitHub Issues</a><a href="https://www.karateklubben.com" target="_blank">Eskilstuna Karateklubb</a>
 </div>
@@ -48,16 +48,19 @@ $DBconnection = null;
 ?>
   </div><br/>
   <div id="sponsors">
-      <h2>Huvud-sponsorer</h2>
+      <h2>Samarbets-partner</h2>
       <p><a href="http://www.eka-knivar.se" target="_blank"><img src="img/sponsors/EKA-logo.svg" alt="EKA Knivar" width="100%" height="100%" border="0" /></a></p>
-      <p><a href="https://www.athleticmerch.com/" target="_blank"><img src="img/sponsors/athletic-merch.svg" alt="Athletic Merch" width="100%" height="100%" border="0" /></a></p>
-      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_vit.svg" alt="Sparbanksstiftelsen Rekarne" width="100%" height="100%" border="0" /></a></p>
+      <p><a href="https://budofitness.se/" target="_blank"><img src="img/sponsors/Budofitness_blackbackground.svg" width="100%" height="100%" border="0" alt="Budo&Fitness"></a></p>            
+      <p><a href="https://budo-nord.com/" target="_blank"><img src="img/sponsors/Budo-Nord_blackbackground.svg" width="100%" height="100%" border="0" alt="Budo-Nord"></a></p>                  
       <h3>Övriga sponsorer</h3>      
+      <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_vit.svg" alt="Sparbanksstiftelsen Rekarne" width="100%" height="100%" border="0" /></a></p>      
+
+<!--Hide code  
       <p><a href="https://www.stigasports.com/sv" target="_blank"><img src="img/sponsors/Stiga.png" width="150" height="37" border="0" alt="Stiga Sports"></a></p>            
+      <p><a href="https://www.athleticmerch.com/" target="_blank"><img src="img/sponsors/athletic-merch.svg" alt="Athletic Merch" width="100%" height="100%" border="0" /></a></p>
       <p><a href="http://www.eskilstunalogistik.se/start/" target="_blank"><img src="img/sponsors/eskilstuna-logistik-logotyp-vit.svg" width="100%" height="100%" border="0" alt="Eskilstuna Logistik"></a></p>      
       <p><a href="http://www.kfast.se/" target="_blank"><img src="img/sponsors/kfast-logo-vit.svg" width="100%" height="100%" border="0" alt="Kommunfastighet Eskilstuna"></a></p>      
       <p><a href="http://www.eem.se/privat/" target="_blank"><img src="img/sponsors/eem-logo-vit.svg" width="100%" height="100%" border="0" alt="Eskilstuna Energi & milj&ouml;"></a></p>      
-<!--Hide code  
       <p><a href="http://www.sparbanksstiftelsenrekarne.se/" target="_blank"><img src="img/sponsors/Sparbanksstiftelsen_nav.png" width="150" height="37" border="0" alt="Sparbanksstiftelsen Rekarne"></a></p>                  
       <p><a href="https://www.sparbankenrekarne.se/" target="_blank"><img src="img/sponsors/sparbanken-rekarne.svg" alt="Sparbanken Rekarne" width="100%" height="100%" border="0" /></a></p>      
       <p><a href="http://klarafastigheter.se/" target="_blank"><img src="img/sponsors/klara_fastigheter.png" width="150" height="81" border="0" alt="Klara Fastigheter"></a></p>            

@@ -1,5 +1,5 @@
 <?php 
-//Corrected bug that prevented displaying teams' for selection of class
+//Added link to previous page and corrected text in existing link: https://github.com/zongordon/CORS/issues/76
 
 //Declare and initialise variables
 $colname_rsClass = '';$class_gender = ''; $contestant_height = ''; $contestant_result = ''; $contestant_gender = ''; $sql_db = '';
@@ -332,7 +332,8 @@ foreach($row_rsClassData as $row_rsClasses) {
 <?php } ?>
   </table>
 <?php }?>
-<p><a href="ClassesList.php">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
+<p><a href="javascript:window.history.back();">Klicka h&auml;r s&aring; kommer du tillbaka till f&ouml;reg&aring;ende sida!</a></p>
+<p><a href="ClassesList.php">Klicka h&auml;r s&aring; kommer du tillbaka till t&auml;vlingsklasser!</a></p>
 <?php 
 //Kill statement
 $stmt_rsRegistrations->closeCursor();
