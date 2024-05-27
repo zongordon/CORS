@@ -1,4 +1,4 @@
-/* Changed sponsor pics and layout of them
+/* Changed sponsor pics and layout of them: https://github.com/zongordon/CORS/issues/75
 /***********************************************/
 /* 3_elimladder.css                             */
 
@@ -667,9 +667,9 @@ label{
 	z-index:1;
 	left: 1000px;
 	top: 564px;
-	width:75px;
-	height:53px;
-        background-image: url("img/sponsors/EEM_small.png");
+	width:100px;
+	height:73px;
+        background-image: url("img/sponsors/Budo-Nord_white_background.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic3KataPoint {
@@ -677,30 +677,30 @@ label{
 	z-index:1;
 	left: 1000px;
 	top: 564px;
-	width:75px;
-	height:53px;
-        background-image: url("img/sponsors/EEM_small.png");
+	width:100px;
+	height:73px;
+        background-image: url("img/sponsors/Budo-Nord_white_background.png");
         background-repeat: no-repeat;
 }
 
 #apSponsorPic4 {
 	position:absolute;
 	z-index:1;
-	left: 900px;
+	left: 850px;
 	top: 564px;
-	width:75px;
+	width:100px;
 	height:53px;
-        background-image: url("img/sponsors/athletic-merch_small.png");
+        background-image: url("img/sponsors/BF_white_background.png");
         background-repeat: no-repeat;
 }
 #apSponsorPic4KataPoint {
 	position:absolute;
 	z-index:1;
-	left: 900px;
+	left: 850px;
 	top: 564px;
-	width:75px;
+	width:100px;
 	height:53px;
-        background-image: url("img/sponsors/athletic-merch_small.png");
+        background-image: url("img/sponsors/BF_white_background.png");
         background-repeat: no-repeat;
 }
 
@@ -709,9 +709,9 @@ label{
 	z-index:1;
 	left: 150px;
 	top: 564px;
-	width:75px;
-	height:27px;
-        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+	width:100px;
+	height:73px;
+        background-image: url("img/sponsors/Budo-Nord_white_background.png");
         background-repeat: no-repeat;
 }
 
@@ -720,9 +720,9 @@ label{
 	z-index:1;
 	left: 150px;
 	top: 594px;
-	width:75px;
-	height:27px;
-        background-image: url("img/sponsors/Etuna_Logistik_small.png");
+	width:100px;
+	height:73px;
+        background-image: url("img/sponsors/Budo-Nord_white_background.png");
         background-repeat: no-repeat;
 }
 
@@ -731,9 +731,9 @@ label{
 	z-index:1;
 	left: 10px;
 	top: 564px;
-	width:102px;
-	height:32px;
-        background-image: url("img/sponsors/Kfast_small.png");
+	width:100px;
+	height:53px;
+        background-image: url("img/sponsors/BF_white_background.png");
         background-repeat: no-repeat;
 }
 
@@ -742,8 +742,8 @@ label{
 	z-index:1;
 	left: 10px;
 	top: 594px;
-	width:102px;
-	height:32px;
-        background-image: url("img/sponsors/Kfast_small.png");
+	width:100px;
+	height:53px;
+        background-image: url("img/sponsors/BF_white_background.png");
         background-repeat: no-repeat;
 }

@@ -1,6 +1,7 @@
 <?php 
-//Removed buttons to register contestants when maximum number of registrations are met or exceeded
-
+//Added "name" in $patterns to allow character "-" when validating names: https://github.com/zongordon/CORS/issues/74
+$contestant_age_min = '';
+$contestant_age_max = '';
 //Catch anything wrong with query
 try {
 // Select account data for the selected club
@@ -230,7 +231,7 @@ if (filter_input(INPUT_POST,"MM_insert_contestant") === "new_contestant") {
 
     $val = new Validation();
     $length = 5;//min length of strings
-    $val->name('namn')->value($insert_contestant_name)->pattern('words')->required()->min($length);
+    $val->name('namn')->value($insert_contestant_name)->pattern('name')->required()->min($length);
     $val->name('f&ouml;delsedatum')->value($insert_contestant_birth)->datePattern('Y-m-d')->required();
     $val->name('k&ouml;n')->value($insert_contestant_gender)->pattern('words')->required();
 	        
@@ -372,17 +373,17 @@ if (filter_input(INPUT_POST,"MM_insert_team") === "new_team") {
                 $min_birthday = $row_rsTeamMember['contestant_birth'];
                 $max_birthday = $min_birthday;
             }
-            elseif ($min_birthday == $row_rsTeamMember['contestant_birth']) {//The members's birth is the same as previous
+            elseif ($min_birthday === $row_rsTeamMember['contestant_birth']) {//The members's birth is the same as previous
             } 
             elseif ($min_birthday > $row_rsTeamMember['contestant_birth']) {//The members's birth is the earlier than previous
                 $min_birthday = $row_rsTeamMember['contestant_birth']; 
             }
-            elseif ($max_birthday == $row_rsTeamMember['contestant_birth']) {//The members's birth is the same as previous
+            elseif ($max_birthday === $row_rsTeamMember['contestant_birth']) {//The members's birth is the same as previous
             } 
             elseif ($max_birthday < $row_rsTeamMember['contestant_birth']) {//The members's birth is the later than previous
                 $max_birthday = $row_rsTeamMember['contestant_birth']; 
             }                
-        } else {//The conestant is not selected as team member    
+        } else {//The contestant is not selected as team member    
           }          
     }
 	if ($output_form === 'no') {
@@ -679,6 +680,7 @@ else {
     $calculate_age->contestant_team = $row_rsContestants['contestant_team'];
     $calculate_age->contestant_gender = $row_rsContestants['contestant_gender'];
     $calculate_age->contestant_gender_mix = 'Mix';
+    
      //Catch anything wrong with query
     try {
     //Select classes applicable for the contestant'S age and gender
@@ -711,7 +713,7 @@ else {
     $totalRows_rsClassData = $stmt_rsClassData->rowCount();   
     } catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
-    }
+    } 
     ?>
           <tr>
             <td><form id="new_registration" name="new_registration" method="POST" action="<?php echo $editFormAction; ?>">

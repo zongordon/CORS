@@ -1,5 +1,6 @@
 <?php 
-//Replace width="200" with class="wide_tbl" and removed  nowrap="nowrap"
+//Prevented error message before any club is selected (caused by comparing $row_rsAccount['account_id'] with NULL)
+//Changed code to calculate total cost for the club. https://github.com/zongordon/CORS/issues/73
 
 if (!isset($_SESSION)) {
   session_start();
@@ -41,14 +42,14 @@ $row_rsSelectedClub = $stmt_rsSelectedClub->fetch(PDO::FETCH_ASSOC);
 
 //Catch anything wrong with query
 try {
-// Select information regarding active accounts
+// Select coach names regarding active accounts
 require('Connections/DBconnection.php');           
-$query_rsCost = "SELECT coach_names, COUNT(reg_id), SUM(class_fee) FROM competition INNER JOIN classes USING(comp_id) "
+$query_rsCoachNames = "SELECT coach_names FROM competition INNER JOIN classes USING(comp_id) "
         . "INNER JOIN registration USING(class_id) INNER JOIN clubregistration USING (club_reg_id) INNER JOIN account "
         . "USING(account_id) WHERE account_id = :account_id AND comp_current = 1";
-$stmt_rsCost = $DBconnection->prepare($query_rsCost);
-$stmt_rsCost->execute(array(':account_id'=>$colname_rsSelectedClub));
-$row_rsCost = $stmt_rsCost->fetch(PDO::FETCH_ASSOC);
+$stmt_rsCoachNames = $DBconnection->prepare($query_rsCoachNames);
+$stmt_rsCoachNames->execute(array(':account_id'=>$colname_rsSelectedClub));
+$row_rsCoachNames = $stmt_rsCoachNames->fetch(PDO::FETCH_ASSOC);
 }   catch(PDOException $ex) {
         echo "An Error occured with queryX: ".$ex->getMessage();
     }
@@ -58,7 +59,7 @@ try {
 // Select registrations from selected account and class data from selected account and current competition
 require('Connections/DBconnection.php');           
 $query_rsRegistrations = "SELECT a.club_name, re.reg_id, re.contestant_height, co.contestant_name, cl.class_id, cl.class_team, "
-        . "cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age "
+        . "cl.class_category, cl.class_discipline, cl.class_gender, cl.class_gender_category, cl.class_weight_length, cl.class_age, cl.class_fee "
         . "FROM registration AS re INNER JOIN classes AS cl USING (class_id) INNER JOIN contestants AS co USING (contestant_id) "
         . "INNER JOIN competition as com USING (comp_id) INNER JOIN account as a USING (account_id) "
         . "WHERE account_id = :account_id AND comp_current = 1 ORDER BY cl.class_team, cl.class_discipline, cl.class_gender, "
@@ -84,7 +85,7 @@ include_once("includes/news_sponsors_nav.php");?>
 <!-- Include different navigation links depending on authority  -->
 <div id="localNav"><?php include("includes/navigation.php"); ?></div>
 <div id="content">    
-    <div class="feature">
+    <div class="feature">        
 <h3>Anm&auml;lningar, coacher och kostnad per klubb</h3>
 <p>Rapporten visar vilka anm&auml;lningar som gjorts till aktuell t&auml;vling, vilka coacher som anm&auml;lts och den sammanlagda kostnaden f&ouml;r vald klubb.</p>
 <p>V&auml;l klubb och klicka p&aring; V&auml;lj!</p>
@@ -94,13 +95,16 @@ include_once("includes/news_sponsors_nav.php");?>
             <td valign="middle">Klubb</td>
             <td><label>
               <select name="account_id" id="account_id">
-                <?php
+                <?php  
 foreach($row_rsAccounts as $row_rsAccount) {  
 ?>
                 <option value="<?php echo $row_rsAccount['account_id']?>"
-            <?php if (!(strcmp($row_rsAccount['account_id'], filter_input(INPUT_POST,'account_id')))) {
+            <?php
+                if (filter_input(INPUT_POST,'account_id') <> NULL){
+                  if (!(strcmp($row_rsAccount['account_id'], filter_input(INPUT_POST,'account_id')))) {
                     echo "selected=\"selected\""; 
-                  } ?>>
+                  }
+                }?>>
                 <?php echo $row_rsAccount['club_name']?>
                 </option>
 <?php
@@ -114,7 +118,8 @@ foreach($row_rsAccounts as $row_rsAccount) {
   <?php if ($totalRows_rsRegistrations == 0) { // Show if recordset empty ?>
     <p>Det finns inget resultat att visa!</p>
   <?php } ?>
-  <?php if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty ?>  
+  <?php if ($totalRows_rsRegistrations > 0) { // Show if recordset not empty 
+      $totalCost = 0; ?>  
       <table class="wide_tbl" border="1">
         <tr>
           <td><strong>Klubb</strong></td>
@@ -140,13 +145,15 @@ foreach($row_rsAccounts as $row_rsAccount) {
       if ($row_rsRegistrations['class_weight_length'] <> "-") {
          echo $row_rsRegistrations['class_weight_length']; 
       }
+      //Calculating total cost for the club
+      $totalCost = $totalCost + $row_rsRegistrations['class_fee'];
       ?></td>
         </tr>
         <?php } ?>
         <tr>
           <td valign="top"><strong>Antal&nbsp;anm&auml;lningar</strong>:<br/><?php echo $totalRows_rsRegistrations;?></td>
-          <td valign="top"><strong>Total kostnad</strong>:<br/><?php echo $row_rsCost['SUM(class_fee)'].' kr';?></td>
-          <td valign="top" colspan="2"><strong>Coacher</strong>:<br/><?php echo $row_rsCost['coach_names'];?></td>
+          <td valign="top"><strong>Total kostnad</strong>:<br/><?php echo $totalCost.' kr';?></td>
+          <td valign="top" colspan="2"><strong>Coacher</strong>:<br/><?php echo $row_rsCoachNames['coach_names'];?></td>
         </tr>        
     </table>
     <?php
@@ -159,7 +166,7 @@ foreach($row_rsAccounts as $row_rsAccount) {
 //Kill statements
 $stmt_rsAccounts->closeCursor();
 $stmt_rsRegistrations->closeCursor();
-$stmt_rsCost->closeCursor();
+$stmt_rsCoachNames->closeCursor();
 $stmt_rsSelectedClub->closeCursor();
 include("includes/footer.php");
 ?>
